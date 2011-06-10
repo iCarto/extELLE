@@ -57,5 +57,14 @@
 					action-command="SaveMap" position="2" name="save-map" />
 			</tool-bar>
 		</extension>
+
+		<extension class-name="es.udc.cartolab.gvsig.elle.EasyWMSExtension"
+			description="load_wms_easyly"
+			active="true">
+			<menu text="data_base_menu/WMS Sitga" icon="wms_sitga" position="5000"/>
+			<tool-bar name="ELLE">
+				<action-tool icon="wms_sitga" action-command="SITGA_WMS" tooltip="load_wms_easyly" position="5000"/>
+			</tool-bar>
+		</extension>
 	</extensions>
 </plugin-config>

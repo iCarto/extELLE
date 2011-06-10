@@ -24,5 +24,7 @@
 	<classpathentry kind="lib" path="lib/miglayout-3.7.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/extSymbology"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/extDBConnection"/>
+	<classpathentry kind="lib" path="/libFMap/lib/org.gvsig.fmap.raster.jar" sourcepath="/extRasterTools-SE"/>
+	<classpathentry kind="lib" path="/libFMap/lib/org.gvsig.raster.jar" sourcepath="/libRaster/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
