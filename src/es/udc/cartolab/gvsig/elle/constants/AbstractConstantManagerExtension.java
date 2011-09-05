@@ -11,21 +11,39 @@ public abstract class AbstractConstantManagerExtension extends Extension {
     // we have to cast the results of getConstants all the time
     // Maybe use another approach like define a IConstants interface for the
     // objects that handles the values itself will be useful
-    HashMap<String, Object> constants = new HashMap<String, Object>();
+    private HashMap<String, Object> constants = new HashMap<String, Object>();
+
+    // Each time setConstant or clearConstants is used previousConstant is
+    // updated
+    private HashMap<String, Object> previousConstants = null;
 
 
     public void setConstant(String constantName, Object constantValue) {
+	previousConstants = (HashMap<String, Object>) constants.clone();
+
 	// TODO: It should be better that the extension that implements this
 	// defined the available keys and here only set the value if the key
 	// already exists
 	constants.put(constantName, constantValue);
+
+    }
+
+    public void setConstants(HashMap<String, Object> constants) {
+	previousConstants = (HashMap<String, Object>) constants.clone();
+	constants = this.constants;
     }
 
     public Object getConstant(String constantName) {
 	return constants.get(constantName);
     }
 
+    public HashMap<String, Object> getPreviousConstants() {
+	return previousConstants;
+    }
+
     public void clearConstants() {
+	previousConstants = (HashMap<String, Object>) constants.clone();
+
 	// TODO: Maybe we should not clear, we should maintains the keys and put
 	// to null all the values of the entries
 	constants.clear();
