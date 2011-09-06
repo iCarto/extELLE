@@ -1,3 +1,25 @@
+/*
+ * This file is part of ELLE
+ * 
+ * Copyright (c) 2011. Empresa Pública de Obras e Servizos Hidráulicos
+ * 
+ * ELLE was originally developed by Cartolab, Cartography Laboratory from
+ * A Coruña University (Spain) directed by Fco. Alberto Varela Garcia
+ * http://www.cartolab.es
+ * 
+ * ELLE is free software: you can redistribute it and/or modify it under the terms
+ * of the GNU General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or any later version.
+ *
+ * ELLE is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with ELLE.
+ * If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+
 package es.udc.cartolab.gvsig.elle.constants;
 
 import java.net.URL;
@@ -6,6 +28,11 @@ import java.util.HashMap;
 import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
 
+/**
+ * 
+ * @author Francisco Puga <fpuga@cartolab.es>
+ * 
+ */
 public abstract class AbstractConstantManagerExtension extends Extension {
 
     // TODO: Use a Object HashMap allows handled complex "constants" like the
@@ -41,8 +68,8 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 	    url = this.getClass().getClassLoader().getResource(iconResourcePath);
 	    if (url == null) {
 		url = PluginServices
-			.getPluginServices("es.udc.cartolab.gvsig.elle")
-			.getClassLoader().getResource(iconResourcePath);
+		.getPluginServices("es.udc.cartolab.gvsig.elle")
+		.getClassLoader().getResource(iconResourcePath);
 	    }
 	    PluginServices.getIconTheme().registerDefault(iconIdentifier,url);
 	}

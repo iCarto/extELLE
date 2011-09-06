@@ -1,8 +1,12 @@
 /*
- * Copyright (c) 2011. Augas de Galicia.
- *
  * This file is part of ELLE
- *
+ * 
+ * Copyright (c) 2011. Empresa Pública de Obras e Servizos Hidráulicos
+ * 
+ * ELLE was originally developed by Cartolab, Cartography Laboratory from
+ * A Coruña University (Spain) directed by Fco. Alberto Varela Garcia
+ * http://www.cartolab.es
+ * 
  * ELLE is free software: you can redistribute it and/or modify it under the terms
  * of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or any later version.
@@ -14,7 +18,6 @@
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
  * 
- * ELLE was originally developed by Cartolab. http://www.cartolab.es
  */
 package es.udc.cartolab.gvsig.elle.constants;
 
