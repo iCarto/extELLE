@@ -17,6 +17,12 @@ public abstract class AbstractConstantManagerExtension extends Extension {
     // updated
     private HashMap<String, Object> previousConstants = null;
 
+    private ConstantStatusBarControl statusBar = null;
+
+    @Override
+    public void postInitialize() {
+	statusBar = new ConstantStatusBarControl();
+    }
 
     public void setConstant(String constantName, Object constantValue) {
 	previousConstants = (HashMap<String, Object>) constants.clone();
@@ -26,11 +32,14 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 	// already exists
 	constants.put(constantName, constantValue);
 
+	statusBar.setValue(getConstantsInfo());
     }
 
     public void setConstants(HashMap<String, Object> constants) {
 	previousConstants = (HashMap<String, Object>) constants.clone();
 	constants = this.constants;
+
+	statusBar.setValue(getConstantsInfo());
     }
 
     public Object getConstant(String constantName) {
@@ -47,6 +56,8 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 	// TODO: Maybe we should not clear, we should maintains the keys and put
 	// to null all the values of the entries
 	constants.clear();
+
+	statusBar.setValue(getConstantsInfo());
     }
 
     public boolean areConstantsSetFor(String constantName) {
@@ -57,6 +68,18 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 
 	return constants.get(constantName) != null;
     }
+
+    /**
+     * A representative text of the actual state of the constants. The value
+     * returned for this method is the message that will be used in the status
+     * bar
+     * 
+     * Implementation Example: 
+     * return "C: " + getConstant("Country") + " C: " + getConstant("Region");
+     * 
+     */
+    // String.format(format, args);
+    public abstract String getConstantsInfo();
 
     @Override
     public void execute(String actionCommand) {
