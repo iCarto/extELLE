@@ -1,7 +1,9 @@
 package es.udc.cartolab.gvsig.elle.constants;
 
+import java.net.URL;
 import java.util.HashMap;
 
+import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
 
 public abstract class AbstractConstantManagerExtension extends Extension {
@@ -19,9 +21,36 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 
     private ConstantStatusBarControl statusBar = null;
 
-    @Override
-    public void postInitialize() {
+    /**
+     * The identifiers of the icons that appears in the config.xml related to
+     * elle-constants extensions. The images should be present in the images
+     * folder of the plugin and have .png as extensions. This field can be
+     * override to use your own names
+     * 
+     * If the image exists in your own plugin the image provided by your plugin
+     * will be used, if not exists the image used will the image provided in
+     * elle
+     */
+    protected String[] iconsIdentifiers = {"zoom-to-constants", "select-constants"};
+
+    private void registerIcons() {
+	URL url = null;
+
+	for (String iconIdentifier:iconsIdentifiers) {
+	    String iconResourcePath = "images/" + iconIdentifier + ".png";
+	    url = this.getClass().getClassLoader().getResource(iconResourcePath);
+	    if (url == null) {
+		url = PluginServices
+			.getPluginServices("es.udc.cartolab.gvsig.elle")
+			.getClassLoader().getResource(iconResourcePath);
+	    }
+	    PluginServices.getIconTheme().registerDefault(iconIdentifier,url);
+	}
+    }
+
+    public void initialize() {
 	statusBar = new ConstantStatusBarControl();
+	registerIcons();
     }
 
     public void setConstant(String constantName, Object constantValue) {
@@ -74,15 +103,12 @@ public abstract class AbstractConstantManagerExtension extends Extension {
      * returned for this method is the message that will be used in the status
      * bar
      * 
-     * Implementation Example: 
+     * Implementation Example:
      * return "C: " + getConstant("Country") + " C: " + getConstant("Region");
      * 
      */
     // String.format(format, args);
     public abstract String getConstantsInfo();
 
-    @Override
-    public void execute(String actionCommand) {
-    }
 
 }

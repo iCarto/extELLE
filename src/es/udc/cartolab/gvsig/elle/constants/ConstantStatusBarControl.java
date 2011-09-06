@@ -72,15 +72,15 @@ public class ConstantStatusBarControl extends JLabel implements IControl {
 	return controlNotExistsJet;
     }
 
-    @Override
+
     public void addActionListener(ActionListener listener) {
     }
 
-    @Override
+
     public void removeActionListener(ActionListener listener) {
     }
 
-    @Override
+
     public Object setValue(Object value) {
 	setText(value.toString());
 	return value;
