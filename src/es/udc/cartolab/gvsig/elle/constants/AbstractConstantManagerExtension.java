@@ -24,9 +24,11 @@ package es.udc.cartolab.gvsig.elle.constants;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
+import com.iver.andami.plugins.IExtension;
 
 /**
  * 
@@ -47,6 +49,9 @@ public abstract class AbstractConstantManagerExtension extends Extension {
     private HashMap<String, Object> previousConstants = null;
 
     private ConstantStatusBarControl statusBar = null;
+
+    private TreeMap<String, String> constantsNamesInStatusBar;
+
 
     /**
      * The identifiers of the icons that appears in the config.xml related to
@@ -77,6 +82,7 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 
     public void initialize() {
 	statusBar = new ConstantStatusBarControl();
+	statusBar.register((Class<IExtension>) this.getClass());
 	registerIcons();
     }
 
@@ -98,12 +104,31 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 	statusBar.setValue(getConstantsInfo());
     }
 
+    /**
+     * For the constants that we want to be showed in some form in the status
+     * bar we should provide a String that will represent it's name in the bar.
+     * The value will be automatically get. Here we must put only the constants
+     * that we want that appear in the bar, there is not need to put all of it
+     */
+    public void setConstantsNamesInStatusBar(
+	    TreeMap<String, String> constantsNamesInStatusBar) {
+	this.constantsNamesInStatusBar = constantsNamesInStatusBar;
+    }
+
     public Object getConstant(String constantName) {
 	return constants.get(constantName);
     }
 
+    public HashMap<String, Object> getConstants() {
+	return constants;
+    }
+
     public HashMap<String, Object> getPreviousConstants() {
 	return previousConstants;
+    }
+
+    public TreeMap<String, String> getConstantsNamesInStatusBar() {
+	return constantsNamesInStatusBar;
     }
 
     public void clearConstants() {
@@ -125,17 +150,47 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 	return constants.get(constantName) != null;
     }
 
+    /*****************************************************************************
+     * METHODS TO REPRESENT THE INFORMATION IN THE STATUS BAR fpuga. I not
+     * really like this approach. Probably it should be in another but i can't
+     * figure now an easy to implement / easy to use by third party extension
+     * way to do this
+     * ****************************************************************************/
+
+    /**
+     * String to use for represent the not set constants
+     */
+    private String nullCharacter = "-";
+
+    public void setNullCharacter(String nullCharacter) {
+	this.nullCharacter = nullCharacter;
+    }
+
     /**
      * A representative text of the actual state of the constants. The value
      * returned for this method is the message that will be used in the status
      * bar
      * 
-     * Implementation Example:
-     * return "C: " + getConstant("Country") + " C: " + getConstant("Region");
-     * 
+     * Child can override this method to get a more acquired representation
      */
-    // String.format(format, args);
-    public abstract String getConstantsInfo();
+    public String getConstantsInfo() {
+	StringBuilder s = new StringBuilder();
+	for (String k : constantsNamesInStatusBar.keySet()) {
+	    s.append(constantsNamesInStatusBar.get(k));
+	    s.append(": ");
+	    s.append(nullToString(constants.get(k)));
+	    s.append(" ");
+	}
 
+	return s.toString();
+    }
+
+    private String nullToString(Object s) {
+	if ((s == null) || (s.toString().trim().isEmpty())) {
+	    return nullCharacter;
+	} else {
+	    return s.toString();
+	}
+    }
 
 }

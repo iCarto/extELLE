@@ -44,10 +44,7 @@ public class ConstantStatusBarControl extends JLabel implements IControl {
 
     private String name = "ELLE_CONSTANTS";
 
-    /**
-     * String to use for represent the not set constants
-     */
-    private String nullCharacter = "-";
+    
 
     public ConstantStatusBarControl() {
 	super();
@@ -56,18 +53,19 @@ public class ConstantStatusBarControl extends JLabel implements IControl {
     }
 
     /**
-     * If a bar with this name not exists jet in the StatusBar, this bar is
-     * added
+     * Associates this bar with an Extension and adds this bar to the StatusBar
+     * if a bar with this name not exists jet in the StatusBar. If a bar with
+     * this name already exists does nothing
      * 
      * @param extension
      *            The extension that will control the visibility and enability
      *            of this bar
-     * @return true if a bar whit this name not exists jet in the status bar
+     * @return true if a bar with this name not exists jet in the status bar
      */
-    public boolean addThisStatusBarControl(Class<IExtension> extension) {
+    public boolean register(Class<IExtension> extension) {
 	boolean controlNotExistsJet = false;
 
-	if (PluginServices.getMainFrame().getStatusBar().getControl(name) != null) {
+	if (PluginServices.getMainFrame().getStatusBar().getControl(name) == null) {
 	    PluginServices.getMainFrame().addStatusBarControl(extension, this);
 	    controlNotExistsJet = true;
 	}
@@ -99,15 +97,5 @@ public class ConstantStatusBarControl extends JLabel implements IControl {
 	this.name = name;
     }
 
-    public void setNullCharacter(String nullCharacter) {
-	this.nullCharacter = nullCharacter;
-    }
-
-    private String nullToString(String s) {
-	if ((s == null) || (s.trim().isEmpty())) {
-	    return nullCharacter;
-	} else {
-	    return s;
-	}
-    }
+    
 }
