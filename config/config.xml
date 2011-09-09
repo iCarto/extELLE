@@ -61,9 +61,9 @@
 		<extension class-name="es.udc.cartolab.gvsig.elle.EasyWMSExtension"
 			description="load_wms_easyly"
 			active="true">
-			<menu text="data_base_menu/WMS Sitga" icon="wms_sitga" position="5000"/>
+			<menu text="Expropiaciones/Cargar Planos Fincas WMS" icon="planos_wms" position="5000"/>
 			<tool-bar name="ELLE">
-				<action-tool icon="wms_sitga" action-command="SITGA_WMS" tooltip="load_wms_easyly" position="5000"/>
+				<action-tool icon="planos_wms" action-command="SITGA_WMS" tooltip="Cargar Planos Fincas WMS" position="5000"/>
 			</tool-bar>
 		</extension>
 	</extensions>
