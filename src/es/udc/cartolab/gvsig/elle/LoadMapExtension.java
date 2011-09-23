@@ -20,6 +20,7 @@ import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
 import com.iver.andami.preferences.IPreference;
 import com.iver.andami.preferences.IPreferenceExtension;
+import com.iver.andami.ui.mdiManager.IWindow;
 import com.iver.cit.gvsig.About;
 import com.iver.cit.gvsig.AddLayer;
 import com.iver.cit.gvsig.ProjectExtension;
@@ -39,27 +40,41 @@ public class LoadMapExtension extends Extension implements IPreferenceExtension 
     public static EllePreferencesPage ellePreferencesPage = new EllePreferencesPage();
 
     public void execute(String actionCommand) {
-	ProjectExtension pExt = (ProjectExtension) PluginServices
-		.getExtension(ProjectExtension.class);
-	Project project = pExt.getProject();
+	View view = createViewIfNeeded();
+	LoadMapWizard wizard = new LoadMapWizard(view);
+	wizard.open();
+    }
 
-	// creating view and add it to the project
-	if (!(PluginServices.getMDIManager().getActiveWindow() instanceof View)) {
+    /**
+     * If the active window is a View returns it, if not creates a new one, adds
+     * it to the project and returns it
+     */
+    protected View createViewIfNeeded() {
+
+	// TODO: fpuga: Check what happens when exists a view in the project but
+	// is not active
+	IWindow iWindow = PluginServices.getMDIManager().getActiveWindow();
+	View view = null;
+
+	if (iWindow instanceof View) {
+	    view = (View) iWindow;
+	} else {
+	    ProjectExtension pExt = (ProjectExtension) PluginServices
+		    .getExtension(ProjectExtension.class);
+	    Project project = pExt.getProject();
 	    ProjectView doc = ProjectFactory.createView(null);
 	    doc.setName("ELLE View");
 	    doc.setProject(project, 0);
 	    project.addDocument(doc);
 	    // Opening view
-	    View elleView = new View();
-	    elleView.initialize();
-	    elleView.setModel(doc);
-	    elleView.getWindowInfo().setMaximizable(true);
-	    elleView.getWindowInfo().setMaximized(true);
-	    PluginServices.getMDIManager().addWindow(elleView);
+	    view = new View();
+	    view.initialize();
+	    view.setModel(doc);
+	    view.getWindowInfo().setMaximizable(true);
+	    view.getWindowInfo().setMaximized(true);
+	    PluginServices.getMDIManager().addWindow(view);
 	}
-	LoadMapWizard wizard = new LoadMapWizard((View) PluginServices
-		.getMDIManager().getActiveWindow());
-	wizard.open();
+	return view;
     }
 
     public void initialize() {
