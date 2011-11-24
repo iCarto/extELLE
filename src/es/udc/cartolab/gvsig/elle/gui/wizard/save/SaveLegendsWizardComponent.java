@@ -156,7 +156,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 		group.add(databaseRB);
 		group.add(fileRB);
 
-		noLegendRB.setSelected(true);
+		databaseRB.setSelected(true);
 
 		return panelOptions;
 	}
@@ -168,6 +168,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 		"[]"));
 
 		overviewCHB = new JCheckBox(PluginServices.getText(this, "save_overview_legends"));
+		overviewCHB.setSelected(true);
 		overviewCHB.addActionListener(new ActionListener() {
 
 
@@ -250,7 +251,6 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
 		} else {
 			panel.add(new JLabel(PluginServices.getText(this, "notConnectedError")));
-			databaseRB.setEnabled(false);
 		}
 
 		return panel;

@@ -110,6 +110,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 		//map overview
 		overviewChb = new JCheckBox(PluginServices.getText(this, "save_overview"));
+		overviewChb.setSelected(true);
 
 		//map name
 		JPanel namePanel = new JPanel();
