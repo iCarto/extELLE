@@ -65,52 +65,31 @@ public class ElleWizard extends WizardPanel {
 			//load layer
 			IProjection proj = crsPanel.getCurProj();
 			int[] selectedPos = layerList.getSelectedIndices();
+
+	    try {
 			if (selectedPos.length > 1) {
-				layer = new FLayers();
-				((FLayers) layer).setName("ELLE");
-				((FLayers) layer).setMapContext(view.getMapControl().getMapContext());
-
-				try {
-					for (int pos : selectedPos) {
-						((FLayers)layer).addLayer(getLayer(pos, proj));
-					}
-				} catch (SQLException e) {
-					JOptionPane.showMessageDialog(this,
-							"SQLException: " + e.getMessage(),
-							"SQL Error",
-							JOptionPane.ERROR_MESSAGE);
-					try {
-						dbs = DBSession.reconnect();
-					} catch (DBException e1) {
-						e1.printStackTrace();
-					}
-				} catch (DBException e) {
-					JOptionPane.showMessageDialog(this,
-							"SQLException: " + e.getMessage(),
-							"DB Error",
-							JOptionPane.ERROR_MESSAGE);
-				}
-
+		    // TODO: Users should have a preference to say if the want
+		    // to load the layers in a group or not.
+				layer = layersAsTocGroup(proj,
+					selectedPos);
 			} else {
 				int pos = layerList.getSelectedIndex();
+		    layer = getLayer(pos, proj);
+
+		}
+	    } catch (SQLException e) {
+		JOptionPane.showMessageDialog(this,
+			"SQLException: " + e.getMessage(), "SQL Error",
+			JOptionPane.ERROR_MESSAGE);
 				try {
-					layer = getLayer(pos, proj);
-				} catch (SQLException e) {
-					JOptionPane.showMessageDialog(this,
-							"SQLException: " + e.getMessage(),
-							"SQL Error",
-							JOptionPane.ERROR_MESSAGE);
-					try {
-						dbs = DBSession.reconnect();
-					} catch (DBException e1) {
-						e1.printStackTrace();
-					}
-				} catch (DBException e) {
-					JOptionPane.showMessageDialog(this,
-							"SQLException: " + e.getMessage(),
-							"DB Error",
-							JOptionPane.ERROR_MESSAGE);
+		    dbs = DBSession.reconnect();
+		} catch (DBException e1) {
+		    e1.printStackTrace();
 				}
+	    } catch (DBException e) {
+		JOptionPane.showMessageDialog(this,
+			"SQLException: " + e.getMessage(), "DB Error",
+			JOptionPane.ERROR_MESSAGE);
 			}
 			PluginServices.getMDIManager().restoreCursor();
 		} else {
@@ -122,6 +101,19 @@ public class ElleWizard extends WizardPanel {
 		}
 
 		return layer;
+	}
+
+	private FLayer layersAsTocGroup(IProjection proj,
+ int[] selectedPos)
+	    throws SQLException, DBException {
+	FLayers layers = new FLayers();
+	layers.setName("ELLE");
+	layers.setMapContext(view.getMapControl().getMapContext());
+	for (int pos : selectedPos) {
+	    layers.addLayer(getLayer(pos, proj));
+	}
+
+	return layers;
 	}
 
 	protected String getWhereClause() {
