@@ -91,12 +91,12 @@ public class MapDAO {
 
 		DBSession dbs = DBSession.getCurrentSession();
 		if (dbs != null) {
-			String where = "WHERE mapa='" + mapName + "'";
+			String where = "WHERE map_name='" + mapName + "'";
 
-			System.out.println(where);
 
 			/////////////// MapControl
-			String[][] layers = dbs.getTable("_map", dbs.getSchema(), where, new String[]{"posicion"}, false);
+			String[][] layers = dbs.getTable("_map", dbs.getSchema(), where,
+					new String[] { "position" }, false);
 
 			for (int i=0; i<layers.length; i++) {
 				String schema=null;
@@ -157,10 +157,11 @@ public class MapDAO {
 
 		DBSession dbs = DBSession.getCurrentSession();
 		if (dbs != null) {
-			String where = "WHERE mapa='" + mapName + "'";
+			String where = "WHERE map_name='" + mapName + "'";
 
 			System.out.println(where);
-			String[][] layersOV = dbs.getTable("_map_overview", dbs.getSchema(), where, new String[]{"posicion"}, false);
+			String[][] layersOV = dbs.getTable("_map_overview",
+					dbs.getSchema(), where, new String[] { "position" }, false);
 
 			for (int i = 0; i < layersOV.length; i++) {
 				String schema = null;
@@ -276,7 +277,6 @@ public class MapDAO {
 	}
 
 	public  boolean mapExists(String mapName) throws SQLException {
-
 	String[] maps = getMaps();
 	for (String map : maps) {
 	    if (mapName.equals(map)) {
@@ -321,8 +321,10 @@ public class MapDAO {
 			}
 		}
 		//remove previous entries and rename aux table
-		dbs.deleteRows(dbs.getSchema(), "_map", "where mapa='" + mapName + "'");
-		dbs.updateRows(dbs.getSchema(), "_map", new String[]{"mapa"}, new String[]{mapName}, "where mapa='" + auxMapName + "'");
+		dbs.deleteRows(dbs.getSchema(), "_map", "where map_name='" + mapName
+				+ "'");
+		dbs.updateRows(dbs.getSchema(), "_map", new String[] { "map_name" },
+				new String[] { mapName }, "where map_name='" + auxMapName + "'");
 	}
 
 	public  void saveMapOverview(Object[][] rows, String mapName) throws SQLException {
@@ -359,7 +361,8 @@ public class MapDAO {
 					//undo insertions
 					try {
 						dbs = DBSession.reconnect();
-						dbs.deleteRows(dbs.getSchema(), "_map_overview", "where mapa='" + auxMapname + "'");
+						dbs.deleteRows(dbs.getSchema(), "_map_overview",
+								"where map_name='" + auxMapname + "'");
 						throw new SQLException(e);
 					} catch (DBException e1) {
 						// TODO Auto-generated catch block
@@ -369,8 +372,11 @@ public class MapDAO {
 			}
 		}
 		//remove previous entries and rename aux table
-		dbs.deleteRows(dbs.getSchema(), "_map_overview", "where mapa='" + mapName + "'");
-		dbs.updateRows(dbs.getSchema(), "_map_overview", new String[]{"mapa"}, new String[]{mapName}, "where mapa='" + auxMapname + "'");
+		dbs.deleteRows(dbs.getSchema(), "_map_overview", "where map_name='"
+				+ mapName + "'");
+		dbs.updateRows(dbs.getSchema(), "_map_overview",
+				new String[] { "map_name" }, new String[] { mapName },
+				"where map_name='" + auxMapname + "'");
 
 	}
 
@@ -382,27 +388,28 @@ public class MapDAO {
 
 		String sqlCreateMap = "CREATE TABLE " + dbs.getSchema() +"._map "
 		+ "("
-		+ "   mapa character varying(255) NOT NULL,"
-		+ "   nombre_capa character varying(255) NOT NULL,"
-		+ "   nombre_tabla character varying(255),"
-		+ "   posicion integer NOT NULL DEFAULT 0,"
-		+ "   visible boolean,"
-		+ "   max_escala character varying(50),"
-		+ "   min_escala character varying(50),"
-		+ "   grupo character varying,"
-		+ "   \"schema\" character varying,"
-		+ "   localizador boolean,"
-		+ "   PRIMARY KEY (mapa, nombre_capa)"
+ + "   map_name character varying(255) NOT NULL,"
+				+ "   group_toc_name character varying(255),"
+				+ "   layer_toc_name character varying(255) NOT NULL,"
+				+ "   toc_position integer NOT NULL DEFAULT 0,"
+				+ "   visible boolean DEFAULT TRUE,"
+				+ "   max_scale character varying(50),"
+				+ "   min_scale character varying(50),"
+				+ "   overview boolean DEFAULT FALSE,"
+				+ "   schemaName character varying(255) NOT NULL,"
+				+ "   layerDBName character varying(255) NOT NULL,"
+				+ "   sql_restriction character varying,"
+				+ "   PRIMARY KEY (map_name, group_toc_name, layer_toc_name)"
 		+ ")";
 
 		String sqlCreateMapOverview =  "CREATE TABLE " + dbs.getSchema() + "._map_overview"
 		+ "("
-		+ "  mapa character varying NOT NULL,"
-		+ "  nombre_capa character varying NOT NULL,"
-		+ "  \"schema\" character varying,"
-		+ "  posicion integer,"
-		+ "  nombre_tabla character varying,"
-		+ "  PRIMARY KEY (mapa, nombre_capa)"
+				+ "  map_name character varying(255) NOT NULL,"
+				+ "  layer_toc_name character varying(255) NOT NULL,"
+				+ "  toc_position integer NOT NULL DEFAULT 0,"
+				+ "  schemaName character varying(255) NOT NULL,"
+				+ "  layerDBName character varying(255) NOT NULL,"
+				+ "  PRIMARY KEY (map_name, layer_toc_name)"
 		+ ")";
 
 		String sqlGrant = "GRANT SELECT ON TABLE " + dbs.getSchema() + ".%s TO public";
@@ -429,8 +436,10 @@ public class MapDAO {
 
 	public  void deleteMap(String mapName) throws SQLException {
 		DBSession dbs = DBSession.getCurrentSession();
-		String removeMap = "DELETE FROM " + dbs.getSchema() + "._map WHERE mapa=?";
-		String removeMapOverview = "DELETE FROM " + dbs.getSchema() + "._map_overview WHERE mapa=?";
+		String removeMap = "DELETE FROM " + dbs.getSchema()
+				+ "._map WHERE map_name=?";
+		String removeMapOverview = "DELETE FROM " + dbs.getSchema()
+				+ "._map_overview WHERE map_name=?";
 
 		PreparedStatement ps = dbs.getJavaConnection().prepareStatement(removeMap);
 		ps.setString(1, mapName);

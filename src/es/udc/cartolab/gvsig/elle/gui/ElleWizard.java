@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2010. CartoLab, Universidad de A Coruña
- * 
+ *
  * This file is part of ELLE
- * 
+ *
  * ELLE is free software: you can redistribute it and/or modify it under the terms
  * of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or any later version.
- * 
+ *
  * ELLE is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
 */
@@ -196,9 +196,7 @@ public class ElleWizard extends WizardPanel {
 				dbs = DBSession.getCurrentSession();
 
 				if (dbs.tableExists(dbs.getSchema(), "_map")) {
-
 		    String[] maps = MapDAO.getInstance().getMaps();
-
 					layerList = form.getList("layerList");
 					groupList = form.getList("groupList");
 					groupList.setListData(maps);
@@ -208,7 +206,10 @@ public class ElleWizard extends WizardPanel {
 						public void valueChanged(ListSelectionEvent arg0) {
 							int[] selected = groupList.getSelectedIndices();
 							if (selected.length == 1) {
-								String where = String.format("where mapa ='%s'", groupList.getSelectedValues()[0]);
+										String where = String
+												.format("where map_name ='%s'",
+														groupList
+																.getSelectedValues()[0]);
 								try {
 									layers = dbs.getTable("_map", where);
 								} catch (SQLException e) {

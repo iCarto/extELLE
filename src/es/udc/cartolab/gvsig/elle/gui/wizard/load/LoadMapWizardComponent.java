@@ -111,7 +111,6 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 				dbs = DBSession.getCurrentSession();
 
 				if (dbs.tableExists(dbs.getSchema(), "_map") && dbs.tableExists(dbs.getSchema(), "_map_overview")) {
-
 		    String[] maps = MapDAO.getInstance().getMaps();
 
 					//layerList = form.getList("layerList");
@@ -135,7 +134,8 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 
 							if (selected.length == 1) {
 								String selectedValue = (String) mapList.getSelectedValues()[0];
-								String where = String.format("WHERE mapa = '%s'", selectedValue);
+								String where = String.format(
+										"WHERE map_name = '%s'", selectedValue);
 								try {
 									layers = dbs.getTable("_map", dbs.getSchema(), where, new String[]{"posicion"}, true);
 									String layerText = "";
