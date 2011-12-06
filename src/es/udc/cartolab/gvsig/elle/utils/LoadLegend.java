@@ -313,9 +313,19 @@ public abstract class LoadLegend {
 
 	}
 
-	private static void loadDBLegend(FLyrVect layer, String styleName, boolean overview) throws SQLException, IOException {
-
-		String table;
+    /**
+     * 
+     * @param layerName
+     * @param styleName
+     * @param overview
+     * @return [0][0] = layerName [0][1] = styleName [0][2] = sld/gvl [0][3] =
+     *         definition
+     * 
+     * @throws SQLException
+     */
+    public static String[][] getLegendFromDB(String layerName,
+	    String styleName, boolean overview) throws SQLException {
+	String table;
 		if (overview) {
 			table = "_map_overview_style";
 		} else {
@@ -323,19 +333,34 @@ public abstract class LoadLegend {
 		}
 
 		DBSession dbs = DBSession.getCurrentSession();
-		String layerName = layer.getName();
-//		String styleName = dbCB.getSelectedItem().toString();
-		String[][] style = dbs.getTable(table, "where nombre_capa='" + layerName + "' and nombre_estilo='" + styleName + "'");
-		if (style.length == 1) {
-			String type = style[0][2];
-			String def = style[0][3];
+	String[][] style = dbs.getTable(table, "where nombre_capa='"
+		+ layerName + "' and nombre_estilo='" + styleName + "'");
+	return style;
+    }
 
-			File tmpLegend = File.createTempFile("style", layerName + "." + type);
-			FileWriter writer = new FileWriter(tmpLegend);
-			writer.write(def);
-			writer.close();
-			setLegend(layer, tmpLegend.getAbsolutePath(), true);
-		}
+    public static String writeDBLegendOnDisc(String[][] style)
+	    throws IOException {
+	String legendOnDiscPath = null;
+	if (style.length == 1) {
+	    String layerName = style[0][0];
+	    String type = style[0][2];
+	    String def = style[0][3];
+	    File tmpLegend = File.createTempFile("style", layerName + "."
+		    + type);
+	    FileWriter writer = new FileWriter(tmpLegend);
+	    writer.write(def);
+	    writer.close();
+	    legendOnDiscPath = tmpLegend.getAbsolutePath();
+	}
+	return legendOnDiscPath;
+    }
+
+    public static String loadDBLegend(FLyrVect layer, String styleName,
+	    boolean overview) throws SQLException, IOException {
+
+		String layerName = layer.getName();
+	String[][] style = getLegendFromDB(layerName, styleName, overview);
+	return writeDBLegendOnDisc(style);
 	}
 
 	private static void loadFileLegend(FLyrVect layer, String styleName, boolean overview) {
@@ -349,23 +374,25 @@ public abstract class LoadLegend {
 		}
 	}
 
-	public static void loadLegend(FLyrVect layer, String styleName, boolean overview, int source) throws SQLException, IOException {
+    public static void loadLegend(FLyrVect layer, String styleName,
+	    boolean overview, int source) throws SQLException, IOException {
 
-		switch (source) {
-		case DB_LEGEND : loadDBLegend(layer, styleName, overview);
-		break;
-		case FILE_LEGEND : loadFileLegend(layer, styleName, overview);
-		break;
-
-		}
-
-		for (ELLEMap map : MapDAO.getInstance().getLoadedMaps()) {
-			if (map.layerInMap(layer.getName())) {
-				map.setStyleSource(source);
-				map.setStyleName(styleName);
-			}
-		}
-
+	switch (source) {
+	case DB_LEGEND:
+	    legendPath = loadDBLegend(layer, styleName, overview);
+	    setLegend(layer, legendPath, true);
+	    break;
+	case FILE_LEGEND:
+	    loadFileLegend(layer, styleName, overview);
+	    break;
 	}
+
+	for (ELLEMap map : MapDAO.getInstance().getLoadedMaps()) {
+	    if (map.layerInMap(layer.getName())) {
+		map.setStyleSource(source);
+		map.setStyleName(styleName);
+	    }
+	}
+    }
 
 }
