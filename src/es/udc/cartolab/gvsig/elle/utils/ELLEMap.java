@@ -155,11 +155,11 @@ public class ELLEMap {
 		Collections.sort(layers);
 		for (LayerProperties lp : layers) {
 			FLayers group;
-			if (!lp.getGroup().equals("")) {
-				group = getGroup(view.getMapControl().getMapContext().getLayers(), lp.getGroup());
+			if (!lp.getGroupTOCName().equals("")) {
+				group = getGroup(view.getMapControl().getMapContext().getLayers(), lp.getGroupTOCName());
 				if (group == null) {
 					group = new FLayers();
-					group.setName(lp.getGroup());
+					group.setName(lp.getGroupTOCName());
 					group.setMapContext(view.getMapControl().getMapContext());
 					view.getMapControl().getMapContext().getLayers().addLayer(group);
 				}
@@ -169,7 +169,7 @@ public class ELLEMap {
 
 			FLayer layer;
 			try {
-				layer = getMapDAO().getLayer(lp, whereClause, proj);
+		layer = getMapDAO().getLayer(lp, lp.getSQLRestriction(), proj);
 				if (layer!=null) {
 					if (lp.getMaxScale()>-1) {
 						layer.setMaxScale(lp.getMaxScale());
@@ -202,7 +202,8 @@ public class ELLEMap {
 		Collections.sort(overviewLayers);
 		for (LayerProperties lp : overviewLayers) {
 			try {
-				FLayer ovLayer = getMapDAO().getLayer(lp, whereClause, proj);
+		FLayer ovLayer = getMapDAO().getLayer(lp,
+			lp.getSQLRestriction(), proj);
 				ovLayer.setVisible(true);
 				view.getMapOverview().getMapContext().beginAtomicEvent();
 				// FLayer ovLayer = layer.cloneLayer(); // why this????
@@ -265,7 +266,7 @@ public class ELLEMap {
 			if (layer != null) {
 				view.getMapControl().getMapContext().getLayers().removeLayer(layer);
 			}
-			FLayer group = view.getMapControl().getMapContext().getLayers().getLayer(lp.getGroup());
+			FLayer group = view.getMapControl().getMapContext().getLayers().getLayer(lp.getGroupTOCName());
 			if (group!=null && group instanceof FLayers && ((FLayers) group).getLayersCount()==0) {
 				view.getMapControl().getMapContext().getLayers().removeLayer(group);
 			}

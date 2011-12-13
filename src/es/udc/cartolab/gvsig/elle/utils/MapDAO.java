@@ -77,7 +77,7 @@ public class MapDAO {
 
 	public FLayer getLayer(LayerProperties lp, String whereClause, IProjection proj) throws SQLException, DBException {
 		return getLayer(lp.getLayername(), lp.getTablename(), lp.getSchema(),
-				whereClause, proj, lp.visible());
+		lp.getSQLRestriction(), proj, lp.visible());
 	}
 
 	public ELLEMap getMap(View view, String mapName, String whereClause) throws Exception {
@@ -95,25 +95,35 @@ public class MapDAO {
 
 
 			/////////////// MapControl
-			String[][] layers = dbs.getTable("_map", dbs.getSchema(), where,
-					new String[] { "position" }, false);
+	    String[][] layers = dbs.getTable("_map", dbs.getSchema(),
+		    new String[] { "group_toc_name", // 0
+			    "layer_toc_name", // 1
+			    "toc_position", // 2
+			    "visible", // 3
+			    "max_scale", // 4
+			    "min_scale", // 5
+			    "schemaname", // 6
+			    "layerdbname", // 7
+			    "sql_restriction" // 8
+		    }, where, new String[] { "toc_position" }, false);
 
 			for (int i=0; i<layers.length; i++) {
 				String schema=null;
-				if (layers[i][8].length()>0) {
-					schema = layers[i][8];
+		if (layers[i][6].length() > 0) {
+		    schema = layers[i][6];
 				}
-				LayerProperties lp = new LayerProperties(schema, layers[i][2], layers[i][1]);
+		LayerProperties lp = new LayerProperties(schema, layers[i][7],
+			layers[i][1]);
 
 				boolean visible = true;
-				if (!layers[i][4].equalsIgnoreCase("t")) {
+		if (!layers[i][3].equalsIgnoreCase("t")) {
 					visible = false;
 				}
 				lp.setVisible(visible);
 
 				double maxScale = -1;
 				try {
-					maxScale = Double.parseDouble(layers[i][5]);
+		    maxScale = Double.parseDouble(layers[i][4]);
 				} catch (NumberFormatException e) {
 					//do nothing
 				}
@@ -123,7 +133,7 @@ public class MapDAO {
 
 				double minScale = -1;
 				try {
-					minScale = Double.parseDouble(layers[i][6]);
+		    minScale = Double.parseDouble(layers[i][5]);
 				} catch (NumberFormatException e) {
 					//do nothing
 				}
@@ -133,14 +143,15 @@ public class MapDAO {
 
 				int position = 0;
 				try {
-					position = Integer.parseInt(layers[i][4]);
+		    position = Integer.parseInt(layers[i][2]);
 				} catch (NumberFormatException e) {
 					//do nothing
 				}
 
 				lp.setPosition(position);
 
-				lp.setGroup(layers[i][7]);
+		lp.setGroup(layers[i][0]);
+		lp.setSQLRestriction(layers[i][8]);
 
 				viewLayers.add(lp);
 			}
@@ -159,9 +170,12 @@ public class MapDAO {
 		if (dbs != null) {
 			String where = "WHERE map_name='" + mapName + "'";
 
-			System.out.println(where);
-			String[][] layersOV = dbs.getTable("_map_overview",
-					dbs.getSchema(), where, new String[] { "position" }, false);
+	    String[][] layersOV = dbs.getTable("_map_overview",
+		    dbs.getSchema(), new String[] { "layer_toc_name", // 0
+			    "toc_position", // 1
+			    "schemaname", // 2
+			    "layerdbname" // 3
+		    }, where, new String[] { "toc_position" }, false);
 
 			for (int i = 0; i < layersOV.length; i++) {
 				String schema = null;
@@ -169,16 +183,12 @@ public class MapDAO {
 					schema = layersOV[i][2];
 				}
 
-				LayerProperties lp = null;
-				try {
-					lp = new LayerProperties(schema, layersOV[i][4], layersOV[i][1]);
-				} catch (IndexOutOfBoundsException e) {
-					lp = new LayerProperties(schema, layersOV[i][1], layersOV[i][1]);
-				}
+		LayerProperties lp = new LayerProperties(schema,
+			layersOV[i][3], layersOV[i][0]);
 
 				int position = 0;
 				try {
-					position = Integer.parseInt(layersOV[i][3]);
+		    position = Integer.parseInt(layersOV[i][1]);
 				} catch (NumberFormatException e) {
 					//do nothing
 				}
@@ -192,56 +202,69 @@ public class MapDAO {
 		return overviewLayers;
 	}
 
-	/**
-	 * Get layers querying on '_map' table to the MapView.
-	 * Get layers querying on '_map_overview' table to the MapOverView.
-	 *
-	 * _MAP SCHEMA:
-	 * 0.- mapa character varying(255) NOT NULL,
-	 * 1.- nombre_capa character varying(255) NOT NULL,
-	 * 2.- nombre_tabla character varying(255),
-	 * 3.- posicion integer NOT NULL DEFAULT 0,
-	 * 4.- visible boolean,
-	 * 5.- max_escala character varying(50),
-	 * 6.- min_escala character varying(50),
-	 * 7.- grupo character varying,
-	 * 8.- "schema" character varying,
-	 * 9.- localizador boolean
-	 *
-	 *
-	 *
-	 * @param view
-	 * @param mapName
-	 * @param proj
-	 * @param whereClause
-	 * @param stylesSource must fit with LoadLegend's NO_LEGEND, DB_LEGEND or FILE_LEGEND
-	 * @param stylesName
-	 * @throws Exception
-	 */
+    /**
+     *
+     * @param lp
+     *            The LayerProperties of the the layer we are processing
+     * @param whereClause
+     *            The general where clause get from the constants set to the map
+     * @return a composed where clause to apply to the layer
+     */
+    private String getComposedWhereClauseForThisLayer(LayerProperties lp,
+	    String whereClause) {
+	String layerWhereClause = null;
+	if (whereClause.length() != 0) {
+	    if (lp.getSQLRestriction().length() != 0) {
+		layerWhereClause = whereClause + " AND "
+			+ lp.getSQLRestriction();
+	    }
+	} else if (lp.getSQLRestriction().length() != 0) {
+	    layerWhereClause = " WHERE " + lp.getSQLRestriction();
+	}
+	return layerWhereClause;
+    }
+
+    /**
+     * Get layers querying on '_map' table to the MapView. Get layers querying
+     * on '_map_overview' table to the MapOverView.
+     *
+     * @param view
+     * @param mapName
+     * @param proj
+     * @param whereClause
+     * @param stylesSource
+     *            must fit with LoadLegend's NO_LEGEND, DB_LEGEND or FILE_LEGEND
+     * @param stylesName
+     * @throws Exception
+     */
 	public ELLEMap getMap(View view, String mapName,
 			String whereClause, int stylesSource, String stylesName) throws Exception {
 
-		if (whereClause == null) {
-			whereClause = "";
-		}
+
 
 		ELLEMap map = new ELLEMap(mapName, view);
-		map.setWhereClause(whereClause);
+
 
 		List<LayerProperties> viewLayers = getViewLayers(mapName);
 		for (LayerProperties lp : viewLayers) {
+	    lp.setSQLRestriction(getComposedWhereClauseForThisLayer(lp,
+		    whereClause));
 			map.addLayer(lp);
 		}
 
 		/////////////// MapOverview
 		List<LayerProperties> overviewLayers = getOverviewLayers(mapName);
 		for (LayerProperties lp : overviewLayers) {
+	    lp.setSQLRestriction(getComposedWhereClauseForThisLayer(lp,
+		    whereClause));
 			map.addOverviewLayer(lp);
 		}
 
 		map.setStyleSource(stylesSource);
 		map.setStyleName(stylesName);
 
+
+		map.setWhereClause(whereClause);
 		return map;
 
 	}
@@ -299,12 +322,11 @@ public class MapDAO {
 		for (Object[] row : rows) {
 			if (row.length == 8 || row.length == 9) {
 
-				Object[] rowToSave = new Object[10];
+		Object[] rowToSave = new Object[10];
 				rowToSave[0] = auxMapName;
 				for (int i=0; i<row.length; i++) {
 					rowToSave[i+1] = row[i];
 				}
-				rowToSave[9] = null;
 
 				try {
 					dbs.insertRow(dbs.getSchema(), "_map", rowToSave);
@@ -312,7 +334,8 @@ public class MapDAO {
 					// undo insertions
 					try {
 						dbs = DBSession.reconnect();
-						dbs.deleteRows(dbs.getSchema(), "_map", "where mapa='" + auxMapName + "'");
+			dbs.deleteRows(dbs.getSchema(), "_map",
+				"where map_name='" + auxMapName + "'");
 						throw new SQLException(e);
 					} catch (DBException e1) {
 						e1.printStackTrace();
@@ -395,7 +418,6 @@ public class MapDAO {
 				+ "   visible boolean DEFAULT TRUE,"
 				+ "   max_scale character varying(50),"
 				+ "   min_scale character varying(50),"
-				+ "   overview boolean DEFAULT FALSE,"
 				+ "   schemaName character varying(255) NOT NULL,"
 				+ "   layerDBName character varying(255) NOT NULL,"
 				+ "   sql_restriction character varying,"
@@ -456,7 +478,7 @@ public class MapDAO {
 
     public String[] getMaps() throws SQLException {
 	String[] maps = DBSession.getCurrentSession().getDistinctValues("_map",
-		"mapa");
+		"map_name");
 	return maps;
     }
 

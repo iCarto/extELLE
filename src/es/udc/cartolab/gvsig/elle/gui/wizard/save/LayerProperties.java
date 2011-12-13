@@ -37,6 +37,7 @@ public class LayerProperties implements Comparable {
 	private double maxScale = -1, minScale = -1;
 	private int position;
 	private String legendType;
+    private String SQLRestriction;
 
 
 	public LayerProperties(FLyrVect layer) throws WizardException {
@@ -107,7 +108,7 @@ public class LayerProperties implements Comparable {
 		this.visible = visible;
 	}
 
-	public String getGroup() {
+	public String getGroupTOCName() {
 		return group;
 	}
 
@@ -154,4 +155,17 @@ public class LayerProperties implements Comparable {
 		}
 		return 0;
 	}
+
+    public void setSQLRestriction(String SQLRestriction) {
+	this.SQLRestriction = SQLRestriction;
+    }
+
+    public String getSQLRestriction() {
+	return SQLRestriction;
+    }
+
+    @Override
+    public String toString() {
+	return schema + "|" + tablename;
+    }
 }

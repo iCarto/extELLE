@@ -174,7 +174,8 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 				PluginServices.getText(this, "layer"),
 				PluginServices.getText(this, "visible"),
 				PluginServices.getText(this, "max_scale"),
-				PluginServices.getText(this, "min_scale")};
+		PluginServices.getText(this, "min_scale"),
+		PluginServices.getText(this, "sql_restriction") };
 		DefaultTableModel model = new MapTableModel();
 		for (String columnName : header) {
 			model.addColumn(columnName);
@@ -188,6 +189,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		mapTable.getColumnModel().getColumn(2).setMinWidth(40);
 		mapTable.getColumnModel().getColumn(3).setMinWidth(60);
 		mapTable.getColumnModel().getColumn(4).setMinWidth(60);
+	mapTable.getColumnModel().getColumn(5).setMinWidth(60);
 
 	}
 
@@ -273,6 +275,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 					}
 				}
 
+
 				LayerProperties lp = mapLayers.get(i);
 				lp.setPosition(position);
 				lp.setVisible(visible);
@@ -284,6 +287,8 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 				}
 				lp.setSave(save);
 
+		lp.setSQLRestriction(model.getValueAt(i, 5).toString());
+
 				position++;
 			} else {
 				errors.add(String.format(repeatedLayerNameError, name));
@@ -292,6 +297,10 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 		return errors;
 	}
+
+    // private Object getSQLRestriction() {
+    // return null;
+    // }
 
 	public void setProperties() throws WizardException {
 		List<String> errors = parse();
@@ -341,7 +350,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 					lp.getLayername(),
 					lp.visible(),
 					maxScaleStr,
-					minScaleStr	};
+ minScaleStr, lp.getSQLRestriction() };
 			model.addRow(row);
 
 		}
@@ -385,7 +394,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 			FLayer layer = layers.getLayer(i);
 			if (layer instanceof FLayers) {
 				createMapLayerList((FLayers) layer);
-			} else if (layer instanceof FLyrVect) {
+	    } else if (layer instanceof FLyrVect) {
 				try {
 					LayerProperties lp = new LayerProperties((FLyrVect) layer);
 					String user = lp.getUserName();
@@ -407,6 +416,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 						lp.setGroup(group);
 						lp.setPosition(mapLayers.size());
 						lp.setSave(true);
+			lp.setSQLRestriction(getWhereClause((FLyrVect) layer));
 
 						mapLayers.add(lp);
 
@@ -428,6 +438,18 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 	}
 
+    private String getWhereClause(FLyrVect lv) {
+	// TODO: whereClause is null or "" by default?
+	String whereClause = "";
+	try {
+	    VectorialDBAdapter adapter = (VectorialDBAdapter) lv.getSource();
+	    whereClause = adapter.getWhereClause().replace("where", "");
+	} catch (Exception e) {
+	    whereClause = "";
+	}
+
+	return whereClause;
+    }
 
 	public void finish() throws WizardException {
 
@@ -536,15 +558,12 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 				if (lp.getMinScale() > -1) {
 					minScale = lp.getMinScale();
 				}
+				//TODO. Save in the correct way. Encapsulating this code in a MapObject that knows the names used in the database
 				if (lp.save()) {
-					Object[] row = {lp.getLayername(),
-							lp.getTablename(),
-							lp.getPosition(),
-							lp.visible(),
-							maxScale,
-							minScale,
-							lp.getGroup(),
-							lp.getSchema()};
+		    Object[] row = { lp.getGroupTOCName(), lp.getLayername(),
+			    lp.getPosition(), lp.visible(), maxScale, minScale,
+			    lp.getSchema(), lp.getTablename(),
+			    lp.getSQLRestriction() };
 					rows.add(row);
 				}
 			}

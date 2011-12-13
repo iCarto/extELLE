@@ -47,106 +47,117 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 
 	protected CRSSelectPanel crsPanel = null;
 	protected JList mapList;
-	private DBSession dbs;
-	private JPanel listPanel;
-	private JTextArea layerTextArea;
-	private String[][] layers;
+    private DBSession dbs;
+    private JPanel listPanel;
+    private JTextArea layerTextArea;
 
 	public final static String PROPERTY_VEW = "view";
     public static final String PROPERTY_MAP_NAME = "property_map_name";
 
-	public LoadMapWizardComponent(Map<String, Object> properties) {
-		super(properties);
+
+    public LoadMapWizardComponent(Map<String, Object> properties) {
+	super(properties);
+
+	dbs = DBSession.getCurrentSession();
+
+	setLayout(new BorderLayout());
+
+	add(getListPanel(), BorderLayout.CENTER);
+	add(getCRSPanel(), BorderLayout.SOUTH);
+    }
+
+    public boolean canFinish() {
+	return canNext();
+    }
+
+    public boolean canNext() {
+	if (mapList != null) {
+	    return mapList.getSelectedIndices().length == 1;
+	}
+	return false;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+	callStateChanged();
+    }
+
+    private JPanel getCRSPanel() {
+	if (crsPanel == null) {
+	    crsPanel = CRSSelectPanel.getPanel(AddLayerDialog
+		    .getLastProjection());
+	    crsPanel.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		    if (crsPanel.isOkPressed()) {
+			AddLayerDialog.setLastProjection(crsPanel.getCurProj());
+		    }
+		}
+	    });
+	}
+	return crsPanel;
+    }
+
+    private JPanel getListPanel() {
+	if (listPanel == null) {
+
+	    listPanel = new JPanel();
+
+	    try {
+
+		FormPanel form = new FormPanel("forms/loadMap.jfrm");
+		form.setFocusTraversalPolicyProvider(true);
+
+		listPanel.add(form);
 
 		dbs = DBSession.getCurrentSession();
 
-		setLayout(new BorderLayout());
+		if (dbs.tableExists(dbs.getSchema(), "_map")
+			&& dbs.tableExists(dbs.getSchema(), "_map_overview")) {
 
-		add(getListPanel(), BorderLayout.CENTER);
-		add(getCRSPanel(), BorderLayout.SOUTH);
-	}
-
-	public boolean canFinish() {
-		return canNext();
-	}
-
-	public boolean canNext() {
-		if (mapList!=null) {
-			return mapList.getSelectedIndices().length == 1;
-		}
-		return false;
-	}
-
-
-	public void actionPerformed(ActionEvent e) {
-		callStateChanged();
-	}
-
-	private JPanel getCRSPanel() {
-		if (crsPanel == null) {
-			crsPanel = CRSSelectPanel.getPanel(AddLayerDialog.getLastProjection());
-			crsPanel.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					if (crsPanel.isOkPressed()) {
-						AddLayerDialog.setLastProjection(crsPanel.getCurProj());
-					}
-				}
-			});
-		}
-		return crsPanel;
-	}
-
-	private JPanel getListPanel() {
-		if (listPanel == null) {
-
-			listPanel = new JPanel();
-
-			try {
-
-				FormPanel form = new FormPanel("forms/loadMap.jfrm");
-				form.setFocusTraversalPolicyProvider(true);
-
-				listPanel.add(form);
-
-				dbs = DBSession.getCurrentSession();
-
-				if (dbs.tableExists(dbs.getSchema(), "_map") && dbs.tableExists(dbs.getSchema(), "_map_overview")) {
 		    String[] maps = MapDAO.getInstance().getMaps();
 
-					//layerList = form.getList("layerList");
-					mapList = form.getList("mapList");
-					mapList.setListData(maps);
+		    // layerList = form.getList("layerList");
+		    mapList = form.getList("mapList");
+		    mapList.setListData(maps);
 
-					layerTextArea = (JTextArea) form.getComponentByName("layerTextArea");
-					layerTextArea.setEditable(false);
+		    layerTextArea = (JTextArea) form
+			    .getComponentByName("layerTextArea");
+		    layerTextArea.setEditable(false);
 
-					JLabel mapLabel = form.getLabel("mapLabel");
-					JLabel layerLabel = form.getLabel("layerLabel");
+		    JLabel mapLabel = form.getLabel("mapLabel");
+		    JLabel layerLabel = form.getLabel("layerLabel");
 
-					mapLabel.setText(PluginServices.getText(this, "map_load"));
-					layerLabel.setText(PluginServices.getText(this, "layer_load"));
+		    mapLabel.setText(PluginServices.getText(this, "map_load"));
+		    layerLabel.setText(PluginServices.getText(this,
+			    "layer_load"));
 
-					mapList.addListSelectionListener(new ListSelectionListener() {
+		    mapList.addListSelectionListener(new ListSelectionListener() {
 
-						public void valueChanged(ListSelectionEvent arg0) {
-							int[] selected = mapList.getSelectedIndices();
-							callStateChanged();
+			public void valueChanged(ListSelectionEvent arg0) {
+			    int[] selected = mapList.getSelectedIndices();
+			    callStateChanged();
 
-							if (selected.length == 1) {
-								String selectedValue = (String) mapList.getSelectedValues()[0];
-								String where = String.format(
-										"WHERE map_name = '%s'", selectedValue);
-								try {
-									layers = dbs.getTable("_map", dbs.getSchema(), where, new String[]{"posicion"}, true);
-									String layerText = "";
-									for (int i=0; i<layers.length; i++) {
-										layerText = layerText + layers[i][1] + "\n";
-									}
+			    if (selected.length == 1) {
+				String selectedMap = (String) mapList
+					.getSelectedValues()[0];
+				String where = String.format(
+					"WHERE map_name = '%s'", selectedMap);
+				try {
+
+				    String[][] layers = dbs.getTable("_map",
+					    dbs.getSchema(),
+					    new String[] { "layer_toc_name" },
+					    where,
+					    new String[] { "toc_position" },
+					    true);
+				    String layerText = "";
+				    for (int i = 0; i < layers.length; i++) {
+					layerText = layerText + layers[i][0]
+						+ "\n";
+				    }
 
 									layerTextArea.setText(layerText);
 
 								} catch (SQLException e) {
-									// TODO Auto-generated catch block
 									JOptionPane.showMessageDialog(null,
 											"Error SQL: " + e.getMessage(),
 											"SQL Exception",
@@ -154,7 +165,6 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 									try {
 										dbs = DBSession.reconnect();
 									} catch (DBException e1) {
-										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
 								}
