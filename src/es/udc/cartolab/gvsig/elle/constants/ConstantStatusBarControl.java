@@ -22,6 +22,7 @@
 package es.udc.cartolab.gvsig.elle.constants;
 
 import java.awt.event.ActionListener;
+import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -43,6 +44,10 @@ import com.iver.andami.plugins.IExtension;
 public class ConstantStatusBarControl extends JLabel implements IControl {
 
     private String name = "ELLE_CONSTANTS";
+
+    private TreeMap<Integer, IConstant> constantsInStatusBar;
+
+    private String nullCharacter = "-";
 
     
 
@@ -82,6 +87,27 @@ public class ConstantStatusBarControl extends JLabel implements IControl {
     }
 
 
+    public void printConstantsInfo() {
+	StringBuilder s = new StringBuilder();
+
+	for (IConstant c : constantsInStatusBar.values()) {
+	    s.append(c.getNameInStatusBar());
+	    s.append(": ");
+	    s.append(nullToString(c.getValue()));
+	    s.append(" ");
+	}
+
+	setValue(s);
+    }
+
+    private String nullToString(Object s) {
+	if ((s == null) || (s.toString().trim().isEmpty())) {
+	    return nullCharacter;
+	} else {
+	    return s.toString();
+	}
+    }
+
     public Object setValue(Object value) {
 	setText(value.toString());
 	return value;
@@ -97,5 +123,12 @@ public class ConstantStatusBarControl extends JLabel implements IControl {
 	this.name = name;
     }
 
+    public void setConstats(TreeMap<Integer, IConstant> constantsInStatusBar) {
+	this.constantsInStatusBar = constantsInStatusBar;
+    }
+
+    public void setNullCharacter(String nullCharacter) {
+	this.nullCharacter = nullCharacter;
+    }
     
 }

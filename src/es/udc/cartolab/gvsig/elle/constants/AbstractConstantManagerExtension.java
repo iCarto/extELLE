@@ -37,20 +37,13 @@ import com.iver.andami.plugins.IExtension;
  */
 public abstract class AbstractConstantManagerExtension extends Extension {
 
-    // TODO: Use a Object HashMap allows handled complex "constants" like the
-    // "municipios" field on Constants.java on extEIELUtils, but this make that
-    // we have to cast the results of getConstants all the time
-    // Maybe use another approach like define a IConstants interface for the
-    // objects that handles the values itself will be useful
-    private HashMap<String, Object> constants = new HashMap<String, Object>();
+    private HashMap<String, IConstant> constants = new HashMap<String, IConstant>();
 
     // Each time setConstant or clearConstants is used previousConstant is
     // updated
-    private HashMap<String, Object> previousConstants = null;
+    private HashMap<String, IConstant> previousConstants = null;
 
     private ConstantStatusBarControl statusBar = null;
-
-    private TreeMap<String, String> constantsNamesInStatusBar;
 
 
     /**
@@ -80,65 +73,75 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 	}
     }
 
+    /**
+     * Be aware to call super if this method is overided, or reimplement it
+     * functionality.
+     */
     public void initialize() {
 	statusBar = new ConstantStatusBarControl();
 	statusBar.register((Class<IExtension>) this.getClass());
 	registerIcons();
-    }
+	setConstants(initConstants());
 
-    public void setConstant(String constantName, Object constantValue) {
-	previousConstants = (HashMap<String, Object>) constants.clone();
-
-	// TODO: It should be better that the extension that implements this
-	// defined the available keys and here only set the value if the key
-	// already exists
-	constants.put(constantName, constantValue);
-
-	statusBar.setValue(getConstantsInfo());
-    }
-
-    public void setConstants(HashMap<String, Object> constants) {
-	previousConstants = (HashMap<String, Object>) constants.clone();
-	constants = this.constants;
-
-	statusBar.setValue(getConstantsInfo());
     }
 
     /**
-     * For the constants that we want to be showed in some form in the status
-     * bar we should provide a String that will represent it's name in the bar.
-     * The value will be automatically get. Here we must put only the constants
-     * that we want that appear in the bar, there is not need to put all of it
+     * Instantiated here the constants that are going to be used. This method
+     * will be called by the initialize method of
+     * AbstractConstantManagerExtension. You should avoid change the parameters
+     * of the constants after instantiated it here
      */
-    public void setConstantsNamesInStatusBar(
-	    TreeMap<String, String> constantsNamesInStatusBar) {
-	this.constantsNamesInStatusBar = constantsNamesInStatusBar;
+    protected abstract HashMap<String, IConstant> initConstants();
+
+
+    private void setConstants(HashMap<String, IConstant> constants) {
+	if (constants != null) {
+	    previousConstants = (HashMap<String, IConstant>) constants.clone();
+	}
+
+	// TODO: Hacer chequeos
+	this.constants = constants;
+	TreeMap<Integer, IConstant> constantsInStatusBar = new TreeMap<Integer, IConstant>();
+	for (IConstant c : constants.values()) {
+	    if (c.getNameInStatusBar() != null) {
+		constantsInStatusBar.put(c.getOrder(), c);
+	    }
+	}
+	statusBar.setNullCharacter("-");
+	statusBar.setConstats(constantsInStatusBar);
     }
 
-    public Object getConstant(String constantName) {
+
+
+    public IConstant getConstant(String constantName) {
 	return constants.get(constantName);
     }
-
-    public HashMap<String, Object> getConstants() {
-	return constants;
+    
+    /**
+     * Wrap method to set the value of a constant. It's recommended to use this
+     * method instead of call directly the setValue of IConstant to avoid so
+     * boring operations like update the status bar
+     */
+    public void setValue(String constantName, Object value) {
+	constants.get(constantName).setValue(value);
+	statusBar.printConstantsInfo();
     }
 
-    public HashMap<String, Object> getPreviousConstants() {
+
+
+    public HashMap<String, IConstant> getPreviousConstants() {
 	return previousConstants;
     }
 
-    public TreeMap<String, String> getConstantsNamesInStatusBar() {
-	return constantsNamesInStatusBar;
-    }
 
     public void clearConstants() {
-	previousConstants = (HashMap<String, Object>) constants.clone();
+	previousConstants = (HashMap<String, IConstant>) constants.clone();
 
-	// TODO: Maybe we should not clear, we should maintains the keys and put
-	// to null all the values of the entries
-	constants.clear();
+	for (IConstant c : constants.values()) {
+	    c.setValue(null);
+	}
 
-	statusBar.setValue(getConstantsInfo());
+	statusBar.printConstantsInfo();
     }
 
     public boolean areConstantsSetFor(String constantName) {
@@ -147,7 +150,7 @@ public abstract class AbstractConstantManagerExtension extends Extension {
 	// Maybe use a TreeMap allow us a trivial test: The values for the
 	// higher hierarchies is set
 
-	return constants.get(constantName) != null;
+	return constants.get(constantName).getValue() != null;
     }
 
     /*****************************************************************************
@@ -157,40 +160,9 @@ public abstract class AbstractConstantManagerExtension extends Extension {
      * way to do this
      * ****************************************************************************/
 
-    /**
-     * String to use for represent the not set constants
-     */
-    private String nullCharacter = "-";
 
     public void setNullCharacter(String nullCharacter) {
-	this.nullCharacter = nullCharacter;
-    }
-
-    /**
-     * A representative text of the actual state of the constants. The value
-     * returned for this method is the message that will be used in the status
-     * bar
-     * 
-     * Child can override this method to get a more acquired representation
-     */
-    public String getConstantsInfo() {
-	StringBuilder s = new StringBuilder();
-	for (String k : constantsNamesInStatusBar.keySet()) {
-	    s.append(constantsNamesInStatusBar.get(k));
-	    s.append(": ");
-	    s.append(nullToString(constants.get(k)));
-	    s.append(" ");
-	}
-
-	return s.toString();
-    }
-
-    private String nullToString(Object s) {
-	if ((s == null) || (s.toString().trim().isEmpty())) {
-	    return nullCharacter;
-	} else {
-	    return s.toString();
-	}
+	statusBar.setNullCharacter(nullCharacter);
     }
 
 }

@@ -1,1 +1,21 @@
 README
+
+
+Ideas
+* En initConstants hay que poner varias cadenas, nombre de capa, ... Habría que poder comprobar 
+sin lanzar gvSIG que esas cadenas están bien puestas. 
+
+* Estaba bien poder fijar a la constante un valor por defecto al que volver cuando se hace un clear
+
+* Tal vez en las constantes también habría que dar la posibilidad de tener una lista predefinida de
+elementos que no hubiera que coger de la base de datos si no de otra fuente. Aunque eso igual no
+debe estar en IConstant si no en los diálogos de selección.
+
+
+
+* En los diálogos de selección de constantes, puede ser necesario acceder directamente a la tabla
+de la base de datos. Una solución sería que IConstant tenga métodos para devolver el esquema y el 
+nombre de la tabla. O no tenerlo en IConstant pero si en constant o algo totalmente distinto.
+
+* En los diálogos de selección de constantes, al coger los distintos valores, hay que tener mucho
+cuidado con el tipo de datos, porque habrá que escapar las sentencias ...
