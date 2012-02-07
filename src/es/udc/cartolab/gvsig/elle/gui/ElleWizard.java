@@ -35,7 +35,6 @@ import com.iver.cit.gvsig.fmap.layers.FLayer;
 import com.iver.cit.gvsig.fmap.layers.FLayers;
 import com.iver.cit.gvsig.gui.WizardPanel;
 import com.iver.cit.gvsig.gui.panels.CRSSelectPanel;
-import com.iver.cit.gvsig.project.documents.view.gui.View;
 import com.jeta.forms.components.panel.FormPanel;
 
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
@@ -49,7 +48,6 @@ public class ElleWizard extends WizardPanel {
 	private CRSSelectPanel crsPanel = null;
 	private DBSession dbs;
 	private String[][] layers;
-	private View view;
 
 
 	public void execute() {
@@ -68,7 +66,7 @@ public class ElleWizard extends WizardPanel {
 			if (selectedPos.length > 1) {
 				layer = new FLayers();
 				((FLayers) layer).setName("ELLE");
-				((FLayers) layer).setMapContext(view.getMapControl().getMapContext());
+		((FLayers) layer).setMapContext(getMapCtrl().getMapContext());
 
 				try {
 					for (int pos : selectedPos) {
@@ -149,11 +147,6 @@ public class ElleWizard extends WizardPanel {
 	}
 
 	public void initWizard() {
-		if (!(PluginServices.getMDIManager().getActiveWindow() instanceof View)) {
-			return;
-		}
-
-		view = (View) PluginServices.getMDIManager().getActiveWindow();
 
 		dbs = DBSession.getCurrentSession();
 		setTabName("ELLE");
@@ -212,7 +205,6 @@ public class ElleWizard extends WizardPanel {
 								try {
 									layers = dbs.getTable("_map", where);
 								} catch (SQLException e) {
-									// TODO Auto-generated catch block
 									JOptionPane.showMessageDialog(null,
 											"Error SQL: " + e.getMessage(),
 											"SQL Exception",
@@ -220,7 +212,6 @@ public class ElleWizard extends WizardPanel {
 									try {
 										dbs = DBSession.reconnect();
 									} catch (DBException e1) {
-										// TODO Auto-generated catch block
 										e1.printStackTrace();
 									}
 								}
