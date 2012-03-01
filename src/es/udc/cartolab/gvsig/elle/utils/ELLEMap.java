@@ -149,6 +149,49 @@ public class ELLEMap {
 		overviewLayers.add(layer);
 	}
 
+
+	/* jlopez
+	 *
+	 * This method is used in order to retrieve all nested groups
+	 * as FLayers with the string representation stored in DB.
+	 */
+	private List<String> getGroupNames(String allGroups) {
+		List<String> groupNames = new ArrayList<String>();
+		char previousChar = '/';
+		int startName = 0;
+		for (int i = 0; i < allGroups.length(); i++) {
+			if (allGroups.charAt(i) == '/') {
+				// We check whether the slash is being escaped.
+				if (previousChar != '\\') {
+					if ((i - startName) > 0) {
+						// We undo previously existing backslashes duplication and slashes escapes.
+						groupNames.add(allGroups.substring(startName, i).replace("\\/", "/").replace("\\\\", "\\"));
+					} else {
+						// Starting index == ending index --> empty string.
+						groupNames.add("");
+					}
+					startName = i+1;
+				}
+			}
+			if (allGroups.charAt(i) == '\\') {
+				if (previousChar == '\\') {
+					// The backslash is duplicated, so it's not escaping a slash.
+					previousChar = '/';
+				} else {
+					previousChar = allGroups.charAt(i);
+				}
+			} else {
+				previousChar = allGroups.charAt(i);
+			}
+	
+		}
+	
+		// We undo previously existing backslashes duplication and slashes escapes.
+		groupNames.add(allGroups.substring(startName).replace("\\/", "/").replace("\\\\", "\\"));
+	
+		return groupNames;
+	}
+
 	@SuppressWarnings("unchecked")
 	private void loadViewLayers(IProjection proj) {
 		//load view layers
@@ -156,13 +199,19 @@ public class ELLEMap {
 		for (LayerProperties lp : layers) {
 			FLayers group;
 			if (!lp.getGroup().equals("")) {
-				group = getGroup(view.getMapControl().getMapContext().getLayers(), lp.getGroup());
-				if (group == null) {
-					group = new FLayers();
-					group.setName(lp.getGroup());
-					group.setMapContext(view.getMapControl().getMapContext());
-					view.getMapControl().getMapContext().getLayers().addLayer(group);
+				List<String> groupNames = getGroupNames(lp.getGroup());
+				FLayers currentGroup = view.getMapControl().getMapContext().getLayers();
+				for (String name:groupNames) {
+					group = getGroup(currentGroup, name);
+					if (group == null) {
+						group = new FLayers();
+						group.setName(name);
+						group.setMapContext(view.getMapControl().getMapContext());
+						currentGroup.addLayer(group);
+					}
+					currentGroup = group;
 				}
+				group = currentGroup;
 			} else {
 				group = view.getMapControl().getMapContext().getLayers();
 			}
