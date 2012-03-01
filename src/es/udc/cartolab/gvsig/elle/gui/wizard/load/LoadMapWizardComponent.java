@@ -34,6 +34,7 @@ import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.addlayer.AddLayerDialog;
 import com.iver.cit.gvsig.fmap.drivers.DBException;
 import com.iver.cit.gvsig.gui.panels.CRSSelectPanel;
+import com.iver.cit.gvsig.project.documents.view.ProjectView;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 import com.jeta.forms.components.panel.FormPanel;
 
@@ -206,6 +207,9 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 			try {
 				ELLEMap map = MapDAO.getInstance().getMap(view, mapList.getSelectedValue().toString(), "");
 				map.load(crsPanel.getCurProj());
+				if (view.getModel().getName().equals("ELLE View") && (view.getModel() instanceof ProjectView)) {
+					((ProjectView) view.getModel()).setName(mapList.getSelectedValue().toString());
+				}
 			} catch (Exception e) {
 				throw new WizardException(e);
 			}
