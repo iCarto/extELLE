@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle;
 
 import com.iver.andami.PluginServices;
@@ -26,35 +26,35 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.load.LoadLegendWizard;
 
 public class LoadAllLegendsExtension extends Extension {
 
-	public void execute(String actionCommand) {
+    public void execute(String actionCommand) {
 
-		LoadLegendWizard wizard = new LoadLegendWizard((View) PluginServices.getMDIManager().getActiveWindow());
-		wizard.open();
-	}
+	LoadLegendWizard wizard = new LoadLegendWizard((View) PluginServices.getMDIManager().getActiveWindow());
+	wizard.open();
+    }
 
-	public void initialize() {
-		registerIcons();
-	}
+    public void initialize() {
+	registerIcons();
+    }
 
-	protected void registerIcons() {
-		PluginServices.getIconTheme().registerDefault(
-				"load-legends",
-				this.getClass().getClassLoader().getResource("images/leycargar.png")
-			);
-	}
+    protected void registerIcons() {
+	PluginServices.getIconTheme().registerDefault(
+		"load-legends",
+		this.getClass().getClassLoader().getResource("images/leycargar.png")
+		);
+    }
 
-	public boolean isEnabled() {
-		IWindow w = PluginServices.getMDIManager().getActiveWindow();
-		if (w instanceof View) {
-			FLayers layers = ((View) w).getMapControl().getMapContext().getLayers();
-			return layers.getLayersCount() > 0;
-		}
-		return false;
+    public boolean isEnabled() {
+	IWindow w = PluginServices.getMDIManager().getActiveWindow();
+	if (w instanceof View) {
+	    FLayers layers = ((View) w).getMapControl().getMapContext().getLayers();
+	    return layers.getLayersCount() > 0;
 	}
+	return false;
+    }
 
-	public boolean isVisible() {
-		IWindow w = PluginServices.getMDIManager().getActiveWindow();
-		return w instanceof View;
-	}
+    public boolean isVisible() {
+	IWindow w = PluginServices.getMDIManager().getActiveWindow();
+	return w instanceof View;
+    }
 
 }

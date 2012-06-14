@@ -13,7 +13,7 @@
  * 
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle.gui.wizard;
 
 import java.util.ArrayList;
@@ -23,49 +23,49 @@ import javax.swing.JPanel;
 
 public abstract class WizardComponent extends JPanel {
 
-	private ArrayList<WizardListener> listeners = new ArrayList<WizardListener>();
-	protected Map<String, Object> properties;
+    private ArrayList<WizardListener> listeners = new ArrayList<WizardListener>();
+    protected Map<String, Object> properties;
 
-	public WizardComponent(Map<String, Object> properties) {
-		this.properties = properties;
+    public WizardComponent(Map<String, Object> properties) {
+	this.properties = properties;
+    }
+
+    public abstract boolean canFinish();
+
+    public abstract boolean canNext();
+
+    public void addWizardListener(WizardListener l) {
+	if (!listeners.contains(l)) {
+	    listeners.add(l);
 	}
+    }
 
-	public abstract boolean canFinish();
-
-	public abstract boolean canNext();
-
-	public void addWizardListener(WizardListener l) {
-		if (!listeners.contains(l)) {
-			listeners.add(l);
-		}
+    public void removeWizardListener(WizardListener l) {
+	if (listeners.contains(l)) {
+	    listeners.remove(l);
 	}
+    }
 
-	public void removeWizardListener(WizardListener l) {
-		if (listeners.contains(l)) {
-			listeners.remove(l);
-		}
+    protected void callStateChanged() {
+	for(WizardListener listener : listeners) {
+	    listener.wizardChanged();
 	}
+    }
 
-	protected void callStateChanged() {
-		for(WizardListener listener : listeners) {
-			listener.wizardChanged();
-		}
-	}
+    public abstract String getWizardComponentName();
 
-	public abstract String getWizardComponentName();
+    public abstract void showComponent() throws WizardException;
 
-	public abstract void showComponent() throws WizardException;
+    public abstract void finish() throws WizardException;
 
-	public abstract void finish() throws WizardException;
+    public abstract void setProperties() throws WizardException;
 
-	public abstract void setProperties() throws WizardException;
-	
-	public void putProperty(String key, Object value) {
-		properties.put(key, value);
-	}
-	
-	public Object getProperty(String key) {
-		return properties.get(key);
-	}
+    public void putProperty(String key, Object value) {
+	properties.put(key, value);
+    }
+
+    public Object getProperty(String key) {
+	return properties.get(key);
+    }
 
 }

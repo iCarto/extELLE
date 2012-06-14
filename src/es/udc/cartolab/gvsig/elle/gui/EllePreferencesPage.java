@@ -13,7 +13,7 @@
  * 
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle.gui;
 
 import java.awt.event.ActionEvent;
@@ -37,174 +37,174 @@ import com.jeta.forms.components.panel.FormPanel;
 
 public class EllePreferencesPage extends AbstractPreferencePage implements ActionListener {
 
-	/* key names */
-	public static final String DEFAULT_LEGEND_DIR_KEY_NAME = "LegendDir";
-	public static final String DEFAULT_LEGEND_FILE_TYPE_KEY_NAME = "LegendFileType";
+    /* key names */
+    public static final String DEFAULT_LEGEND_DIR_KEY_NAME = "LegendDir";
+    public static final String DEFAULT_LEGEND_FILE_TYPE_KEY_NAME = "LegendFileType";
 
-	/* default values */
-	private static final String DEFAULT_LEGEND_DIR = Launcher.getAppHomeDir();
-	public static final String DEFAULT_LEGEND_FILE_TYPE = "gvl";
+    /* default values */
+    private static final String DEFAULT_LEGEND_DIR = Launcher.getAppHomeDir();
+    public static final String DEFAULT_LEGEND_FILE_TYPE = "gvl";
 
-	protected String id;
-	private ImageIcon icon;
-	private boolean panelStarted = false;
-	private JTextField legendDirField;
-	private JButton legendDirButton;
-	private JComboBox legendTypeCBox;
-	private String title = "ELLE";
+    protected String id;
+    private ImageIcon icon;
+    private boolean panelStarted = false;
+    private JTextField legendDirField;
+    private JButton legendDirButton;
+    private JComboBox legendTypeCBox;
+    private String title = "ELLE";
 
-	public EllePreferencesPage() {
-		super();
-		id = this.getClass().getName();
-		icon = new ImageIcon(this.getClass().getClassLoader().getResource("images/logo.png"));
-		panelStarted = false;
+    public EllePreferencesPage() {
+	super();
+	id = this.getClass().getName();
+	icon = new ImageIcon(this.getClass().getClassLoader().getResource("images/logo.png"));
+	panelStarted = false;
+    }
+
+    public void setChangesApplied() {
+	setChanged(false);
+    }
+
+    public void storeValues() throws StoreException {
+	PluginServices ps = PluginServices.getPluginServices(this);
+	XMLEntity xml = ps.getPersistentXML();
+
+	storeDir(xml);
+	storeType(xml);
+
+    }
+
+    private void storeDir(XMLEntity xml) throws StoreException {
+	String legendDir = legendDirField.getText();
+	File f = new File(legendDir);
+	if (f.exists() && f.isDirectory() && f.canRead()) {
+	    xml.putProperty(DEFAULT_LEGEND_DIR_KEY_NAME,
+		    legendDir);
+	} else {
+	    String message = String.format("%s no es un directorio válido", legendDir);
+	    throw new StoreException(message);
 	}
+    }
 
-	public void setChangesApplied() {
-		setChanged(false);
-	}
-
-	public void storeValues() throws StoreException {
-		PluginServices ps = PluginServices.getPluginServices(this);
-		XMLEntity xml = ps.getPersistentXML();
-
-		storeDir(xml);
-		storeType(xml);
-
-	}
-
-	private void storeDir(XMLEntity xml) throws StoreException {
-		String legendDir = legendDirField.getText();
-		File f = new File(legendDir);
-		if (f.exists() && f.isDirectory() && f.canRead()) {
-			xml.putProperty(DEFAULT_LEGEND_DIR_KEY_NAME,
-					legendDir);
-		} else {
-			String message = String.format("%s no es un directorio válido", legendDir);
-			throw new StoreException(message);
-		}
-	}
-
-	private void storeType(XMLEntity xml) {
-		String type = legendTypeCBox.getSelectedItem().toString();
-		xml.putProperty(DEFAULT_LEGEND_FILE_TYPE_KEY_NAME, type);
-	}
+    private void storeType(XMLEntity xml) {
+	String type = legendTypeCBox.getSelectedItem().toString();
+	xml.putProperty(DEFAULT_LEGEND_FILE_TYPE_KEY_NAME, type);
+    }
 
 
-	public String getID() {
-		return id;
-	}
+    public String getID() {
+	return id;
+    }
 
 
-	public ImageIcon getIcon() {
-		return icon;
-	}
+    public ImageIcon getIcon() {
+	return icon;
+    }
 
 
-	public JPanel getPanel() {
+    public JPanel getPanel() {
 
-		if (!panelStarted ) {
-			panelStarted = true;
+	if (!panelStarted ) {
+	    panelStarted = true;
 
-			FormPanel form = new FormPanel("forms/preferences.jfrm");
-			form.setFocusTraversalPolicyProvider(true);
+	    FormPanel form = new FormPanel("forms/preferences.jfrm");
+	    form.setFocusTraversalPolicyProvider(true);
 
-			JLabel legendLabel = form.getLabel("legendLabel");
-			legendLabel.setText(PluginServices.getText(this, "legend_directory"));
+	    JLabel legendLabel = form.getLabel("legendLabel");
+	    legendLabel.setText(PluginServices.getText(this, "legend_directory"));
 
-			legendDirField = form.getTextField("legendField");
-			legendDirButton = (JButton) form.getButton("legendButton");
-			legendDirButton.addActionListener(this);
+	    legendDirField = form.getTextField("legendField");
+	    legendDirButton = (JButton) form.getButton("legendButton");
+	    legendDirButton.addActionListener(this);
 
-			JLabel legendTypeLabel = form.getLabel("legendTypeLabel");
-			legendTypeLabel.setText(PluginServices.getText(this, "legend_type_pref"));
+	    JLabel legendTypeLabel = form.getLabel("legendTypeLabel");
+	    legendTypeLabel.setText(PluginServices.getText(this, "legend_type_pref"));
 
-			legendTypeCBox = form.getComboBox("legendTypeCB");
-			legendTypeCBox.addItem("gvl");
-			legendTypeCBox.addItem("sld");
+	    legendTypeCBox = form.getComboBox("legendTypeCB");
+	    legendTypeCBox.addItem("gvl");
+	    legendTypeCBox.addItem("sld");
 
-			addComponent(form);
-
-		}
-
-		return this;
-	}
-
-
-	public String getTitle() {
-		return title;
-	}
-
-
-	public void initializeDefaults() {
-
-		legendDirField.setText(DEFAULT_LEGEND_DIR);
-
-		setCB(DEFAULT_LEGEND_FILE_TYPE);
+	    addComponent(form);
 
 	}
 
-	private void setCB(String text) {
-		int itemCount = legendTypeCBox.getItemCount();
-		for (int i=0; i<itemCount; i++) {
-			if (text.equals(legendTypeCBox.getItemAt(i))) {
-				legendTypeCBox.setSelectedIndex(i);
-				break;
-			}
-		}
+	return this;
+    }
+
+
+    public String getTitle() {
+	return title;
+    }
+
+
+    public void initializeDefaults() {
+
+	legendDirField.setText(DEFAULT_LEGEND_DIR);
+
+	setCB(DEFAULT_LEGEND_FILE_TYPE);
+
+    }
+
+    private void setCB(String text) {
+	int itemCount = legendTypeCBox.getItemCount();
+	for (int i=0; i<itemCount; i++) {
+	    if (text.equals(legendTypeCBox.getItemAt(i))) {
+		legendTypeCBox.setSelectedIndex(i);
+		break;
+	    }
+	}
+    }
+
+
+    public void initializeValues() {
+
+	if (!panelStarted) {
+	    getPanel();
 	}
 
+	PluginServices ps = PluginServices.getPluginServices(this);
+	XMLEntity xml = ps.getPersistentXML();
 
-	public void initializeValues() {
-
-		if (!panelStarted) {
-			getPanel();
-		}
-
-		PluginServices ps = PluginServices.getPluginServices(this);
-		XMLEntity xml = ps.getPersistentXML();
-
-		// Default Projection
-		String legendDir = null;
-		if (xml.contains(DEFAULT_LEGEND_DIR_KEY_NAME)) {
-			legendDir = xml.getStringProperty(DEFAULT_LEGEND_DIR_KEY_NAME);
-		} else {
-			legendDir = DEFAULT_LEGEND_DIR;
-		}
-
-		legendDirField.setText(legendDir);
-
-		String type = DEFAULT_LEGEND_FILE_TYPE;
-		if (xml.contains(DEFAULT_LEGEND_FILE_TYPE_KEY_NAME)) {
-			type = xml.getStringProperty(DEFAULT_LEGEND_FILE_TYPE_KEY_NAME);
-		}
-
-		setCB(type.toLowerCase());
-
+	// Default Projection
+	String legendDir = null;
+	if (xml.contains(DEFAULT_LEGEND_DIR_KEY_NAME)) {
+	    legendDir = xml.getStringProperty(DEFAULT_LEGEND_DIR_KEY_NAME);
+	} else {
+	    legendDir = DEFAULT_LEGEND_DIR;
 	}
 
+	legendDirField.setText(legendDir);
 
-	public boolean isValueChanged() {
-		return super.hasChanged();
+	String type = DEFAULT_LEGEND_FILE_TYPE;
+	if (xml.contains(DEFAULT_LEGEND_FILE_TYPE_KEY_NAME)) {
+	    type = xml.getStringProperty(DEFAULT_LEGEND_FILE_TYPE_KEY_NAME);
 	}
 
-	public void actionPerformed(ActionEvent event) {
-		if (event.getSource()==legendDirButton) {
-			File currentDirectory = new File(legendDirField.getText());
-			JFileChooser chooser;
-			if (!(currentDirectory.exists() &&
-					currentDirectory.isDirectory() &&
-					currentDirectory.canRead())) {
-				currentDirectory = new File(DEFAULT_LEGEND_DIR);
-			}
-			chooser = new JFileChooser(currentDirectory);
+	setCB(type.toLowerCase());
 
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			int returnVal = chooser.showOpenDialog(legendDirField);
-			if(returnVal == JFileChooser.APPROVE_OPTION) {
-				legendDirField.setText(chooser.getSelectedFile().getAbsolutePath());
-			}
-		}
+    }
+
+
+    public boolean isValueChanged() {
+	return super.hasChanged();
+    }
+
+    public void actionPerformed(ActionEvent event) {
+	if (event.getSource()==legendDirButton) {
+	    File currentDirectory = new File(legendDirField.getText());
+	    JFileChooser chooser;
+	    if (!(currentDirectory.exists() &&
+		    currentDirectory.isDirectory() &&
+		    currentDirectory.canRead())) {
+		currentDirectory = new File(DEFAULT_LEGEND_DIR);
+	    }
+	    chooser = new JFileChooser(currentDirectory);
+
+	    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	    int returnVal = chooser.showOpenDialog(legendDirField);
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		legendDirField.setText(chooser.getSelectedFile().getAbsolutePath());
+	    }
 	}
+    }
 
 }

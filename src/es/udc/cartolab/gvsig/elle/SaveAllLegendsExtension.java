@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle;
 
 import com.iver.andami.PluginServices;
@@ -25,50 +25,50 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.save.SaveLegendsWizard;
 
 public class SaveAllLegendsExtension extends Extension {
 
-	public void execute(String actionCommand) {
+    public void execute(String actionCommand) {
 
-		int option = -1;
+	int option = -1;
 
-		if (actionCommand.equals("ACTIVES")) {
-			option = SaveLegendsWizard.ACTIVES;
-		}
-		if (actionCommand.equals("VISIBLES")) {
-			option = SaveLegendsWizard.VISIBLES;
-		}
-		if (actionCommand.equals("ALL")) {
-			option = SaveLegendsWizard.ALL;
-		}
-
-		SaveLegendsWizard w = new SaveLegendsWizard((View) PluginServices.getMDIManager().getActiveWindow(), option);
-		w.open();
-
+	if (actionCommand.equals("ACTIVES")) {
+	    option = SaveLegendsWizard.ACTIVES;
+	}
+	if (actionCommand.equals("VISIBLES")) {
+	    option = SaveLegendsWizard.VISIBLES;
+	}
+	if (actionCommand.equals("ALL")) {
+	    option = SaveLegendsWizard.ALL;
 	}
 
-	public void initialize() {
-		registerIcons();
-	}
+	SaveLegendsWizard w = new SaveLegendsWizard((View) PluginServices.getMDIManager().getActiveWindow(), option);
+	w.open();
 
-	protected void registerIcons() {
-		PluginServices.getIconTheme().registerDefault(
-				"save-all-legends",
-				this.getClass().getClassLoader().getResource("images/leyguardar.png")
-			);
-	}
+    }
 
-	public boolean isEnabled() {
+    public void initialize() {
+	registerIcons();
+    }
+
+    protected void registerIcons() {
+	PluginServices.getIconTheme().registerDefault(
+		"save-all-legends",
+		this.getClass().getClassLoader().getResource("images/leyguardar.png")
+		);
+    }
+
+    public boolean isEnabled() {
+	return true;
+    }
+
+    public boolean isVisible() {
+
+	IWindow window = PluginServices.getMDIManager().getActiveWindow();
+	if (window instanceof View) {
+	    if (((View) window).getMapControl().getMapContext().getLayers().getLayersCount()>0) {
 		return true;
+	    }
 	}
-
-	public boolean isVisible() {
-
-		IWindow window = PluginServices.getMDIManager().getActiveWindow();
-		if (window instanceof View) {
-			if (((View) window).getMapControl().getMapContext().getLayers().getLayersCount()>0) {
-				return true;
-			}
-		}
-		return false;
-	}
+	return false;
+    }
 
 
 }

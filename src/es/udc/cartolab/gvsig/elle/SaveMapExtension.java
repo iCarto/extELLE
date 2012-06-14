@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle;
 
 import com.iver.andami.PluginServices;
@@ -27,42 +27,42 @@ import es.udc.cartolab.gvsig.users.utils.DBSession;
 public class SaveMapExtension extends Extension {
 
 
-	public void execute(String actionCommand) {
-		View view = (View) PluginServices.getMDIManager().getActiveWindow();
-		SaveMapWizard wizard = new SaveMapWizard(view);
-		wizard.open();
+    public void execute(String actionCommand) {
+	View view = (View) PluginServices.getMDIManager().getActiveWindow();
+	SaveMapWizard wizard = new SaveMapWizard(view);
+	wizard.open();
+    }
+
+
+    public void initialize() {
+	registerIcons();
+    }
+
+    protected void registerIcons() {
+	PluginServices.getIconTheme().registerDefault(
+		"save-map",
+		this.getClass().getClassLoader().getResource("images/mapaguardar.png")
+		);
+    }
+
+
+    public boolean isEnabled() {
+	if (PluginServices.getMDIManager().getActiveWindow() instanceof View) {
+	    FLayers layers = ((View) PluginServices.getMDIManager().getActiveWindow()).getMapControl().getMapContext().getLayers();
+	    return layers.getLayersCount() > 0;
 	}
+	return false;
+    }
 
 
-	public void initialize() {
-		registerIcons();
+    public boolean isVisible() {
+	if (PluginServices.getMDIManager().getActiveWindow() instanceof View) {
+	    DBSession session = DBSession.getCurrentSession();
+	    if (session != null) {
+		return session.getDBUser().isAdmin();
+	    }
 	}
-
-	protected void registerIcons() {
-		PluginServices.getIconTheme().registerDefault(
-				"save-map",
-				this.getClass().getClassLoader().getResource("images/mapaguardar.png")
-			);
-	}
-
-
-	public boolean isEnabled() {
-		if (PluginServices.getMDIManager().getActiveWindow() instanceof View) {
-			FLayers layers = ((View) PluginServices.getMDIManager().getActiveWindow()).getMapControl().getMapContext().getLayers();
-			return layers.getLayersCount() > 0;
-		}
-		return false;
-	}
-
-
-	public boolean isVisible() {
-		if (PluginServices.getMDIManager().getActiveWindow() instanceof View) {
-			DBSession session = DBSession.getCurrentSession();
-			if (session != null) {
-				return session.getDBUser().isAdmin();
-			}
-		}
-		return false;
-	}
+	return false;
+    }
 
 }

@@ -13,7 +13,7 @@
  * 
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle.gui.wizard.load;
 
 import com.iver.andami.PluginServices;
@@ -22,20 +22,20 @@ import com.iver.cit.gvsig.project.documents.view.gui.View;
 
 public class LoadLegendWizard extends LoadMapWizard {
 
-	public LoadLegendWizard(View view) {
-		super(view);
+    public LoadLegendWizard(View view) {
+	super(view);
 
-	}
+    }
 
-	public WindowInfo getWindowInfo() {
-		WindowInfo wi = super.getWindowInfo();
-		wi.setHeight(300);
-		wi.setTitle(PluginServices.getText(this, "load_legends"));
-		return wi;
-	}
+    public WindowInfo getWindowInfo() {
+	WindowInfo wi = super.getWindowInfo();
+	wi.setHeight(300);
+	wi.setTitle(PluginServices.getText(this, "load_legends"));
+	return wi;
+    }
 
-	protected void addWizardComponents() {
-		views.add(new LoadLegendWizardComponent(properties));
-	}
+    protected void addWizardComponents() {
+	views.add(new LoadLegendWizardComponent(properties));
+    }
 
 }

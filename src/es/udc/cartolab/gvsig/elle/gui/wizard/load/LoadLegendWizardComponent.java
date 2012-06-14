@@ -82,7 +82,7 @@ public class LoadLegendWizardComponent extends WizardComponent {
 	//components placement
 	setLayout(new MigLayout("inset 0, align center",
 		"20[grow]",
-	"[]15[][]15[][]"));
+		"[]15[][]15[][]"));
 	add(noLegendRB, "wrap");
 	add(databaseRB, "wrap");
 	add(dbPanel, "shrink, growx, growy, wrap");
@@ -143,7 +143,7 @@ public class LoadLegendWizardComponent extends WizardComponent {
 	JPanel panel = new JPanel();
 	MigLayout layout = new MigLayout("inset 0, align center",
 		"10[grow][]50",
-	"5[grow]5");
+		"5[grow]5");
 	panel.setLayout(layout);
 
 	if (DBSession.getCurrentSession()!=null) {
@@ -166,7 +166,7 @@ public class LoadLegendWizardComponent extends WizardComponent {
 	JPanel panel = new JPanel();
 	MigLayout layout = new MigLayout("inset 0, align center",
 		"10[grow][]50",
-	"5[grow]5");
+		"5[grow]5");
 	panel.setLayout(layout);
 
 	boolean panelAdded = false;

@@ -13,7 +13,7 @@
  * 
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle.gui.wizard.save;
 
 import javax.swing.JOptionPane;
@@ -28,71 +28,71 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 
 public class SaveMapWizard extends WizardWindow {
 
-	public final static String PROPERTY_VIEW = "view";
+    public final static String PROPERTY_VIEW = "view";
 
-	private WindowInfo viewInfo;
-	private final int width = 750;
-	private final int height = 500;
+    private WindowInfo viewInfo;
+    private final int width = 750;
+    private final int height = 500;
 
 
-	public SaveMapWizard(View view) {
-		super();
+    public SaveMapWizard(View view) {
+	super();
 
-		properties.put(PROPERTY_VIEW, view);
+	properties.put(PROPERTY_VIEW, view);
 
+    }
+
+
+    public WindowInfo getWindowInfo() {
+	if (viewInfo == null) {
+	    viewInfo = new WindowInfo(WindowInfo.MODALDIALOG | WindowInfo.RESIZABLE);
+	    viewInfo.setTitle(PluginServices.getText(this, "save_map"));
+	    viewInfo.setWidth(width);
+	    viewInfo.setHeight(height);
 	}
+	return viewInfo;
+    }
 
 
-	public WindowInfo getWindowInfo() {
-		if (viewInfo == null) {
-			viewInfo = new WindowInfo(WindowInfo.MODALDIALOG | WindowInfo.RESIZABLE);
-			viewInfo.setTitle(PluginServices.getText(this, "save_map"));
-			viewInfo.setWidth(width);
-			viewInfo.setHeight(height);
-		}
-		return viewInfo;
+    public Object getWindowProfile() {
+	return WindowInfo.DIALOG_PROFILE;
+    }
+
+
+    protected void addWizardComponents() {
+	views.add(new SaveMapWizardComponent(properties));
+	views.add(new SaveLegendsWizardComponent(properties));
+    }
+
+    protected void finish() {
+	boolean close = true;
+	boolean success = true;
+	try {
+	    for (WizardComponent wc : views) {
+		wc.finish();
+	    }
+	} catch (WizardException e) {
+	    close = e.closeWizard();
+	    success = false;
+	    if (e.showMessage()) {
+		JOptionPane.showMessageDialog(
+			this,
+			e.getMessage(),
+			"",
+			JOptionPane.ERROR_MESSAGE);
+	    }
+	    e.printStackTrace();
 	}
-
-
-	public Object getWindowProfile() {
-		return WindowInfo.DIALOG_PROFILE;
+	if (close) {
+	    close();
 	}
-
-
-	protected void addWizardComponents() {
-		views.add(new SaveMapWizardComponent(properties));
-		views.add(new SaveLegendsWizardComponent(properties));
+	if (success) {
+	    JOptionPane.showMessageDialog(
+		    this,
+		    PluginServices.getText(this, "map_saved_correctly"),
+		    "",
+		    JOptionPane.INFORMATION_MESSAGE);
 	}
-
-	protected void finish() {
-		boolean close = true;
-		boolean success = true;
-		try {
-			for (WizardComponent wc : views) {
-				wc.finish();
-			}
-		} catch (WizardException e) {
-			close = e.closeWizard();
-			success = false;
-			if (e.showMessage()) {
-				JOptionPane.showMessageDialog(
-						this,
-						e.getMessage(),
-						"",
-						JOptionPane.ERROR_MESSAGE);
-			}
-			e.printStackTrace();
-		}
-		if (close) {
-			close();
-		}
-		if (success) {
-			JOptionPane.showMessageDialog(
-					this,
-					PluginServices.getText(this, "map_saved_correctly"),
-					"",
-					JOptionPane.INFORMATION_MESSAGE);
-		}
-	}
+    }
 
 }

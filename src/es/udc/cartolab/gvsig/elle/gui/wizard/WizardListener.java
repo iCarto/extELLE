@@ -13,11 +13,11 @@
  * 
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle.gui.wizard;
 
 public interface WizardListener {
 
-	public void wizardChanged();
+    public void wizardChanged();
 
 }

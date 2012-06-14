@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle.gui.wizard.save;
 
 import java.util.ArrayList;
@@ -31,96 +31,96 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 
 public class SaveLegendsWizard extends WizardWindow {
 
-	public final static String PROPERTY_VIEW = "view";
+    public final static String PROPERTY_VIEW = "view";
 
-	public final static int ACTIVES = 0;
-	public final static int VISIBLES = 1;
-	public final static int ALL = 2;
+    public final static int ACTIVES = 0;
+    public final static int VISIBLES = 1;
+    public final static int ALL = 2;
 
-	private WindowInfo viewInfo;
-	private int layersOption;
-	private final int width = 750;
-	private final int height = 500;
+    private WindowInfo viewInfo;
+    private int layersOption;
+    private final int width = 750;
+    private final int height = 500;
 
-	public SaveLegendsWizard(View view, int layersOption) {
-		properties.put(SaveMapWizard.PROPERTY_VIEW, view);
+    public SaveLegendsWizard(View view, int layersOption) {
+	properties.put(SaveMapWizard.PROPERTY_VIEW, view);
 
-		this.layersOption = layersOption;
-		setLayersProperties();
+	this.layersOption = layersOption;
+	setLayersProperties();
 
+    }
+
+    protected void addWizardComponents() {
+	views.add(new SaveLegendsWizardComponent(properties));
+    }
+
+    private void setLayersProperties() {
+	Object aux = properties.get(SaveMapWizard.PROPERTY_VIEW);
+	if (aux != null && aux instanceof View) {
+	    FLayers layers = ((View) aux).getMapControl().getMapContext().getLayers();
+	    List<LayerProperties> list = getList(layers);
+	    properties.put(SaveMapWizardComponent.PROPERTY_LAYERS_MAP, list);
 	}
+    }
 
-	protected void addWizardComponents() {
-		views.add(new SaveLegendsWizardComponent(properties));
-	}
+    private List<LayerProperties> getList(FLayers layers) {
+	List<LayerProperties> list = new ArrayList<LayerProperties>();
 
-	private void setLayersProperties() {
-		Object aux = properties.get(SaveMapWizard.PROPERTY_VIEW);
-		if (aux != null && aux instanceof View) {
-			FLayers layers = ((View) aux).getMapControl().getMapContext().getLayers();
-			List<LayerProperties> list = getList(layers);
-			properties.put(SaveMapWizardComponent.PROPERTY_LAYERS_MAP, list);
-		}
-	}
+	for (int i=layers.getLayersCount()-1; i>=0; i--) {
+	    FLayer layer = layers.getLayer(i);
+	    if (layer instanceof FLayers) {
+		list.addAll(getList((FLayers) layer));
+	    } else {
+		if (layer instanceof FLyrVect) {
+		    LayerProperties lp;
+		    try {
+			lp = new LayerProperties((FLyrVect) layer);
 
-	private List<LayerProperties> getList(FLayers layers) {
-		List<LayerProperties> list = new ArrayList<LayerProperties>();
+			lp.setVisible(layer.isVisible());
 
-		for (int i=layers.getLayersCount()-1; i>=0; i--) {
-			FLayer layer = layers.getLayer(i);
-			if (layer instanceof FLayers) {
-				list.addAll(getList((FLayers) layer));
-			} else {
-				if (layer instanceof FLyrVect) {
-					LayerProperties lp;
-					try {
-						lp = new LayerProperties((FLyrVect) layer);
-
-						lp.setVisible(layer.isVisible());
-
-						switch (layersOption) {
-						case ACTIVES :
-							lp.setSave(layer.isActive());
-							break;
-						case VISIBLES :
-							lp.setSave(layer.isVisible());
-							break;
-						case ALL:
-						default:
-							lp.setSave(true);
-						}
-
-						lp.setGroup(layer.getParentLayer().getName());
-						lp.setMaxScale(layer.getMaxScale());
-						lp.setMinScale(layer.getMinScale());
-						lp.setPosition(layers.getLayersCount()-i);
-
-						list.add(lp);
-					} catch (WizardException e) {
-						// layer is not postgis, nothing to do
-					}
-				}
+			switch (layersOption) {
+			case ACTIVES :
+			    lp.setSave(layer.isActive());
+			    break;
+			case VISIBLES :
+			    lp.setSave(layer.isVisible());
+			    break;
+			case ALL:
+			default:
+			    lp.setSave(true);
 			}
+
+			lp.setGroup(layer.getParentLayer().getName());
+			lp.setMaxScale(layer.getMaxScale());
+			lp.setMinScale(layer.getMinScale());
+			lp.setPosition(layers.getLayersCount()-i);
+
+			list.add(lp);
+		    } catch (WizardException e) {
+			// layer is not postgis, nothing to do
+		    }
 		}
-
-		return list;
-
+	    }
 	}
 
+	return list;
 
-	public WindowInfo getWindowInfo() {
-		if (viewInfo == null) {
-			viewInfo = new WindowInfo(WindowInfo.MODALDIALOG | WindowInfo.RESIZABLE);
-			viewInfo.setTitle(PluginServices.getText(this, "Save_legends"));
-			viewInfo.setWidth(width);
-			viewInfo.setHeight(height);
-		}
-		return viewInfo;
+    }
+
+
+    public WindowInfo getWindowInfo() {
+	if (viewInfo == null) {
+	    viewInfo = new WindowInfo(WindowInfo.MODALDIALOG | WindowInfo.RESIZABLE);
+	    viewInfo.setTitle(PluginServices.getText(this, "Save_legends"));
+	    viewInfo.setWidth(width);
+	    viewInfo.setHeight(height);
 	}
+	return viewInfo;
+    }
 
 
-	public Object getWindowProfile() {
-		return WindowInfo.DIALOG_PROFILE;
-	}
+    public Object getWindowProfile() {
+	return WindowInfo.DIALOG_PROFILE;
+    }
 
 }

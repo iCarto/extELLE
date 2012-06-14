@@ -13,7 +13,7 @@
  * 
  * You should have received a copy of the GNU General Public License along with ELLE.
  * If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package es.udc.cartolab.gvsig.elle.gui.wizard.load;
 
 import com.iver.andami.PluginServices;
@@ -24,35 +24,35 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 
 public class LoadMapWizard extends WizardWindow {
 
-	private WindowInfo viewInfo;
-	private String mapName;
+    private WindowInfo viewInfo;
+    private String mapName;
 
-	public LoadMapWizard(View view) {
-		super();
+    public LoadMapWizard(View view) {
+	super();
 
-		properties.put(LoadMapWizardComponent.PROPERTY_VEW, view);
+	properties.put(LoadMapWizardComponent.PROPERTY_VEW, view);
 
+    }
+
+
+    public WindowInfo getWindowInfo() {
+	if (viewInfo == null) {
+	    viewInfo = new WindowInfo(WindowInfo.MODELESSDIALOG | WindowInfo.PALETTE);
+	    viewInfo.setTitle(PluginServices.getText(this, "Load_map"));
+	    viewInfo.setWidth(525);
+	    viewInfo.setHeight(520);
 	}
+	return viewInfo;
+    }
 
 
-	public WindowInfo getWindowInfo() {
-		if (viewInfo == null) {
-			viewInfo = new WindowInfo(WindowInfo.MODELESSDIALOG | WindowInfo.PALETTE);
-			viewInfo.setTitle(PluginServices.getText(this, "Load_map"));
-			viewInfo.setWidth(525);
-			viewInfo.setHeight(520);
-		}
-		return viewInfo;
-	}
+    public Object getWindowProfile() {
+	return WindowInfo.DIALOG_PROFILE;
+    }
 
-
-	public Object getWindowProfile() {
-		return WindowInfo.DIALOG_PROFILE;
-	}
-
-	protected void addWizardComponents() {
-		views.add(new LoadMapWizardComponent(properties));
-		views.add(new LoadLegendWizardComponent(properties));
-	}
+    protected void addWizardComponents() {
+	views.add(new LoadMapWizardComponent(properties));
+	views.add(new LoadLegendWizardComponent(properties));
+    }
 
 }
