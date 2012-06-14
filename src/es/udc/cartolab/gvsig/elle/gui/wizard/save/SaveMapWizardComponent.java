@@ -55,6 +55,7 @@ import com.iver.cit.gvsig.fmap.layers.VectorialDBAdapter;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 import com.iver.utiles.swing.jtable.JTable;
 
+import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardComponent;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
@@ -461,18 +462,18 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		//check existence of tables _map and _map_overview
 		DBSession dbs = DBSession.getCurrentSession();
 		try {
-			boolean tableMapExists = dbs.tableExists(dbs.getSchema(), "_map");
-			boolean tableMapOvExists = dbs.tableExists(dbs.getSchema(), "_map_overview");
+			boolean tableMapExists = dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapTable());
+			boolean tableMapOvExists = dbs.tableExists(DBStructure.getSchema(), DBStructure.getOverviewTable());
 			//TODO legends tables
 
 			if (!tableMapExists || !tableMapOvExists) {
 
-				boolean canCreate = dbs.getDBUser().canCreateTable(dbs.getSchema());
+				boolean canCreate = dbs.getDBUser().canCreateTable(DBStructure.getSchema());
 				if (!canCreate) {
 					//[jestevez] I think this code is never reached due to the limitations of SaveMapExtension
 					throw new WizardException(PluginServices.getText(this, "table_map_contact_admin"));
 				} else {
-					String message = String.format(PluginServices.getText(this, "tables_will_be_created"), dbs.getSchema());
+					String message = String.format(PluginServices.getText(this, "tables_will_be_created"), DBStructure.getSchema());
 					int answer = JOptionPane.showConfirmDialog(
 							this,
 							message,

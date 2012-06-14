@@ -28,7 +28,7 @@
 	</target>
 
 	<target name="create-jar" description="Creates the plugin jar">
-		<jar jarfile="${dist}/lib/${plugin}.jar" basedir="${build}" includes="es/udc/cartolab/**" />
+		<jar jarfile="${dist}/lib/${plugin}.jar" basedir="${build}" includes="es/**" />
 	  	<jar update="true" jarfile="${dist}/lib/${plugin}.jar" basedir="images" includes="*" />
 		</target>
 

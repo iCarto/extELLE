@@ -29,6 +29,7 @@ import com.iver.cit.gvsig.fmap.drivers.DBException;
 import com.iver.cit.gvsig.fmap.layers.FLayer;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 
+import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.wizard.save.LayerProperties;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -96,7 +97,7 @@ public class MapDAO {
 			System.out.println(where);
 
 			/////////////// MapControl
-			String[][] layers = dbs.getTable("_map", dbs.getSchema(), where, new String[]{"posicion"}, false);
+			String[][] layers = dbs.getTable(DBStructure.getMapTable(), DBStructure.getSchema(), where, new String[]{"posicion"}, false);
 
 			for (int i=0; i<layers.length; i++) {
 				String schema=null;
@@ -160,7 +161,7 @@ public class MapDAO {
 			String where = "WHERE mapa='" + mapName + "'";
 
 			System.out.println(where);
-			String[][] layersOV = dbs.getTable("_map_overview", dbs.getSchema(), where, new String[]{"posicion"}, false);
+			String[][] layersOV = dbs.getTable(DBStructure.getOverviewTable(), DBStructure.getSchema(), where, new String[]{"posicion"}, false);
 
 			for (int i = 0; i < layersOV.length; i++) {
 				String schema = null;
@@ -307,12 +308,12 @@ public class MapDAO {
 				rowToSave[9] = null;
 
 				try {
-					dbs.insertRow(dbs.getSchema(), "_map", rowToSave);
+					dbs.insertRow(DBStructure.getSchema(), DBStructure.getMapTable(), rowToSave);
 				} catch (SQLException e) {
 					// undo insertions
 					try {
 						dbs = DBSession.reconnect();
-						dbs.deleteRows(dbs.getSchema(), "_map", "where mapa='" + auxMapName + "'");
+						dbs.deleteRows(DBStructure.getSchema(), DBStructure.getMapTable(), "where mapa='" + auxMapName + "'");
 						throw new SQLException(e);
 					} catch (DBException e1) {
 						e1.printStackTrace();
@@ -321,8 +322,8 @@ public class MapDAO {
 			}
 		}
 		//remove previous entries and rename aux table
-		dbs.deleteRows(dbs.getSchema(), "_map", "where mapa='" + mapName + "'");
-		dbs.updateRows(dbs.getSchema(), "_map", new String[]{"mapa"}, new String[]{mapName}, "where mapa='" + auxMapName + "'");
+		dbs.deleteRows(DBStructure.getSchema(), DBStructure.getMapTable(), "where mapa='" + mapName + "'");
+		dbs.updateRows(DBStructure.getSchema(), DBStructure.getMapTable(), new String[]{"mapa"}, new String[]{mapName}, "where mapa='" + auxMapName + "'");
 	}
 
 	public  void saveMapOverview(Object[][] rows, String mapName) throws SQLException {
@@ -338,7 +339,7 @@ public class MapDAO {
 				 * Also, a more accurate approach will be have a hashmap 'columnName = valueName' because using this code
 				 * if the order of the columns changes it will not work.
 				 */
-				String[] columns = dbs.getColumns(dbs.getSchema(), "_map_overview");
+				String[] columns = dbs.getColumns(DBStructure.getSchema(), DBStructure.getOverviewTable());
 
 				//_map_overview structure: mapName, tablename, schema, position, [layername]
 				Object[] rowToSave = new Object[columns.length];
@@ -354,12 +355,12 @@ public class MapDAO {
 				}
 
 				try {
-					dbs.insertRow(dbs.getSchema(), "_map_overview", columns, rowToSave);
+					dbs.insertRow(DBStructure.getSchema(), DBStructure.getOverviewTable(), columns, rowToSave);
 				} catch (SQLException e) {
 					//undo insertions
 					try {
 						dbs = DBSession.reconnect();
-						dbs.deleteRows(dbs.getSchema(), "_map_overview", "where mapa='" + auxMapname + "'");
+						dbs.deleteRows(DBStructure.getSchema(), DBStructure.getOverviewTable(), "where mapa='" + auxMapname + "'");
 						throw new SQLException(e);
 					} catch (DBException e1) {
 						// TODO Auto-generated catch block
@@ -369,8 +370,8 @@ public class MapDAO {
 			}
 		}
 		//remove previous entries and rename aux table
-		dbs.deleteRows(dbs.getSchema(), "_map_overview", "where mapa='" + mapName + "'");
-		dbs.updateRows(dbs.getSchema(), "_map_overview", new String[]{"mapa"}, new String[]{mapName}, "where mapa='" + auxMapname + "'");
+		dbs.deleteRows(DBStructure.getSchema(), DBStructure.getOverviewTable(), "where mapa='" + mapName + "'");
+		dbs.updateRows(DBStructure.getSchema(), DBStructure.getOverviewTable(), new String[]{"mapa"}, new String[]{mapName}, "where mapa='" + auxMapname + "'");
 
 	}
 
@@ -380,7 +381,7 @@ public class MapDAO {
 
 		DBSession dbs = DBSession.getCurrentSession();
 
-		String sqlCreateMap = "CREATE TABLE " + dbs.getSchema() +"._map "
+		String sqlCreateMap = "CREATE TABLE " + DBStructure.getSchema() +"."+DBStructure.getMapTable()+" "
 		+ "("
 		+ "   mapa character varying(255) NOT NULL,"
 		+ "   nombre_capa character varying(255) NOT NULL,"
@@ -395,7 +396,7 @@ public class MapDAO {
 		+ "   PRIMARY KEY (mapa, nombre_capa)"
 		+ ")";
 
-		String sqlCreateMapOverview =  "CREATE TABLE " + dbs.getSchema() + "._map_overview"
+		String sqlCreateMapOverview =  "CREATE TABLE " + DBStructure.getSchema() + "."+DBStructure.getOverviewTable()
 		+ "("
 		+ "  mapa character varying NOT NULL,"
 		+ "  nombre_capa character varying NOT NULL,"
@@ -405,20 +406,20 @@ public class MapDAO {
 		+ "  PRIMARY KEY (mapa, nombre_capa)"
 		+ ")";
 
-		String sqlGrant = "GRANT SELECT ON TABLE " + dbs.getSchema() + ".%s TO public";
+		String sqlGrant = "GRANT SELECT ON TABLE " + DBStructure.getSchema() + ".%s TO public";
 
 		Connection con = dbs.getJavaConnection();
 		Statement stat = con.createStatement();
 
-		if (!dbs.tableExists(dbs.getSchema(), "_map")) {
+		if (!dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapTable())) {
 			stat.execute(sqlCreateMap);
-			stat.execute(String.format(sqlGrant, "_map"));
+			stat.execute(String.format(sqlGrant, DBStructure.getMapTable()));
 			commit = true;
 		}
 
-		if (!dbs.tableExists(dbs.getSchema(), "_map_overview")) {
+		if (!dbs.tableExists(DBStructure.getSchema(), DBStructure.getOverviewTable())) {
 			stat.execute(sqlCreateMapOverview);
-			stat.execute(String.format(sqlGrant, "_map_overview"));
+			stat.execute(String.format(sqlGrant, DBStructure.getOverviewTable()));
 			commit = true;
 		}
 
@@ -429,8 +430,8 @@ public class MapDAO {
 
 	public  void deleteMap(String mapName) throws SQLException {
 		DBSession dbs = DBSession.getCurrentSession();
-		String removeMap = "DELETE FROM " + dbs.getSchema() + "._map WHERE mapa=?";
-		String removeMapOverview = "DELETE FROM " + dbs.getSchema() + "._map_overview WHERE mapa=?";
+		String removeMap = "DELETE FROM " + DBStructure.getSchema() + "."+DBStructure.getMapTable()+" WHERE mapa=?";
+		String removeMapOverview = "DELETE FROM " + DBStructure.getSchema() + "."+DBStructure.getOverviewTable()+" WHERE mapa=?";
 
 		PreparedStatement ps = dbs.getJavaConnection().prepareStatement(removeMap);
 		ps.setString(1, mapName);
@@ -446,7 +447,7 @@ public class MapDAO {
 	}
 
     public String[] getMaps() throws SQLException {
-	String[] maps = DBSession.getCurrentSession().getDistinctValues("_map",
+	String[] maps = DBSession.getCurrentSession().getDistinctValues(DBStructure.getMapTable(),
 		"mapa");
 	return maps;
     }

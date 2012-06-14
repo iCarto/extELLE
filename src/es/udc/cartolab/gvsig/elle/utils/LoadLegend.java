@@ -42,6 +42,7 @@ import com.iver.cit.gvsig.fmap.rendering.ILegend;
 import com.iver.cit.gvsig.fmap.rendering.IVectorLegend;
 import com.iver.utiles.XMLEntity;
 
+import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.EllePreferencesPage;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -206,8 +207,8 @@ public abstract class LoadLegend {
 
 	public static void deleteLegends(String legendsName) throws SQLException {
 		DBSession dbs = DBSession.getCurrentSession();
-		String removeMap = "DELETE FROM " + dbs.getSchema() + "._map_style WHERE nombre_estilo=?";
-		String removeMapOverview = "DELETE FROM " + dbs.getSchema() + "._map_overview_style WHERE nombre_estilo=?";
+		String removeMap = "DELETE FROM " + DBStructure.getSchema() + "."+DBStructure.getMapStyleTable()+" WHERE nombre_estilo=?";
+		String removeMapOverview = "DELETE FROM " + DBStructure.getSchema() + "."+DBStructure.getOverviewStyleTable()+" WHERE nombre_estilo=?";
 
 		PreparedStatement ps = dbs.getJavaConnection().prepareStatement(removeMap);
 		ps.setString(1, legendsName);
@@ -225,7 +226,7 @@ public abstract class LoadLegend {
 	public static boolean legendExistsDB(String legendName) throws SQLException {
 
 		DBSession dbs = DBSession.getCurrentSession();
-		String[] legends = dbs.getDistinctValues("_map_style", "nombre_estilo");
+		String[] legends = dbs.getDistinctValues(DBStructure.getMapStyleTable(), "nombre_estilo");
 		boolean found = false;
 		for (int i=0; i<legends.length; i++) {
 			if (legendName.equals(legends[i])) {
@@ -243,7 +244,7 @@ public abstract class LoadLegend {
 
 		DBSession dbs = DBSession.getCurrentSession();
 
-		String sqlCreateMapStyle =  "CREATE TABLE " + dbs.getSchema() + "._map_style"
+		String sqlCreateMapStyle =  "CREATE TABLE " + DBStructure.getSchema() + "."+DBStructure.getMapStyleTable()
 		+ "("
 		+ "  nombre_capa character varying NOT NULL,"
 		+ "  nombre_estilo character varying NOT NULL,"
@@ -255,7 +256,7 @@ public abstract class LoadLegend {
 		+ "  OIDS=FALSE"
 		+ ")";
 
-		String sqlCreateMapOverviewStyle = "CREATE TABLE " + dbs.getSchema() + "._map_overview_style"
+		String sqlCreateMapOverviewStyle = "CREATE TABLE " + DBStructure.getSchema() + "."+DBStructure.getOverviewStyleTable()
 		+ "("
 		+ "  nombre_capa character varying NOT NULL,"
 		+ "  nombre_estilo character varying NOT NULL,"
@@ -264,20 +265,20 @@ public abstract class LoadLegend {
 		+ "  PRIMARY KEY (nombre_capa, nombre_estilo)"
 		+ ")";
 
-		String sqlGrant = "GRANT SELECT ON TABLE " + dbs.getSchema() + ".%s TO public";
+		String sqlGrant = "GRANT SELECT ON TABLE " + DBStructure.getSchema() + ".%s TO public";
 
 		Connection con = dbs.getJavaConnection();
 		Statement stat = con.createStatement();
 
-		if (!dbs.tableExists(dbs.getSchema(), "_map_style")) {
+		if (!dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapStyleTable())) {
 			stat.execute(sqlCreateMapStyle);
-			stat.execute(String.format(sqlGrant, "_map_style"));
+			stat.execute(String.format(sqlGrant, DBStructure.getMapStyleTable()));
 			commit = true;
 		}
 
-		if (!dbs.tableExists(dbs.getSchema(), "_map_overview_style")) {
+		if (!dbs.tableExists(DBStructure.getSchema(), DBStructure.getOverviewStyleTable())) {
 			stat.execute(sqlCreateMapOverviewStyle);
-			stat.execute(String.format(sqlGrant, "_map_style"));
+			stat.execute(String.format(sqlGrant, DBStructure.getMapStyleTable()));
 			commit = true;
 		}
 
@@ -317,9 +318,9 @@ public abstract class LoadLegend {
 
 		String table;
 		if (overview) {
-			table = "_map_overview_style";
+			table = DBStructure.getOverviewStyleTable();
 		} else {
-			table = "_map_style";
+			table = DBStructure.getMapStyleTable();
 		}
 
 		DBSession dbs = DBSession.getCurrentSession();

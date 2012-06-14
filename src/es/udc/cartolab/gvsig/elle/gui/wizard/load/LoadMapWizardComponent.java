@@ -38,6 +38,7 @@ import com.iver.cit.gvsig.project.documents.view.ProjectView;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 import com.jeta.forms.components.panel.FormPanel;
 
+import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardComponent;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.utils.ELLEMap;
@@ -111,7 +112,7 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 
 				dbs = DBSession.getCurrentSession();
 
-				if (dbs.tableExists(dbs.getSchema(), "_map") && dbs.tableExists(dbs.getSchema(), "_map_overview")) {
+				if (dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapTable()) && dbs.tableExists(DBStructure.getSchema(), DBStructure.getOverviewTable())) {
 
 		    String[] maps = MapDAO.getInstance().getMaps();
 
@@ -138,7 +139,7 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 								String selectedValue = (String) mapList.getSelectedValues()[0];
 								String where = String.format("WHERE mapa = '%s'", selectedValue);
 								try {
-									layers = dbs.getTable("_map", dbs.getSchema(), where, new String[]{"posicion"}, true);
+									layers = dbs.getTable(DBStructure.getMapTable(), DBStructure.getSchema(), where, new String[]{"posicion"}, true);
 									String layerText = "";
 									for (int i=0; i<layers.length; i++) {
 										layerText = layerText + layers[i][1] + "\n";

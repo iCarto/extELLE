@@ -1,0 +1,6 @@
+elle_server=localhost
+elle_port=5432
+elle_pguser=postgres
+
+elle_template=template_postgis
+elle_dbname=elle

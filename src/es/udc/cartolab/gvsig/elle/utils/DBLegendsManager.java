@@ -26,6 +26,7 @@ import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.fmap.drivers.DBException;
 import com.iver.cit.gvsig.fmap.layers.FLyrVect;
 
+import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.gui.wizard.save.LayerProperties;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
@@ -34,7 +35,7 @@ public class DBLegendsManager extends AbstractLegendsManager {
 
 	private boolean tableStylesExists, tableOvStylesExists;
 	private String notConnected = PluginServices.getText(this, "notConnectedError");
-	private String schema, styleTable = "_map_style", styleOvTable = "_map_overview_style";
+	private String schema, styleTable = DBStructure.getMapStyleTable(), styleOvTable = DBStructure.getOverviewStyleTable();
 
 	public DBLegendsManager(String leyendGroupName) throws WizardException {
 		super(leyendGroupName);
@@ -42,9 +43,9 @@ public class DBLegendsManager extends AbstractLegendsManager {
 		DBSession dbs = DBSession.getCurrentSession();
 		if (dbs!=null) {
 			try {
-				tableStylesExists = dbs.tableExists(dbs.getSchema(), styleTable);
-				tableOvStylesExists = dbs.tableExists(dbs.getSchema(), styleOvTable);
-				schema = dbs.getSchema();
+				tableStylesExists = dbs.tableExists(DBStructure.getSchema(), styleTable);
+				tableOvStylesExists = dbs.tableExists(DBStructure.getSchema(), styleOvTable);
+				schema = DBStructure.getSchema();
 			} catch (SQLException e) {
 				throw new WizardException(e);
 			}
@@ -99,7 +100,7 @@ public class DBLegendsManager extends AbstractLegendsManager {
 					type,
 					xml
 			};
-			dbs.insertRow(dbs.getSchema(), table, row);
+			dbs.insertRow(DBStructure.getSchema(), table, row);
 		} catch (SQLException e) {
 
 		} catch (Exception e) {

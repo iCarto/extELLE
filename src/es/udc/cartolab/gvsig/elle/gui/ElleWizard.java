@@ -37,6 +37,7 @@ import com.iver.cit.gvsig.gui.WizardPanel;
 import com.iver.cit.gvsig.gui.panels.CRSSelectPanel;
 import com.jeta.forms.components.panel.FormPanel;
 
+import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -188,7 +189,7 @@ public class ElleWizard extends WizardPanel {
 
 				dbs = DBSession.getCurrentSession();
 
-				if (dbs.tableExists(dbs.getSchema(), "_map")) {
+				if (dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapTable())) {
 
 		    String[] maps = MapDAO.getInstance().getMaps();
 
@@ -203,7 +204,7 @@ public class ElleWizard extends WizardPanel {
 							if (selected.length == 1) {
 								String where = String.format("where mapa ='%s'", groupList.getSelectedValues()[0]);
 								try {
-									layers = dbs.getTable("_map", where);
+									layers = dbs.getTable(DBStructure.getMapTable(), where);
 								} catch (SQLException e) {
 									JOptionPane.showMessageDialog(null,
 											"Error SQL: " + e.getMessage(),
