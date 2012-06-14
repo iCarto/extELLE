@@ -3,7 +3,6 @@ package es.icarto.gvsig.elle.tests;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.iver.cit.gvsig.fmap.featureiterators.FeatureIteratorTest;
 import com.iver.cit.gvsig.fmap.layers.LayerFactory;
 
 import es.icarto.gvsig.elle.db.DBStructure;
@@ -19,10 +17,6 @@ import es.udc.cartolab.gvsig.elle.utils.MapDAO;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 public class ELLETests {
-
-    static final String fwAndamiDriverPath = "../_fwAndami/gvSIG/extensiones/com.iver.cit.gvsig/drivers";
-    private static File baseDataPath;
-    private static File baseDriversPath;
 
     @Before
     public void connectToDatabase() throws Exception {
@@ -70,19 +64,8 @@ public class ELLETests {
     }
 
     private void doSetup() throws Exception {
-	URL url = FeatureIteratorTest.class.getResource("testdata");
-	if (url == null) {
-	    throw new Exception(
-		    "No se encuentra el directorio con datos de prueba");
-	}
-
-	baseDataPath = new File(url.getFile());
-	if (!baseDataPath.exists()) {
-	    throw new Exception(
-		    "No se encuentra el directorio con datos de prueba");
-	}
-
-	baseDriversPath = new File(fwAndamiDriverPath);
+	String fwAndamiDriverPath = "../_fwAndami/gvSIG/extensiones/com.iver.cit.gvsig/drivers";
+	File baseDriversPath = new File(fwAndamiDriverPath);
 	if (!baseDriversPath.exists()) {
 	    throw new Exception("Can't find drivers path: "
 		    + fwAndamiDriverPath);
