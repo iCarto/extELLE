@@ -43,7 +43,6 @@ public class ELLEMap {
     private List<LayerProperties> layers;
     private String styleName = "";
     private BaseView view;
-    private String whereClause = "";
     private boolean loaded = false;
     private List<LayerProperties> overviewLayers;
     private IProjection projection;
@@ -109,19 +108,46 @@ public class ELLEMap {
 	this.view = view;
     }
 
-
     /**
-     * @param whereClause the whereClause to set
+     * Will iterate over all layers in map setting the where clause. To set only
+     * a particular layer use instead #getLayer("name").setWhere("where");
      */
-    public void setWhereClause(String whereClause) {
-	this.whereClause = whereClause;
+    public void setWhereOnAllLayers(String whereClause) {
+	if (this.layers != null) {
+	    for (LayerProperties layer : this.layers) {
+		layer.setWhere(whereClause);
+	    }
+	}
     }
 
-    /**
-     * @return the whereClause
-     */
-    public String getWhereClause() {
-	return whereClause;
+    public LayerProperties getLayer(String layerName) {
+	if (this.layers != null) {
+	    for (LayerProperties layer : this.layers) {
+		if (layer.getLayername().equals(layerName)) {
+		    return layer;
+		}
+	    }
+	}
+	return null;
+    }
+
+    public void addLayer(LayerProperties layer) {
+	layers.add(layer);
+    }
+
+    public void addOverviewLayer(LayerProperties layer) {
+	overviewLayers.add(layer);
+    }
+
+    public LayerProperties getOverviewLayer(String layerName) {
+	if (this.overviewLayers != null) {
+	    for (LayerProperties layer : this.overviewLayers) {
+		if (layer.getLayername().equals(layerName)) {
+		    return layer;
+		}
+	    }
+	}
+	return null;
     }
 
     private FLayers getGroup(FLayers layers, String group) {
@@ -140,15 +166,6 @@ public class ELLEMap {
 	}
 	return null;
     }
-
-    public void addLayer(LayerProperties layer) {
-	layers.add(layer);
-    }
-
-    public void addOverviewLayer(LayerProperties layer) {
-	overviewLayers.add(layer);
-    }
-
 
     /* jlopez
      *
@@ -197,28 +214,10 @@ public class ELLEMap {
 	//load view layers
 	Collections.sort(layers);
 	for (LayerProperties lp : layers) {
-	    FLayers group;
-	    if (!lp.getGroup().equals("")) {
-		List<String> groupNames = getGroupNames(lp.getGroup());
-		FLayers currentGroup = view.getMapControl().getMapContext().getLayers();
-		for (String name:groupNames) {
-		    group = getGroup(currentGroup, name);
-		    if (group == null) {
-			group = new FLayers();
-			group.setName(name);
-			group.setMapContext(view.getMapControl().getMapContext());
-			currentGroup.addLayer(group);
-		    }
-		    currentGroup = group;
-		}
-		group = currentGroup;
-	    } else {
-		group = view.getMapControl().getMapContext().getLayers();
-	    }
-
 	    FLayer layer;
+	    FLayers group = getGroup(lp);
 	    try {
-		layer = getMapDAO().getLayer(lp, whereClause, proj);
+		layer = getMapDAO().getLayer(lp, proj);
 		if (layer!=null) {
 		    if (lp.getMaxScale()>-1) {
 			layer.setMaxScale(lp.getMaxScale());
@@ -242,8 +241,29 @@ public class ELLEMap {
 		}
 		e.printStackTrace(); //TODO change this to logger
 	    }
-
 	}
+    }
+
+    private FLayers getGroup(LayerProperties lp) {
+	FLayers group;
+	if (!lp.getGroup().equals("")) {
+	    List<String> groupNames = getGroupNames(lp.getGroup());
+	    FLayers currentGroup = view.getMapControl().getMapContext().getLayers();
+	    for (String name:groupNames) {
+		group = getGroup(currentGroup, name);
+		if (group == null) {
+		    group = new FLayers();
+		    group.setName(name);
+		    group.setMapContext(view.getMapControl().getMapContext());
+		    currentGroup.addLayer(group);
+		}
+		currentGroup = group;
+	    }
+	    group = currentGroup;
+	} else {
+	    group = view.getMapControl().getMapContext().getLayers();
+	}
+	return group;
     }
 
     @SuppressWarnings("unchecked")
@@ -251,7 +271,7 @@ public class ELLEMap {
 	Collections.sort(overviewLayers);
 	for (LayerProperties lp : overviewLayers) {
 	    try {
-		FLayer ovLayer = getMapDAO().getLayer(lp, whereClause, proj);
+		FLayer ovLayer = getMapDAO().getLayer(lp, proj);
 		ovLayer.setVisible(true);
 		view.getMapOverview().getMapContext().beginAtomicEvent();
 		// FLayer ovLayer = layer.cloneLayer(); // why this????

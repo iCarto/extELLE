@@ -33,6 +33,7 @@ public class LayerProperties implements Comparable {
     private String schema, tablename, layername;
     private FLyrVect layer;
     private String group = "";
+    private String sqlWhere = "";
     private boolean save = true, visible = false;
     private double maxScale = -1, minScale = -1;
     private int position;
@@ -145,6 +146,14 @@ public class LayerProperties implements Comparable {
 
     public String getLegendType() {
 	return legendType;
+    }
+
+    public void setWhere(String sqlWhere) {
+	this.sqlWhere = sqlWhere;
+    }
+
+    public String getWhere() {
+	return this.sqlWhere;
     }
 
     public int compareTo(Object o) {

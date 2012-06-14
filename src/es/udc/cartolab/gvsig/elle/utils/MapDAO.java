@@ -76,13 +76,14 @@ public class MapDAO {
 	return layer;
     }
 
-    public FLayer getLayer(LayerProperties lp, String whereClause, IProjection proj) throws SQLException, DBException {
+    public FLayer getLayer(LayerProperties lp, IProjection proj)
+	    throws SQLException, DBException {
 	return getLayer(lp.getLayername(), lp.getTablename(), lp.getSchema(),
-		whereClause, proj, lp.visible());
+		lp.getWhere(), proj, lp.visible());
     }
 
-    public ELLEMap getMap(View view, String mapName, String whereClause) throws Exception {
-	return getMap(view, mapName, whereClause, LoadLegend.NO_LEGEND, "");
+    public ELLEMap getMap(View view, String mapName) throws Exception {
+	return getMap(view, mapName, LoadLegend.NO_LEGEND, "");
     }
 
     protected List<LayerProperties> getViewLayers(String mapName) throws SQLException {
@@ -213,20 +214,14 @@ public class MapDAO {
      * @param view
      * @param mapName
      * @param proj
-     * @param whereClause
      * @param stylesSource must fit with LoadLegend's NO_LEGEND, DB_LEGEND or FILE_LEGEND
      * @param stylesName
      * @throws Exception
      */
-    public ELLEMap getMap(View view, String mapName,
-	    String whereClause, int stylesSource, String stylesName) throws Exception {
-
-	if (whereClause == null) {
-	    whereClause = "";
-	}
+    public ELLEMap getMap(View view, String mapName, int stylesSource,
+	    String stylesName) throws Exception {
 
 	ELLEMap map = new ELLEMap(mapName, view);
-	map.setWhereClause(whereClause);
 
 	List<LayerProperties> viewLayers = getViewLayers(mapName);
 	for (LayerProperties lp : viewLayers) {

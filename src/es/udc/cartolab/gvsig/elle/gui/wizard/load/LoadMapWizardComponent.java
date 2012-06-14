@@ -206,7 +206,8 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 	if (aux!=null && aux instanceof View) {
 	    View view = (View) aux;
 	    try {
-		ELLEMap map = MapDAO.getInstance().getMap(view, mapList.getSelectedValue().toString(), "");
+		ELLEMap map = MapDAO.getInstance().getMap(view,
+			mapList.getSelectedValue().toString());
 		map.load(crsPanel.getCurProj());
 		if (view.getModel().getName().equals("ELLE View") && (view.getModel() instanceof ProjectView)) {
 		    ((ProjectView) view.getModel()).setName(mapList.getSelectedValue().toString());
