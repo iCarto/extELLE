@@ -140,11 +140,7 @@ public class ElleWizard extends WizardPanel {
 
 	String whereClause = getWhereClause();
 
-	if (schema!=null) {
-	    return dbs.getLayer(layerName, tableName, schema, whereClause, proj);
-	} else {
-	    return dbs.getLayer(layerName, tableName, whereClause, proj);
-	}
+	return dbs.getLayer(layerName, tableName, schema, whereClause, proj);
     }
 
     public void initWizard() {
@@ -204,7 +200,10 @@ public class ElleWizard extends WizardPanel {
 			    if (selected.length == 1) {
 				String where = String.format("where mapa ='%s'", groupList.getSelectedValues()[0]);
 				try {
-				    layers = dbs.getTable(DBStructure.getMapTable(), where);
+					    layers = dbs.getTable(
+						    DBStructure.getMapTable(),
+						    DBStructure.getSchema(),
+						    where);
 				} catch (SQLException e) {
 				    JOptionPane.showMessageDialog(null,
 					    "Error SQL: " + e.getMessage(),

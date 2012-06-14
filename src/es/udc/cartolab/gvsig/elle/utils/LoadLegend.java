@@ -226,7 +226,9 @@ public abstract class LoadLegend {
     public static boolean legendExistsDB(String legendName) throws SQLException {
 
 	DBSession dbs = DBSession.getCurrentSession();
-	String[] legends = dbs.getDistinctValues(DBStructure.getMapStyleTable(), "nombre_estilo");
+	String[] legends = dbs.getDistinctValues(
+		DBStructure.getMapStyleTable(), DBStructure.getSchema(),
+		"nombre_estilo");
 	boolean found = false;
 	for (int i=0; i<legends.length; i++) {
 	    if (legendName.equals(legends[i])) {
@@ -326,7 +328,9 @@ public abstract class LoadLegend {
 	DBSession dbs = DBSession.getCurrentSession();
 	String layerName = layer.getName();
 	//		String styleName = dbCB.getSelectedItem().toString();
-	String[][] style = dbs.getTable(table, "where nombre_capa='" + layerName + "' and nombre_estilo='" + styleName + "'");
+	String[][] style = dbs.getTable(table, DBStructure.getSchema(),
+		"where nombre_capa='" + layerName + "' and nombre_estilo='"
+			+ styleName + "'");
 	if (style.length == 1) {
 	    String type = style[0][2];
 	    String def = style[0][3];

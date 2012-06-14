@@ -18,6 +18,7 @@ package es.udc.cartolab.gvsig.elle.utils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -66,11 +67,8 @@ public class MapDAO {
 	FLayer layer = null;
 
 	if (dbs != null) {
-	    if (schema!=null) {
-		layer = dbs.getLayer(layerName, tableName, schema, whereClause, proj);
-	    } else {
-		layer = dbs.getLayer(layerName, tableName, whereClause, proj);
-	    }
+	    layer = dbs.getLayer(layerName, tableName, schema, whereClause,
+		    proj);
 	    layer.setVisible(visible);
 	}
 	return layer;
@@ -358,7 +356,6 @@ public class MapDAO {
 			dbs.deleteRows(DBStructure.getSchema(), DBStructure.getOverviewTable(), "where mapa='" + auxMapname + "'");
 			throw new SQLException(e);
 		    } catch (DBException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		    }
 		}
@@ -368,6 +365,76 @@ public class MapDAO {
 	dbs.deleteRows(DBStructure.getSchema(), DBStructure.getOverviewTable(), "where mapa='" + mapName + "'");
 	dbs.updateRows(DBStructure.getSchema(), DBStructure.getOverviewTable(), new String[]{"mapa"}, new String[]{mapName}, "where mapa='" + auxMapname + "'");
 
+    }
+
+    /**
+     * 
+     * @return false if a SQLException is thrown, true otherwise (schema dropped
+     *         or nothing to do if not exists)
+     */
+    public boolean dropSchema() {
+	if(hasSchema()) {
+	    DBSession dbs = DBSession.getCurrentSession();
+	    Connection con = dbs.getJavaConnection();
+	    String sqlCreateSchema = "DROP SCHEMA " + DBStructure.getSchema()
+		    + " CASCADE";
+	    try {
+		Statement stat = con.createStatement();
+		stat.execute(sqlCreateSchema);
+		con.commit();
+	    } catch (SQLException e) {
+		e.printStackTrace();
+		return false;
+	    }
+	}
+	return true;
+    }
+
+    /**
+     * 
+     * @return false if a SQLException is thrown, true otherwise (schema created
+     *         or nothing to do if it already exists)
+     */
+    public boolean createSchema() {
+	if (!hasSchema()) {
+	    DBSession dbs = DBSession.getCurrentSession();
+	    Connection con = dbs.getJavaConnection();
+	    String sqlCreateSchema = "CREATE SCHEMA " + DBStructure.getSchema();
+	    try {
+		Statement stat = con.createStatement();
+		stat.execute(sqlCreateSchema);
+		con.commit();
+	    } catch (SQLException e) {
+		e.printStackTrace();
+		return false;
+	    }
+	}
+	return true;
+    }
+
+    /**
+     * 
+     * @return true if schema exists, false otherwise (if not exists or
+     *         SQLException is thrown)
+     */
+    public boolean hasSchema() {
+	DBSession dbs = DBSession.getCurrentSession();
+	Connection con = dbs.getJavaConnection();
+	String sqlHasSchema = "SELECT COUNT(*) AS schemaCount FROM information_schema.schemata WHERE schema_name = '"
+		+ DBStructure.getSchema() + "'";
+	try {
+	    Statement stat = con.createStatement();
+	    ResultSet rs = stat.executeQuery(sqlHasSchema);
+	    rs.next();
+	    int schemaCount = rs.getInt("schemaCount");
+	    if (schemaCount == 1) {
+		return true;
+	    }
+	    return false;
+	} catch (SQLException e) {
+	    e.printStackTrace();
+	    return false;
+	}
     }
 
     public  void createMapTables() throws SQLException {
@@ -406,13 +473,16 @@ public class MapDAO {
 	Connection con = dbs.getJavaConnection();
 	Statement stat = con.createStatement();
 
+
 	if (!dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapTable())) {
+	    createSchema();
 	    stat.execute(sqlCreateMap);
 	    stat.execute(String.format(sqlGrant, DBStructure.getMapTable()));
 	    commit = true;
 	}
 
 	if (!dbs.tableExists(DBStructure.getSchema(), DBStructure.getOverviewTable())) {
+	    createSchema();
 	    stat.execute(sqlCreateMapOverview);
 	    stat.execute(String.format(sqlGrant, DBStructure.getOverviewTable()));
 	    commit = true;
@@ -442,11 +512,10 @@ public class MapDAO {
     }
 
     public String[] getMaps() throws SQLException {
-	String[] maps = DBSession.getCurrentSession().getDistinctValues(DBStructure.getMapTable(),
-		"mapa");
+	String[] maps = DBSession.getCurrentSession().getDistinctValues(
+		DBStructure.getMapTable(), DBStructure.getSchema(), "mapa");
 	return maps;
     }
-
 
 }
 

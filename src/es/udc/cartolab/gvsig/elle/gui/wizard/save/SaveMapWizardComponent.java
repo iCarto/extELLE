@@ -386,7 +386,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
      * This method is used in order to retrieve the name of all
      * the nested groups as a string, each of them separated by
      * '/'. Therefore, we have to escape that character ('\/'),
-     * which also means duplicating the backslashes. 
+     * which also means duplicating the backslashes.
      */
     private String getGroupCompositeName(FLayers group) {
 	// We check whether the layer has a parent group or it doesn't.
@@ -468,7 +468,16 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 	    if (!tableMapExists || !tableMapOvExists) {
 
-		boolean canCreate = dbs.getDBUser().canCreateTable(DBStructure.getSchema());
+		boolean canCreate = false;
+		if(MapDAO.getInstance().hasSchema()) {
+		    canCreate = dbs.getDBUser().canCreateTable(
+			    DBStructure.getSchema());
+		} else {
+		    canCreate = dbs.getDBUser().canCreateSchema();
+		    // if the user has permissions to create schema also have
+		    // them to create table inside it
+		}
+
 		if (!canCreate) {
 		    //[jestevez] I think this code is never reached due to the limitations of SaveMapExtension
 		    throw new WizardException(PluginServices.getText(this, "table_map_contact_admin"));

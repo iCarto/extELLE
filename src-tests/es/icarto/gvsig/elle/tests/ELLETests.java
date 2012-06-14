@@ -14,6 +14,7 @@ import org.junit.Test;
 import com.iver.cit.gvsig.fmap.featureiterators.FeatureIteratorTest;
 import com.iver.cit.gvsig.fmap.layers.LayerFactory;
 
+import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -28,6 +29,12 @@ public class ELLETests {
 	doSetup();
 	DBSession.createConnection("localhost", 5432, "elle",
 		"public", "postgres", "postgres");
+	MapDAO.getInstance().dropSchema();
+    }
+
+    @Test
+    public void testCreateSchema() {
+	assertEquals(true, MapDAO.getInstance().createSchema());
     }
 
     @Test
@@ -38,7 +45,7 @@ public class ELLETests {
 
     private boolean createMap() {
 	List<Object[]> rows = new ArrayList<Object[]>();
-	Object[] row = {"Carreteras",
+	Object[] row = { "Carreteras",
 		"rede_carreteras",
 		"1",
 		true,
@@ -49,7 +56,8 @@ public class ELLETests {
 	rows.add(row);
 	try {
 	    DBSession dbs = DBSession.getCurrentSession();
-	    if (!dbs.tableExists(dbs.getSchema(), "_map")) {
+	    if (!dbs.tableExists(DBStructure.getSchema(),
+		    DBStructure.getMapTable())) {
 		MapDAO.getInstance().createMapTables();
 	    }
 	    MapDAO.getInstance().saveMap(rows.toArray(new Object[0][0]),
