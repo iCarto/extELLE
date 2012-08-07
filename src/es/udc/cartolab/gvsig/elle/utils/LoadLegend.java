@@ -223,6 +223,13 @@ public abstract class LoadLegend {
 	dbs.getJavaConnection().commit();
     }
 
+    public static String[] getLegends() throws SQLException {
+	String[] legends = DBSession.getCurrentSession().getDistinctValues(
+		DBStructure.getMapStyleTable(), DBStructure.getSchema(),
+		"nombre_estilo");
+	return legends;
+    }
+
     public static boolean legendExistsDB(String legendName) throws SQLException {
 
 	DBSession dbs = DBSession.getCurrentSession();

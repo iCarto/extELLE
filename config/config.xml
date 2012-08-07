@@ -17,6 +17,22 @@
 					action-command="LoadMap" position="1" name="load-map" />
 			</tool-bar>
 		</extension>
+		<extension class-name="es.udc.cartolab.gvsig.elle.SaveMapExtension" description="save_map" active="true">
+			<menu text="data_base_menu/save_map"
+				icon="save-map"
+				action-command="SaveMap"
+				position="04" />
+			<tool-bar name="ELLE">
+				<action-tool icon="save-map" tooltip="save_map"
+					action-command="SaveMap" position="2" name="save-map" />
+			</tool-bar>
+		</extension>
+		<extension class-name="es.udc.cartolab.gvsig.elle.DeleteMapExtension" description="delete_map" active="true">
+			<menu text="data_base_menu/delete_map"
+				icon="delete-map"
+				action-command="DeleteMap"
+				position="05" />
+		</extension>
 		<extension class-name="es.udc.cartolab.gvsig.elle.LoadAllLegendsExtension" description="Load_several_legends" active="true">
 			<menu text="data_base_menu/load_legends"
 				icon="load-legends"
@@ -46,15 +62,11 @@
 					action-command="ALL" position="4" name="save-all-legends" />
 			</tool-bar>
 		</extension>
-		<extension class-name="es.udc.cartolab.gvsig.elle.SaveMapExtension" description="save_map" active="true">
-			<menu text="data_base_menu/save_map"
-				icon="save-map"
-				action-command="SaveMap"
-				position="04" />
-			<tool-bar name="ELLE">
-				<action-tool icon="save-map" tooltip="save_map"
-					action-command="SaveMap" position="2" name="save-map" />
-			</tool-bar>
+		<extension class-name="es.udc.cartolab.gvsig.elle.DeleteAllLegendsExtension" description="delete_all_legends" active="true">
+			<menu text="data_base_menu/delete_legends"
+				icon="delete-all-legends"
+				action-command="DeleteAllLegends"
+				position="0950" />
 		</extension>
 	</extensions>
 </plugin-config>
