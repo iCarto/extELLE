@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle;
 
+import java.sql.SQLException;
+
 import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
 import com.iver.andami.preferences.IPreference;
@@ -31,6 +33,7 @@ import com.iver.cit.gvsig.project.documents.ProjectDocumentFactory;
 import com.iver.cit.gvsig.project.documents.view.ProjectViewFactory;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 
+import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.EllePreferencesPage;
 import es.udc.cartolab.gvsig.elle.gui.ElleWizard;
 import es.udc.cartolab.gvsig.elle.gui.wizard.load.LoadMapWizard;
@@ -96,19 +99,30 @@ public class LoadMapExtension extends Extension implements IPreferenceExtension 
 			"images/mapacargar.png"));
     }
 
-    public boolean isEnabled() {
-	return true;
-    }
-
-    public boolean isVisible() {
-	DBSession dbs = DBSession.getCurrentSession();
-	return dbs != null;
-    }
-
     public IPreference[] getPreferencesPages() {
 	IPreference[] preferences = new IPreference[1];
 	preferences[0] = ellePreferencesPage;
 	return preferences;
+    }
+
+    public boolean isEnabled() {
+	if (DBSession.isActive() && canUseELLE()) {
+	    return true;
+	}
+	return false;
+    }
+
+    private boolean canUseELLE() {
+	DBSession dbs = DBSession.getCurrentSession();
+	try {
+	    return dbs.getDBUser().canUseSchema(DBStructure.SCHEMA_NAME);
+	} catch (SQLException e) {
+	    return false;
+	}
+    }
+
+    public boolean isVisible() {
+	return true;
     }
 
 }
