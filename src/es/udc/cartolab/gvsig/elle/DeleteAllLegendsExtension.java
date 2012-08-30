@@ -2,6 +2,7 @@ package es.udc.cartolab.gvsig.elle;
 
 import java.sql.SQLException;
 
+import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
 
 import es.icarto.gvsig.elle.db.DBStructure;
@@ -11,6 +12,14 @@ import es.udc.cartolab.gvsig.users.utils.DBSession;
 public class DeleteAllLegendsExtension extends Extension {
 
     public void initialize() {
+	registerIcons();
+    }
+
+    private void registerIcons() {
+	PluginServices.getIconTheme().registerDefault(
+		"delete-all-legends",
+		this.getClass().getClassLoader()
+		.getResource("images/leyborrar.png"));
     }
 
     public void execute(String actionCommand) {
