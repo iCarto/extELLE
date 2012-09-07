@@ -69,7 +69,7 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
     }
 
     public boolean canFinish() {
-	return canNext();
+	return false;
     }
 
     public boolean canNext() {
