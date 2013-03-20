@@ -362,6 +362,8 @@ Han aportado ideas, comentarios, sugerencias y/o informado de errores:
 
 - Francisco Fernández Leal [C-a]
 
+- Enar Chouse Devesa [C-a]
+
 - Gonzalo Martinez Crespo [iC]
 
 - Jorge Ocampo Couto [iC]
@@ -370,11 +372,14 @@ Han aportado ideas, comentarios, sugerencias y/o informado de errores:
 
 - Carmen Molejón Quintana [iC-a]
 
+- José María Jiménez Bernal [aut]
+
 .. parsed-literal::
 
   [C]: CartoLab
   [C-a]: CartoLab (antiguos miembros)
   [iC]: iCarto
   [iC-a]: iCarto (antiguos miembros)
+  [aut]: autónomo
 
 Licencia: GPLv3. Puede ver los términos de esta licencia en http://www.gnu.org/licenses
