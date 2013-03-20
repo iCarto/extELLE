@@ -64,7 +64,7 @@ Recuerde que el código fuente de ELLE se encuentra a su disposición en la pág
 Requisitos
 ==========
 
-ELLE es multiplataforma por lo que puede ser instalado en entornos Windows, GNU/Linux y MacOS.
+ELLE es multiplataforma, por lo que puede ser instalado en entornos Windows, GNU/Linux y MacOS.
 
 Es necesario tener previamente una instalación de gvSIG en su versión 1.x, que se puede descargar desde http://www.gvsig.gva.es, que a su vez debe tener la extensión extDBConnection, cuyo código está disponible en http://www.gitorious.org/extdbconnection
 
