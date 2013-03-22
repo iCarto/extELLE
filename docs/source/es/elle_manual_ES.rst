@@ -244,7 +244,7 @@ Seleccionamos del listado el mapa que queremos eliminar, pulsamos *Aceptar* y co
 Guardado independiente de leyendas
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. |savelegend_button| image:: images/savelegend_button.png
+.. |savelegend_button| image:: images/ELLE_savelegend_button.png
    :scale: 50%
 
 La simbología de las capas de la vista actual se puede guardar a través del menú pulsando en *Base de datos* |rarr| *Guardar leyendas* y luego el conjunto de capas que queramos:
@@ -260,7 +260,7 @@ Esta última opción también es accesible a través del botón |savelegend_butt
 Carga independiente de leyendas
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. |loadlegend_button| image:: images/loadlegend_button.png
+.. |loadlegend_button| image:: images/ELLE_loadlegend_button.png
    :scale: 50%
 
 Podemos cargar una simbología distinta para las capas de la vista actual a través del menú con *Base de datos* |rarr| *Cargar leyendas*, o con el botón |loadlegend_button|. Esto nos abrirá un diálogo análogo y con las mismas funcionalidades que el segundo diálogo de carga (`Figura 5.7`_) visto en la sección `Carga de mapas`_. Una vez que confirmemos, se aplicarán las simbologías de aquellas capas definidas al guardar la leyenda que coincidan con las que existen en el TOC en dicho momento.
