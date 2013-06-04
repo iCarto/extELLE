@@ -15,13 +15,14 @@ import com.iver.cit.gvsig.fmap.layers.LayerFactory;
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
+import es.udc.cartolab.gvsig.users.utils.DBSessionPostGIS;
 
 public class ELLETests {
 
     @Before
     public void connectToDatabase() throws Exception {
 	doSetup();
-	DBSession.createConnection("localhost", 5432, "elle",
+	DBSessionPostGIS.createConnection("localhost", 5432, "elle",
 		"public", "postgres", "postgres");
 	MapDAO.getInstance().dropSchema();
     }
