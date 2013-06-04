@@ -20,9 +20,11 @@ import java.sql.SQLException;
 
 import com.iver.cit.gvsig.fmap.drivers.ConnectionJDBC;
 import com.iver.cit.gvsig.fmap.drivers.DBLayerDefinition;
+import com.iver.cit.gvsig.fmap.drivers.DefaultJDBCDriver;
 import com.iver.cit.gvsig.fmap.drivers.VectorialDriver;
 import com.iver.cit.gvsig.fmap.drivers.jdbc.postgis.PostGisDriver;
 import com.iver.cit.gvsig.fmap.layers.FLyrVect;
+import com.iver.cit.gvsig.fmap.layers.ReadableVectorial;
 import com.iver.cit.gvsig.fmap.layers.VectorialDBAdapter;
 
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
@@ -41,9 +43,9 @@ public class LayerProperties implements Comparable {
 
 
     public LayerProperties(FLyrVect layer) throws WizardException {
-	VectorialDriver driver = (layer).getSource().getDriver();
-	if (driver instanceof PostGisDriver) {
-	    DBLayerDefinition layerDef = ((VectorialDBAdapter) (layer).getSource()).getLyrDef();
+	ReadableVectorial source = (layer).getSource();
+	if (source instanceof VectorialDBAdapter) {
+	    DBLayerDefinition layerDef = ((VectorialDBAdapter) source).getLyrDef();
 
 	    this.layer = layer;
 
@@ -74,7 +76,7 @@ public class LayerProperties implements Comparable {
     public String getUserName() throws SQLException {
 	if (layer != null) {
 	    VectorialDriver driver = (layer).getSource().getDriver();
-	    return ((ConnectionJDBC)((PostGisDriver) driver).getConnection()).getConnection().getMetaData().getUserName();
+	    return ((ConnectionJDBC)((DefaultJDBCDriver) driver).getConnection()).getConnection().getMetaData().getUserName();
 	} else {
 	    return "";
 	}
