@@ -106,7 +106,8 @@ public class MapDAO {
 		LayerProperties lp = new LayerProperties(schema, layers[i][2], layers[i][1]);
 
 		boolean visible = true;
-		if (!layers[i][4].equalsIgnoreCase("t")) {
+		if (!(layers[i][4].equalsIgnoreCase("t") || layers[i][4]
+			.equalsIgnoreCase("1"))) {
 		    visible = false;
 		}
 		lp.setVisible(visible);
