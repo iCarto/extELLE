@@ -413,9 +413,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	    } else if (layer instanceof FLyrVect) {
 		try {
 		    LayerProperties lp = new LayerProperties((FLyrVect) layer);
-		    String user = lp.getUserName();
-		    DBSession dbc = DBSession.getCurrentSession();
-		    if (user != null && user.equals(dbc.getUserName())) {
 			//layer data to fill the table
 			String group = "";
 			if (layer.getParentLayer() != null) {
@@ -438,15 +435,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 			mapLayers.add(lp);
 
-		    }
-		} catch (SQLException e) {
-		    try {
-			DBSession.reconnect();
-		    } catch (DBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		    }
-		    e.printStackTrace();
 		} catch (WizardException e) {
 		    // layer is not postgis, nothing to do
 		}
