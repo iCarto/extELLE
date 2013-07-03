@@ -107,7 +107,8 @@ public class MapDAO {
 
 		boolean visible = true;
 		if (!(layers[i][4].equalsIgnoreCase("t") || layers[i][4]
-			.equalsIgnoreCase("1"))) {
+			.equalsIgnoreCase("1") || layers[i][4]
+			.equalsIgnoreCase("true"))) {
 		    visible = false;
 		}
 		lp.setVisible(visible);
