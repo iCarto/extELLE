@@ -1,6 +1,7 @@
 package es.udc.cartolab.gvsig.elle.gui.wizard.delete;
 
 import java.awt.BorderLayout;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import com.iver.andami.PluginServices;
 import com.iver.andami.messages.NotificationManager;
 import com.iver.cit.gvsig.fmap.drivers.DBException;
 import com.jeta.forms.components.panel.FormPanel;
+import com.jeta.forms.gui.common.FormException;
 
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardComponent;
@@ -92,7 +94,8 @@ public class DeleteAllLegendsWizardComponent extends WizardComponent {
 
 	    try {
 
-		FormPanel form = new FormPanel("forms/delete.jfrm");
+		InputStream stream = getClass().getClassLoader().getResourceAsStream("forms/delete.jfrm");
+		FormPanel form = new FormPanel(stream);
 		form.setFocusTraversalPolicyProvider(true);
 		JLabel legendsLabel = form.getLabel("itemsLabel");
 		legendsLabel.setText(PluginServices.getText(this, "Choose_Legend"));
@@ -127,6 +130,9 @@ public class DeleteAllLegendsWizardComponent extends WizardComponent {
 		} catch (DBException e1) {
 		    e1.printStackTrace();
 		}
+		e.printStackTrace();
+	    } catch (FormException e) {
+		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
 	}

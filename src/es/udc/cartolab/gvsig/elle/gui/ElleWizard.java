@@ -17,6 +17,7 @@
 package es.udc.cartolab.gvsig.elle.gui;
 
 import java.awt.BorderLayout;
+import java.io.InputStream;
 import java.sql.SQLException;
 
 import javax.swing.JLabel;
@@ -36,6 +37,7 @@ import com.iver.cit.gvsig.fmap.layers.FLayers;
 import com.iver.cit.gvsig.gui.WizardPanel;
 import com.iver.cit.gvsig.gui.panels.CRSSelectPanel;
 import com.jeta.forms.components.panel.FormPanel;
+import com.jeta.forms.gui.common.FormException;
 
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
@@ -177,8 +179,9 @@ public class ElleWizard extends WizardPanel {
 	    listPanel = new JPanel();
 
 	    try {
-
-		FormPanel form = new FormPanel("forms/loadLayer.jfrm");
+		 InputStream stream = getClass().getClassLoader()
+			    .getResourceAsStream("forms/loadMap.jfrm");
+		FormPanel form = new FormPanel(stream);
 		form.setFocusTraversalPolicyProvider(true);
 
 		listPanel.add(form);
@@ -257,6 +260,9 @@ public class ElleWizard extends WizardPanel {
 		} catch (DBException e1) {
 		    e1.printStackTrace();
 		}
+	    } catch (FormException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
 	    }
 
 	}

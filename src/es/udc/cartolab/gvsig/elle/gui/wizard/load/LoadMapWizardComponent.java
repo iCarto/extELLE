@@ -19,6 +19,7 @@ package es.udc.cartolab.gvsig.elle.gui.wizard.load;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import com.iver.cit.gvsig.gui.panels.CRSSelectPanel;
 import com.iver.cit.gvsig.project.documents.view.ProjectView;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 import com.jeta.forms.components.panel.FormPanel;
+import com.jeta.forms.gui.common.FormException;
 
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardComponent;
@@ -105,7 +107,9 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 
 	    try {
 
-		FormPanel form = new FormPanel("forms/loadMap.jfrm");
+		 InputStream stream = getClass().getClassLoader()
+			    .getResourceAsStream("forms/loadMap.jfrm");
+		FormPanel form = new FormPanel(stream);
 		form.setFocusTraversalPolicyProvider(true);
 
 		listPanel.add(form);
@@ -183,6 +187,9 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 		    e1.printStackTrace();
 		}
 		//exception
+		e.printStackTrace();
+	    } catch (FormException e) {
+		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
 	}

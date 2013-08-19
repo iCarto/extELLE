@@ -19,6 +19,7 @@ package es.udc.cartolab.gvsig.elle.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.InputStream;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -34,6 +35,7 @@ import com.iver.andami.preferences.AbstractPreferencePage;
 import com.iver.andami.preferences.StoreException;
 import com.iver.utiles.XMLEntity;
 import com.jeta.forms.components.panel.FormPanel;
+import com.jeta.forms.gui.common.FormException;
 
 public class EllePreferencesPage extends AbstractPreferencePage implements ActionListener {
 
@@ -106,24 +108,33 @@ public class EllePreferencesPage extends AbstractPreferencePage implements Actio
 	if (!panelStarted ) {
 	    panelStarted = true;
 
-	    FormPanel form = new FormPanel("forms/preferences.jfrm");
-	    form.setFocusTraversalPolicyProvider(true);
+	    InputStream stream = getClass().getClassLoader().getResourceAsStream("forms/preferences.jfrm");
+	    
+	    FormPanel form;
+	    try {
+		form = new FormPanel(stream);
+		form.setFocusTraversalPolicyProvider(true);
 
-	    JLabel legendLabel = form.getLabel("legendLabel");
-	    legendLabel.setText(PluginServices.getText(this, "legend_directory"));
+		    JLabel legendLabel = form.getLabel("legendLabel");
+		    legendLabel.setText(PluginServices.getText(this, "legend_directory"));
 
-	    legendDirField = form.getTextField("legendField");
-	    legendDirButton = (JButton) form.getButton("legendButton");
-	    legendDirButton.addActionListener(this);
+		    legendDirField = form.getTextField("legendField");
+		    legendDirButton = (JButton) form.getButton("legendButton");
+		    legendDirButton.addActionListener(this);
 
-	    JLabel legendTypeLabel = form.getLabel("legendTypeLabel");
-	    legendTypeLabel.setText(PluginServices.getText(this, "legend_type_pref"));
+		    JLabel legendTypeLabel = form.getLabel("legendTypeLabel");
+		    legendTypeLabel.setText(PluginServices.getText(this, "legend_type_pref"));
 
-	    legendTypeCBox = form.getComboBox("legendTypeCB");
-	    legendTypeCBox.addItem("gvl");
-	    legendTypeCBox.addItem("sld");
+		    legendTypeCBox = form.getComboBox("legendTypeCB");
+		    legendTypeCBox.addItem("gvl");
+		    legendTypeCBox.addItem("sld");
 
-	    addComponent(form);
+		    addComponent(form);
+	    } catch (FormException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	    
 
 	}
 
