@@ -180,7 +180,7 @@ public class ElleWizard extends WizardPanel {
 
 	    try {
 		 InputStream stream = getClass().getClassLoader()
-			    .getResourceAsStream("forms/loadMap.jfrm");
+			    .getResourceAsStream("forms/loadLayer.jfrm");
 		FormPanel form = new FormPanel(stream);
 		form.setFocusTraversalPolicyProvider(true);
 
