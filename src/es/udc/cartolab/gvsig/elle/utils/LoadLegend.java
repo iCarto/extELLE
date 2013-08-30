@@ -207,20 +207,9 @@ public abstract class LoadLegend {
 
     public static void deleteLegends(String legendsName) throws SQLException {
 	DBSession dbs = DBSession.getCurrentSession();
-	String removeMap = "DELETE FROM " + DBStructure.getSchema() + "."+DBStructure.getMapStyleTable()+" WHERE nombre_estilo=?";
-	String removeMapOverview = "DELETE FROM " + DBStructure.getSchema() + "."+DBStructure.getOverviewStyleTable()+" WHERE nombre_estilo=?";
-
-	PreparedStatement ps = dbs.getJavaConnection().prepareStatement(removeMap);
-	ps.setString(1, legendsName);
-	ps.executeUpdate();
-	ps.close();
-
-	ps = dbs.getJavaConnection().prepareStatement(removeMapOverview);
-	ps.setString(1, legendsName);
-	ps.executeUpdate();
-	ps.close();
-
-	dbs.getJavaConnection().commit();
+	String whereClause = "WHERE nombre_estilo='" + legendsName + "'";
+	dbs.deleteRows(DBStructure.getSchema(), DBStructure.getMapStyleTable(), whereClause);
+	dbs.deleteRows(DBStructure.getSchema(), DBStructure.getOverviewStyleTable(), whereClause);
     }
 
     public static String[] getLegends() throws SQLException {
