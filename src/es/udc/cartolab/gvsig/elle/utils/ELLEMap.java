@@ -40,12 +40,14 @@ public class ELLEMap {
 
     private String name;
     private int styleSource = LoadLegend.NO_LEGEND;
-    private List<LayerProperties> layers;
+    private final List<LayerProperties> layers;
     private String styleName = "";
     private BaseView view;
     private boolean loaded = false;
-    private List<LayerProperties> overviewLayers;
+    private final List<LayerProperties> overviewLayers;
     private IProjection projection;
+    private static boolean filtered = false;
+    private static String[] constantValuesSelected;
 
     public ELLEMap(String name, BaseView view) {
 	this.setName(name);
@@ -108,6 +110,22 @@ public class ELLEMap {
 	this.view = view;
     }
 
+    public static boolean getFiltered() {
+	return filtered;
+    }
+
+    public static void setFiltered(boolean filter) {
+	filtered = filter;
+    }
+
+    public static String[] getConstantValuesSelected() {
+	return constantValuesSelected;
+    }
+
+    public static void setConstantValuesSelected(String[] values) {
+	constantValuesSelected = values;
+    }
+
     /**
      * Will iterate over all layers in map setting the where clause. To set only
      * a particular layer use instead #getLayer("name").setWhere("where");
@@ -115,6 +133,14 @@ public class ELLEMap {
     public void setWhereOnAllLayers(String whereClause) {
 	if (this.layers != null) {
 	    for (LayerProperties layer : this.layers) {
+		layer.setWhere(whereClause);
+	    }
+	}
+    }
+
+    public void setWhereOnAllOverviewLayers(String whereClause) {
+	if (this.overviewLayers != null) {
+	    for (LayerProperties layer : this.overviewLayers) {
 		layer.setWhere(whereClause);
 	    }
 	}
@@ -210,13 +236,22 @@ public class ELLEMap {
     }
 
     @SuppressWarnings("unchecked")
-    private void loadViewLayers(IProjection proj) {
+    private void loadViewLayers(IProjection proj, String[] layersAffectedByConstant) {
 	//load view layers
 	Collections.sort(layers);
 	for (LayerProperties lp : layers) {
 	    FLayer layer;
 	    FLayers group = getGroup(lp);
 	    try {
+		boolean coincidence = false;
+		for (int i=0; i<layersAffectedByConstant.length; i++) {
+		    if (lp.getTablename().equalsIgnoreCase(layersAffectedByConstant[i])) {
+			coincidence = true;
+		    }
+		}
+		if (!coincidence) {
+		    lp.setWhere("");
+		}
 		layer = getMapDAO().getLayer(lp, proj);
 		if (layer!=null) {
 		    if (lp.getMaxScale()>-1) {
@@ -267,10 +302,19 @@ public class ELLEMap {
     }
 
     @SuppressWarnings("unchecked")
-    private void loadOverviewLayers(IProjection proj) {
+    private void loadOverviewLayers(IProjection proj, String[] layersAffectedByConstant) {
 	Collections.sort(overviewLayers);
 	for (LayerProperties lp : overviewLayers) {
 	    try {
+		boolean coincidence = false;
+		for (int i=0; i<layersAffectedByConstant.length; i++) {
+		    if (lp.getTablename().equalsIgnoreCase(layersAffectedByConstant[i])) {
+			coincidence = true;
+		    }
+		}
+		if (!coincidence) {
+		    lp.setWhere("");
+		}
 		FLayer ovLayer = getMapDAO().getLayer(lp, proj);
 		ovLayer.setVisible(true);
 		view.getMapOverview().getMapContext().beginAtomicEvent();
@@ -297,11 +341,13 @@ public class ELLEMap {
     }
 
     public void load(IProjection proj) {
+	load(proj, new String[0]);
+    }
+    
+    public void load(IProjection proj, String[] layersAffectedByConstant) {
 	if (!loaded) {
-	    //load view layers
-	    loadViewLayers(proj);
-	    //load overview layers
-	    loadOverviewLayers(proj);
+	    loadViewLayers(proj, layersAffectedByConstant);
+	    loadOverviewLayers(proj, layersAffectedByConstant);
 	    getMapDAO().addLoadedMap(this);
 	    loaded = true;
 	    projection = proj;
@@ -317,14 +363,14 @@ public class ELLEMap {
 	return false;
     }
 
-    /**
-     * reloads view layers
-     * @param proj
-     */
     public void reload() {
+	reload(new String[0]);
+    }
+    
+    public void reload(String[] layersAffectedByConstant) {
 	if (loaded) {
 	    removeViewLayers();
-	    loadViewLayers(projection);
+	    loadViewLayers(projection, layersAffectedByConstant);
 	}
     }
 
