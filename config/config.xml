@@ -68,5 +68,7 @@
 				action-command="DeleteAllLegends"
 				position="0950" />
 		</extension>
+		<extension class-name="es.udc.cartolab.gvsig.elle.ConfigExtension" active="true">
+		</extension>
 	</extensions>
 </plugin-config>

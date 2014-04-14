@@ -40,9 +40,12 @@ import com.jeta.forms.components.panel.FormPanel;
 import com.jeta.forms.gui.common.FormException;
 
 import es.icarto.gvsig.elle.db.DBStructure;
+import es.udc.cartolab.gvsig.elle.ConfigExtension;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
+import es.udc.cartolab.gvsig.elle.utils.MapFilter;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
+@SuppressWarnings("serial")
 public class ElleWizard extends WizardPanel {
 
     private JPanel listPanel = null;
@@ -51,12 +54,21 @@ public class ElleWizard extends WizardPanel {
     private CRSSelectPanel crsPanel = null;
     private DBSession dbs;
     private String[][] layers;
+    private final String wizardTitle;
+    private MapFilter mapFilter;
 
-
+    public ElleWizard() {
+	ConfigExtension configExt = (ConfigExtension) PluginServices.getExtension(ConfigExtension.class);
+	this.wizardTitle = configExt.getWizardTitle();
+	this.mapFilter = configExt.getMapFilter();
+    }
+    
+    @Override
     public void execute() {
 
     }
 
+    @Override
     public FLayer getLayer() {
 
 	dbs = DBSession.getCurrentSession();
@@ -68,7 +80,7 @@ public class ElleWizard extends WizardPanel {
 	    int[] selectedPos = layerList.getSelectedIndices();
 	    if (selectedPos.length > 1) {
 		layer = new FLayers();
-		((FLayers) layer).setName("ELLE");
+		((FLayers) layer).setName(getWizarTitle());
 		((FLayers) layer).setMapContext(getMapCtrl().getMapContext());
 
 		try {
@@ -145,10 +157,11 @@ public class ElleWizard extends WizardPanel {
 	return dbs.getLayer(layerName, tableName, schema, whereClause, proj);
     }
 
+    @Override
     public void initWizard() {
 
 	dbs = DBSession.getCurrentSession();
-	setTabName("ELLE");
+	setTabName(getWizarTitle());
 
 	setLayout(new BorderLayout());
 	JPanel mainPanel = new JPanel();
@@ -173,6 +186,10 @@ public class ElleWizard extends WizardPanel {
 
     }
 
+    private String getWizarTitle() {
+	return wizardTitle;
+    }
+
     private JPanel getListPanel() {
 	if (listPanel == null) {
 
@@ -194,10 +211,11 @@ public class ElleWizard extends WizardPanel {
 
 		    layerList = form.getList("layerList");
 		    groupList = form.getList("groupList");
-		    groupList.setListData(maps);
+		    groupList.setListData(filterMaps(maps));
 
 		    groupList.addListSelectionListener(new ListSelectionListener() {
 
+			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 			    int[] selected = groupList.getSelectedIndices();
 			    if (selected.length == 1) {
@@ -235,6 +253,7 @@ public class ElleWizard extends WizardPanel {
 
 		    layerList.addListSelectionListener(new ListSelectionListener() {
 
+			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 			    int[] selected = groupList.getSelectedIndices();
 			    if (selected.length > 0) {
@@ -271,10 +290,15 @@ public class ElleWizard extends WizardPanel {
 
     }
 
+    private String[] filterMaps(String[] maps) {
+	return mapFilter.filter(maps);
+    }
+
     private JPanel getCRSPanel() {
 	if (crsPanel == null) {
 	    crsPanel = CRSSelectPanel.getPanel(AddLayerDialog.getLastProjection());
 	    crsPanel.addActionListener(new java.awt.event.ActionListener() {
+		@Override
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    if (crsPanel.isOkPressed()) {
 			AddLayerDialog.setLastProjection(crsPanel.getCurProj());
