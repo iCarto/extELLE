@@ -6,6 +6,7 @@ import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
 
 import es.icarto.gvsig.elle.db.DBStructure;
+import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 import es.udc.cartolab.gvsig.elle.gui.wizard.delete.DeleteAllLegendsWizard;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -23,7 +24,7 @@ public class DeleteAllLegendsExtension extends Extension {
     }
 
     public void execute(String actionCommand) {
-	DeleteAllLegendsWizard wizard = new DeleteAllLegendsWizard();
+	WizardWindow wizard = new DeleteAllLegendsWizard();
 	wizard.open();
     }
 

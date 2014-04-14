@@ -36,6 +36,7 @@ import com.iver.cit.gvsig.project.documents.view.gui.View;
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.EllePreferencesPage;
 import es.udc.cartolab.gvsig.elle.gui.ElleWizard;
+import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 import es.udc.cartolab.gvsig.elle.gui.wizard.load.LoadMapWizard;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -45,7 +46,7 @@ public class LoadMapExtension extends Extension implements IPreferenceExtension 
 
     public void execute(String actionCommand) {
 	View view = createViewIfNeeded();
-	LoadMapWizard wizard = new LoadMapWizard(view);
+	WizardWindow wizard = new LoadMapWizard(view);
 	wizard.open();
     }
 

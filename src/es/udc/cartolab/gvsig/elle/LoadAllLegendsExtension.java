@@ -24,6 +24,7 @@ import com.iver.cit.gvsig.fmap.layers.FLayers;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 
 import es.icarto.gvsig.elle.db.DBStructure;
+import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 import es.udc.cartolab.gvsig.elle.gui.wizard.load.LoadLegendWizard;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -31,7 +32,7 @@ public class LoadAllLegendsExtension extends Extension {
 
     public void execute(String actionCommand) {
 
-	LoadLegendWizard wizard = new LoadLegendWizard((View) PluginServices.getMDIManager().getActiveWindow());
+	WizardWindow wizard = new LoadLegendWizard((View) PluginServices.getMDIManager().getActiveWindow());
 	wizard.open();
     }
 

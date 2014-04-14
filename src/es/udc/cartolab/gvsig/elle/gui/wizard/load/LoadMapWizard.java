@@ -22,16 +22,14 @@ import com.iver.cit.gvsig.project.documents.view.gui.View;
 
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 
+@SuppressWarnings("serial")
 public class LoadMapWizard extends WizardWindow {
 
     private WindowInfo viewInfo;
-    private String mapName;
 
     public LoadMapWizard(View view) {
 	super();
-
 	properties.put(LoadMapWizardComponent.PROPERTY_VEW, view);
-
     }
 
 

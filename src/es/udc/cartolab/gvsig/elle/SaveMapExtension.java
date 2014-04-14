@@ -24,6 +24,7 @@ import com.iver.cit.gvsig.fmap.layers.FLayers;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 
 import es.icarto.gvsig.elle.db.DBStructure;
+import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 import es.udc.cartolab.gvsig.elle.gui.wizard.save.SaveMapWizard;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -32,7 +33,7 @@ public class SaveMapExtension extends Extension {
 
     public void execute(String actionCommand) {
 	View view = (View) PluginServices.getMDIManager().getActiveWindow();
-	SaveMapWizard wizard = new SaveMapWizard(view);
+	WizardWindow wizard = new SaveMapWizard(view);
 	wizard.open();
     }
 

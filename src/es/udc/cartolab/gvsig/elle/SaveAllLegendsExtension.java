@@ -24,6 +24,7 @@ import com.iver.cit.gvsig.fmap.layers.FLayers;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 
 import es.icarto.gvsig.elle.db.DBStructure;
+import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 import es.udc.cartolab.gvsig.elle.gui.wizard.save.SaveLegendsWizard;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -43,7 +44,7 @@ public class SaveAllLegendsExtension extends Extension {
 	    option = SaveLegendsWizard.ALL;
 	}
 
-	SaveLegendsWizard w = new SaveLegendsWizard((View) PluginServices.getMDIManager().getActiveWindow(), option);
+	WizardWindow w = new SaveLegendsWizard((View) PluginServices.getMDIManager().getActiveWindow(), option);
 	w.open();
 
     }
