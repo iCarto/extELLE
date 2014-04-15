@@ -30,8 +30,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.gvsig.symbology.fmap.drivers.sld.FMapSLDDriver;
 
+import com.hardcode.gdbms.driver.exceptions.ReadDriverException;
 import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.fmap.drivers.gvl.FMapGVLDriver;
 import com.iver.cit.gvsig.fmap.drivers.legend.IFMapLegendDriver;
@@ -40,6 +43,8 @@ import com.iver.cit.gvsig.fmap.layers.FLayer;
 import com.iver.cit.gvsig.fmap.layers.FLyrVect;
 import com.iver.cit.gvsig.fmap.rendering.ILegend;
 import com.iver.cit.gvsig.fmap.rendering.IVectorLegend;
+import com.iver.cit.gvsig.fmap.rendering.styling.labeling.ILabelingStrategy;
+import com.iver.cit.gvsig.fmap.rendering.styling.labeling.LabelingFactory;
 import com.iver.utiles.XMLEntity;
 
 import es.icarto.gvsig.elle.db.DBStructure;
@@ -329,7 +334,37 @@ public abstract class LoadLegend {
 	    writer.write(def);
 	    writer.close();
 	    setLegend(layer, tmpLegend.getAbsolutePath(), true);
+
+	    // fpuga. April 15, 2014
+	    // This if is here only for compatible reasons with old version of
+	    // ELLE without support for labelling. The if can be safely
+	    // removed when all projects have added to the database a "label"
+	    // column to _map_style and _map_overview_style
+	    if (style[0].length == 5) {
+		setLabel(layer, style[0][4]);
+	    }
 	}
+    }
+
+    public static boolean setLabel(FLyrVect layer, String label) {
+	boolean labeled = false;
+	if ((label != null) && (label.length() > 0)) {
+	    try {
+		XMLEntity parse = XMLEntity.parse(label);
+		ILabelingStrategy strategy = LabelingFactory
+			.createStrategyFromXML(parse, layer);
+		layer.setLabelingStrategy(strategy);
+		layer.setIsLabeled(true);
+		labeled = true;
+	    } catch (MarshalException e) {
+		logger.error(e.getStackTrace(), e);
+	    } catch (ValidationException e) {
+		logger.error(e.getStackTrace(), e);
+	    } catch (ReadDriverException e) {
+		logger.error(e.getStackTrace(), e);
+	    }
+	}
+	return labeled;
     }
 
     private static void loadFileLegend(FLyrVect layer, String styleName, boolean overview) {
