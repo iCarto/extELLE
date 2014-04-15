@@ -240,6 +240,7 @@ public abstract class LoadLegend {
 		+ "  nombre_estilo character varying NOT NULL,"
 		+ "  type character varying(3),"
 		+ "  definicion xml,"
+		+ "  label xml"
 		+ "  PRIMARY KEY (nombre_capa, nombre_estilo)"
 		+ ")"
 		+ "WITH ("
@@ -252,6 +253,7 @@ public abstract class LoadLegend {
 		+ "  nombre_estilo character varying NOT NULL,"
 		+ "  tipo character varying(3),"
 		+ "  definicion xml,"
+		+ "  label xml"
 		+ "  PRIMARY KEY (nombre_capa, nombre_estilo)"
 		+ ")";
 

@@ -19,14 +19,18 @@ package es.udc.cartolab.gvsig.elle.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 
 import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.fmap.drivers.DBException;
+import com.iver.cit.gvsig.fmap.drivers.legend.LegendDriverException;
 import com.iver.cit.gvsig.fmap.layers.FLyrVect;
+import com.iver.cit.gvsig.fmap.rendering.styling.labeling.ILabelingStrategy;
 
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
@@ -89,30 +93,66 @@ public class DBLegendsManager extends AbstractLegendsManager {
 
 	DBSession dbs = DBSession.getCurrentSession();
 	try {
-	    File legendFile = File.createTempFile("style", "." + type);
-	    LoadLegend.saveLegend(layer, legendFile);
-	    BufferedReader reader = new BufferedReader(new FileReader(legendFile.getAbsolutePath()));
-	    StringBuffer buffer = new StringBuffer();
-	    String line = reader.readLine();
-	    while (line != null) {
-		buffer.append(line).append("\n");
-		line = reader.readLine();
-	    }
-	    String xml = buffer.toString();
-	    String[] row = {
+	    String symbology = getSymbologyAsXML(layer, type);
+	    String label = getLabelAsXML(layer);
+
+	    // fpuga. April 15, 2014
+	    // This if is here only for compatible reasons with old version of
+	    // ELLE without support for labelling. The if, and the else can be
+	    // safely removed when all projects have added to the database a
+	    // "label" column to _map_style and _map_overview_style
+	    if (dbs.getColumns(DBStructure.getSchema(), table).length == 5) {
+		String[] row = {
 		    layer.getName(),
 		    getLegendGroupName(),
 		    type,
-		    xml
-	    };
-	    dbs.insertRow(DBStructure.getSchema(), table, row);
+		    symbology,
+		    label
+		};
+		dbs.insertRow(DBStructure.getSchema(), table, row);
+	    } else {
+		String[] row = { 
+			layer.getName(),
+			getLegendGroupName(),
+			type,
+			symbology
+		};
+		dbs.insertRow(DBStructure.getSchema(), table, row);
+	    }
 	} catch (SQLException e) {
-
-	} catch (Exception e) {
+	    throw new WizardException(e);
+	} catch (FileNotFoundException e) {
+	    throw new WizardException(e);
+	} catch (IOException e) {
+	    throw new WizardException(e);
+	} catch (LegendDriverException e) {
 	    throw new WizardException(e);
 	}
+    }
 
+    private String getLabelAsXML(FLyrVect layer) {
+	final ILabelingStrategy labelingStrategy = layer.getLabelingStrategy();
+	String label = null;
+	if (labelingStrategy != null) {
+	    label = labelingStrategy.getXMLEntity().toString();
+	}
+	return label;
+    }
 
+    private String getSymbologyAsXML(FLyrVect layer, String type)
+	    throws IOException, LegendDriverException, FileNotFoundException {
+	File legendFile = File.createTempFile("style", "." + type);
+	LoadLegend.saveLegend(layer, legendFile);
+	BufferedReader reader = new BufferedReader(new FileReader(legendFile.getAbsolutePath()));
+	StringBuffer buffer = new StringBuffer();
+	String line = reader.readLine();
+	while (line != null) {
+	buffer.append(line).append("\n");
+	line = reader.readLine();
+	}
+	String xml = buffer.toString();
+	legendFile.delete();
+	return xml;
     }
 
     public void saveLegends() throws WizardException {
@@ -135,7 +175,7 @@ public class DBLegendsManager extends AbstractLegendsManager {
 	    try {
 		DBSession.reconnect();
 	    } catch (DBException e1) {
-		//TODO logger
+		logger.error(e1.getStackTrace(), e1);
 	    }
 	    return false;
 	}
