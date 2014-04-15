@@ -17,7 +17,6 @@
 package es.udc.cartolab.gvsig.elle.utils;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -497,20 +496,10 @@ public class MapDAO {
 
     public  void deleteMap(String mapName) throws SQLException {
 	DBSession dbs = DBSession.getCurrentSession();
-	String removeMap = "DELETE FROM " + DBStructure.getSchema() + "."+DBStructure.getMapTable()+" WHERE mapa=?";
-	String removeMapOverview = "DELETE FROM " + DBStructure.getSchema() + "."+DBStructure.getOverviewTable()+" WHERE mapa=?";
-
-	PreparedStatement ps = dbs.getJavaConnection().prepareStatement(removeMap);
-	ps.setString(1, mapName);
-	ps.executeUpdate();
-	ps.close();
-
-	ps = dbs.getJavaConnection().prepareStatement(removeMapOverview);
-	ps.setString(1, mapName);
-	ps.executeUpdate();
-	ps.close();
-
-	dbs.getJavaConnection().commit();
+	dbs.deleteRows(DBStructure.getSchema(), DBStructure.getMapTable(),
+		"WHERE mapa='" + mapName + "'");
+	dbs.deleteRows(DBStructure.getSchema(), DBStructure.getOverviewTable(),
+		"WHERE mapa='" + mapName + "'");
     }
 
     public String[] getMaps() throws SQLException {
