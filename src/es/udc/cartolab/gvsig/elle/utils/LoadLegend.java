@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.gvsig.symbology.fmap.drivers.sld.FMapSLDDriver;
 
 import com.iver.andami.PluginServices;
@@ -47,8 +47,8 @@ import es.udc.cartolab.gvsig.elle.gui.EllePreferencesPage;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 /**
- * This ELLE class can load legends (styles) on the layers. This styles are  'gvl' files placed on a folder defined by the user
- * on the config panel.
+ * This ELLE class can load legends (styles) on the layers. This styles are
+ * 'gvl' files placed on a folder defined by the user on the config panel.
  */
 public abstract class LoadLegend {
 
@@ -60,6 +60,8 @@ public abstract class LoadLegend {
     private static HashMap<String, Class<? extends IFMapLegendDriver>> drivers = new HashMap<String, Class<? extends IFMapLegendDriver>>();
     private static String configLegendDir;
 
+    private static Logger logger = Logger.getLogger(LoadLegend.class);
+    
     static {
 	drivers.put("gvl", FMapGVLDriver.class);
 	drivers.put("sld", FMapSLDDriver.class);
@@ -72,7 +74,6 @@ public abstract class LoadLegend {
 		configLegendDir = configLegendDir + File.separator;
 	    }
 	}
-
     }
 
     public static boolean setLegendStyleName(String stylesName) {
@@ -127,7 +128,6 @@ public abstract class LoadLegend {
 
 	}
 	return false;
-
     }
 
     public static void saveLegend(FLyrVect layer, File legendFile) throws LegendDriverException {
@@ -141,24 +141,18 @@ public abstract class LoadLegend {
 		String version = supportedVersions.get(supportedVersions.size()-1);
 		driver.write(layer.getMapContext().getLayers(),layer, layer.getLegend(), legendFile, version);
 	    } catch (InstantiationException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		logger.error(e.getStackTrace(), e);
 	    } catch (IllegalAccessException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		logger.error(e.getStackTrace(), e);
 	    }
 	}
     }
 
     public static void setOverviewLegend(FLyrVect lyr, String legendFilename){
-
 	if (legendFilename == null) {
 	    legendFilename = lyr.getName();
 	}
-
 	setLegend(lyr, getOverviewLegendPath() + legendFilename, true);
-
-
     }
 
     public static boolean setLegend(FLyrVect lyr, String legendFilename, boolean absolutePath){
@@ -182,7 +176,6 @@ public abstract class LoadLegend {
 	    legendFile = new File(legendFilename);
 	    return setLegend(lyr, legendFile);
 	}
-
     }
 
     public static void setLegend(FLyrVect lyr){
@@ -233,7 +226,6 @@ public abstract class LoadLegend {
 	    }
 	}
 	return found;
-
     }
 
     public static void createLegendtables() throws SQLException {
@@ -323,14 +315,13 @@ public abstract class LoadLegend {
 
 	DBSession dbs = DBSession.getCurrentSession();
 	String layerName = layer.getName();
-	//		String styleName = dbCB.getSelectedItem().toString();
 	String[][] style = dbs.getTable(table, DBStructure.getSchema(),
 		"where nombre_capa='" + layerName + "' and nombre_estilo='"
 			+ styleName + "'");
 	if (style.length == 1) {
 	    String type = style[0][2];
 	    String def = style[0][3];
-
+	    
 	    File tmpLegend = File.createTempFile("style", layerName + "." + type);
 	    FileWriter writer = new FileWriter(tmpLegend);
 	    writer.write(def);

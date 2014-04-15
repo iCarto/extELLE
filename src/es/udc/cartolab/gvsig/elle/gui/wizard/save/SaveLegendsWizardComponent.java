@@ -38,6 +38,8 @@ import javax.swing.table.TableColumn;
 
 import net.miginfocom.swing.MigLayout;
 
+import org.apache.log4j.Logger;
+
 import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.fmap.drivers.DBException;
 import com.iver.cit.gvsig.fmap.layers.FLayers;
@@ -53,11 +55,13 @@ import es.udc.cartolab.gvsig.elle.utils.FileLegendsManager;
 import es.udc.cartolab.gvsig.elle.utils.LoadLegend;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
+@SuppressWarnings("serial")
 public class SaveLegendsWizardComponent extends WizardComponent {
 
     public final static String PROPERTY_SAVE_OVERVIEW = "save_overview";
     public final static String PROPERTY_CREATE_TABLES_QUESTION = "create_tables_q";
 
+    private static final Logger logger = Logger.getLogger(SaveLegendsWizardComponent.class);
 
     private List<String> types;
 
@@ -74,7 +78,6 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
     public SaveLegendsWizardComponent(Map<String, Object> properties) {
 	super(properties);
-
 
 	//get config
 	types = LoadLegend.getSortedPreferedLegendTypes();
@@ -102,7 +105,6 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
     }
 
-
     private JPanel getOptionsPanel() {
 
 	JPanel panelOptions = new JPanel();
@@ -110,12 +112,9 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 		"[grow]80",
 		"[][]15[][]15[][]"));
 
-
 	panelOptions.add(getOverviewPanel(), "shrink, growx, growy, wrap");
 
-
 	noLegendRB.addActionListener(new ActionListener() {
-
 
 	    public void actionPerformed(ActionEvent e) {
 		dbSetEnabled(false);
@@ -125,10 +124,8 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 	});
 	panelOptions.add(noLegendRB, "wrap");
 
-
 	databaseRB.setEnabled(DBSession.getCurrentSession() != null);
 	databaseRB.addActionListener(new ActionListener() {
-
 
 	    public void actionPerformed(ActionEvent e) {
 		dbSetEnabled(true);
@@ -141,12 +138,10 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
 	fileRB.addActionListener(new ActionListener() {
 
-
 	    public void actionPerformed(ActionEvent e) {
 		dbSetEnabled(false);
 		fileSetEnabled(true);
 	    }
-
 	});
 	panelOptions.add(fileRB, "wrap");
 	panelOptions.add(filePanel, "shrink, growx, growy, wrap");
@@ -216,9 +211,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
 	table.getColumnModel().getColumn(0).setMaxWidth(30);
 	table.getColumnModel().getColumn(2).setMaxWidth(60);
-
     }
-
 
     private void dbSetEnabled(boolean enabled) {
 	if (dbStyles != null) {
@@ -308,8 +301,6 @@ public class SaveLegendsWizardComponent extends WizardComponent {
     }
 
     public boolean prepare(AbstractLegendsManager legendsManager) {
-
-
 	boolean question = true;
 	Object aux = properties.get(PROPERTY_CREATE_TABLES_QUESTION);
 	if (aux != null && aux instanceof Boolean) {
@@ -337,12 +328,11 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 		prepare = true;
 	    }
 
-
 	    if (prepare) {
 		try {
 		    legendsManager.prepare();
 		} catch (WizardException e) {
-		    //TODO logger
+		    logger.error(e.getStackTrace(), e);
 		    return false;
 		}
 		if (question) {
@@ -384,7 +374,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 		    try {
 			DBSession.reconnect();
 		    } catch (DBException e1) {
-			//TODO logger
+			logger.error(e1.getStackTrace(), e1);
 			return false;
 		    }
 		}
@@ -397,90 +387,90 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
     public void finish() throws WizardException {
 
-	if (!noLegendRB.isSelected()) {
-
-	    AbstractLegendsManager legendsManager;
-	    if (databaseRB.isSelected()) {
-		String name = dbStyles.getText().trim();
-		if (!name.equals("")) {
-		    legendsManager = new DBLegendsManager(name);
-		} else {
-		    throw new WizardException(PluginServices.getText(this,"empty_legend_field"), false);
-		}
-	    } else {
-		String name = fileStyles.getText().trim();
-		if (!name.equals("")) {
-		    legendsManager = new FileLegendsManager(name);
-		} else {
-		    throw new WizardException(PluginServices.getText(this, "empty_legend_field"), false);
-		}
-	    }
-	    DefaultTableModel model = (DefaultTableModel) table.getModel();
-
-	    boolean useNotGvl = false;
-	    for (int i = 0; i<model.getRowCount(); i++) {
-		String type = model.getValueAt(i, 2).toString().toLowerCase();
-		boolean save = (Boolean) model.getValueAt(i, 0);
-		if (save) {
-		    LayerProperties lp = layers.get(i);
-		    lp.setLegendType(type);
-		    legendsManager.addLayer(layers.get(i));
-		    if (!type.equals("gvl")) {
-			useNotGvl = true;
-			break;
-		    }
-		}
-	    }
-
-	    if (overviewCHB.isSelected()) {
-		Object aux = properties.get(SaveMapWizard.PROPERTY_VIEW);
-		if (aux != null && aux instanceof View) {
-		    FLayers ovLayers = ((View) aux).getMapOverview().getMapContext().getLayers();
-		    legendsManager.addOverviewLayers(ovLayers);
-
-		    if (!overviewCB.getSelectedItem().toString().toLowerCase().equals("gvl")) {
-			useNotGvl = true;
-		    }
-		}
-
-	    }
-
-	    boolean cont = true;
-	    if (useNotGvl) {
-		cont = useNotGVL();
-	    }
-
-	    if (cont) {
-		cont = prepare(legendsManager);
-	    }
-
-	    if (cont) {
-		cont = overwriteLegends(legendsManager);
-	    }
-
-	    if (cont) {
-		legendsManager.saveLegends();
-		if (overviewCHB.isSelected()) {
-		    legendsManager.saveOverviewLegends(overviewCB.getSelectedItem().toString());
-		}
-	    } else {
-		throw new WizardException("", false, false);
-	    }
-
+	if (noLegendRB.isSelected()) {
+	    return;
 	}
 
+	AbstractLegendsManager legendsManager;
+	if (databaseRB.isSelected()) {
+	    String name = dbStyles.getText().trim();
+	    if (!name.equals("")) {
+		legendsManager = new DBLegendsManager(name);
+	    } else {
+		throw new WizardException(PluginServices.getText(this,
+			"empty_legend_field"), false);
+	    }
+	} else {
+	    String name = fileStyles.getText().trim();
+	    if (!name.equals("")) {
+		legendsManager = new FileLegendsManager(name);
+	    } else {
+		throw new WizardException(PluginServices.getText(this,
+			"empty_legend_field"), false);
+	    }
+	}
+	DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+	boolean useNotGvl = false;
+	for (int i = 0; i < model.getRowCount(); i++) {
+	    String type = model.getValueAt(i, 2).toString().toLowerCase();
+	    boolean save = (Boolean) model.getValueAt(i, 0);
+	    if (save) {
+		LayerProperties lp = layers.get(i);
+		lp.setLegendType(type);
+		legendsManager.addLayer(layers.get(i));
+		if (!type.equals("gvl")) {
+		    useNotGvl = true;
+		    break;
+		}
+	    }
+	}
+
+	if (overviewCHB.isSelected()) {
+	    Object aux = properties.get(SaveMapWizard.PROPERTY_VIEW);
+	    if (aux != null && aux instanceof View) {
+		FLayers ovLayers = ((View) aux).getMapOverview()
+			.getMapContext().getLayers();
+		legendsManager.addOverviewLayers(ovLayers);
+
+		if (!overviewCB.getSelectedItem().toString().toLowerCase()
+			.equals("gvl")) {
+		    useNotGvl = true;
+		}
+	    }
+	}
+
+	boolean cont = true;
+	if (useNotGvl) {
+	    cont = useNotGVL();
+	}
+
+	if (cont) {
+	    cont = prepare(legendsManager);
+	}
+
+	if (cont) {
+	    cont = overwriteLegends(legendsManager);
+	}
+
+	if (cont) {
+	    legendsManager.saveLegends();
+	    if (overviewCHB.isSelected()) {
+		legendsManager.saveOverviewLegends(overviewCB.getSelectedItem()
+			.toString());
+	    }
+	} else {
+	    throw new WizardException("", false, false);
+	}
     }
 
     public String getWizardComponentName() {
 	return "save_legends";
     }
 
-
     public void setProperties() {
 	// Nothing to do
-
     }
-
 
     public void showComponent() throws WizardException {
 
@@ -519,9 +509,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 	dbStyles.setText(mapName == null ? "" : mapName.toString());
     }
 
-
     private class LegendTableModel extends DefaultTableModel {
-
 
 	public Class<?> getColumnClass(int index) {
 	    if (index == 0) {
@@ -531,15 +519,12 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 	    }
 	}
 
-
 	public boolean isCellEditable(int row, int column) {
 	    if (column == 1) {
 		return false;
 	    }
 	    return true;
 	}
-
     }
-
 
 }

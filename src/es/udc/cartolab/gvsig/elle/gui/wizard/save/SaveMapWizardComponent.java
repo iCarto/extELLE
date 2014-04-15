@@ -42,6 +42,8 @@ import javax.swing.table.DefaultTableModel;
 
 import net.miginfocom.swing.MigLayout;
 
+import org.apache.log4j.Logger;
+
 import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.fmap.drivers.ConnectionJDBC;
 import com.iver.cit.gvsig.fmap.drivers.DBException;
@@ -61,10 +63,14 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
+@SuppressWarnings("serial")
 public class SaveMapWizardComponent extends WizardComponent implements ActionListener {
 
     public static final String PROPERTY_LAYERS_MAP = "table_layers";
     public static final String PROPERTY_MAP_NAME = "property_map_name";
+
+    private static final Logger logger = Logger
+	    .getLogger(SaveMapWizardComponent.class);
 
     private JButton upButton;
     private JButton downButton;
@@ -89,8 +95,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	setLayout(layout);
 
 	add(getMainPanel(), "shrink, growx, growy, wrap");
-
-
     }
 
     private JPanel getMainPanel() {
@@ -100,7 +104,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		"[grow][]");
 	panel.setLayout(layout);
 
-
 	//map, up & down buttons
 	setMapTable();
 	JPanel tablePanel = new JPanel();
@@ -108,7 +111,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	tablePanel.setLayout(tableLayout);
 	tablePanel.add(new JScrollPane(mapTable), "growx, growy");
 	tablePanel.add(getUpDownPanel(), "shrink, align right, wrap");
-
 
 	//map overview
 	overviewChb = new JCheckBox(PluginServices.getText(this, "save_overview"));
@@ -121,11 +123,8 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 	mapNameField.addKeyListener(new KeyListener() {
 
-
 	    public void keyPressed(KeyEvent e) {
-
 	    }
-
 
 	    public void keyReleased(KeyEvent e) {
 		callStateChanged();
@@ -133,7 +132,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 
 	    public void keyTyped(KeyEvent e) {
-
 	    }
 
 	});
@@ -189,7 +187,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	mapTable.getColumnModel().getColumn(2).setMinWidth(40);
 	mapTable.getColumnModel().getColumn(3).setMinWidth(60);
 	mapTable.getColumnModel().getColumn(4).setMinWidth(60);
-
     }
 
     public boolean canFinish() {
@@ -204,7 +201,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
     public String getWizardComponentName() {
 	return "save_map";
     }
-
 
     private List<String> parse() {
 
@@ -381,12 +377,11 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
     }
 
 
-    /* jlopez
-     * 
-     * This method is used in order to retrieve the name of all
-     * the nested groups as a string, each of them separated by
-     * '/'. Therefore, we have to escape that character ('\/'),
-     * which also means duplicating the backslashes.
+    /*
+     * This method is used in order to retrieve the name of all the nested
+     * groups as a string, each of them separated by '/'. Therefore, we have to
+     * escape that character ('\/'), which also means duplicating the
+     * backslashes.
      */
     private String getGroupCompositeName(FLayers group) {
 	// We check whether the layer has a parent group or it doesn't.
@@ -440,19 +435,13 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		}
 	    }
 	}
-
-
     }
 
-
     public void finish() throws WizardException {
-
-	//check existence of tables _map and _map_overview
 	DBSession dbs = DBSession.getCurrentSession();
 	try {
 	    boolean tableMapExists = dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapTable());
 	    boolean tableMapOvExists = dbs.tableExists(DBStructure.getSchema(), DBStructure.getOverviewTable());
-	    //TODO legends tables
 
 	    if (!tableMapExists || !tableMapOvExists) {
 
@@ -491,7 +480,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		}
 	    }
 
-
 	    if (tableMapExists) {
 
 		String mapName = mapNameField.getText();
@@ -517,9 +505,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		    }
 		}
 
-
 		PluginServices.getMDIManager().setWaitCursor();
-
 
 		String[] errors = saveMap(mapName);
 		PluginServices.getMDIManager().restoreCursor();
@@ -536,8 +522,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	    try {
 		dbs = DBSession.reconnect();
 	    } catch (DBException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		logger.error(e.getStackTrace(), e);
 	    }
 	    PluginServices.getMDIManager().restoreCursor();
 	    throw new WizardException(PluginServices.getText(this, "error_saving_map"), e1);
@@ -581,8 +566,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		    try {
 			DBSession.reconnect();
 		    } catch (DBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			logger.error(e1.getStackTrace(), e1);
 		    }
 		    return new String[] { PluginServices.getText(this,
 			    "error_overview") };
@@ -591,7 +575,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	    MapDAO.getInstance().saveMap(rows.toArray(new Object[0][0]), mapName);
 	    return new String[0];
 	}
-
     }
 
     private void saveOverview(String mapName) throws SQLException {
@@ -624,14 +607,12 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 			    }
 			}
 		    } catch (SQLException e) {
-			// TODO Auto-generated catch block
 			try {
+			    logger.error(e.getStackTrace(), e);
 			    DBSession.reconnect();
 			} catch (DBException e1) {
-			    // TODO Auto-generated catch block
-			    e1.printStackTrace();
+			    logger.error(e1.getStackTrace(), e1);
 			}
-			e.printStackTrace();
 		    }
 		}
 	    }
@@ -707,7 +688,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	}
     }
 
-
     public void actionPerformed(ActionEvent e) {
 
 	if (e.getSource() == upButton) {
@@ -734,6 +714,5 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	    }
 	    return true;
 	}
-
     }
 }

@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
+
 import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.fmap.drivers.DBException;
 import com.iver.cit.gvsig.fmap.layers.FLyrVect;
@@ -33,9 +35,13 @@ import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 public class DBLegendsManager extends AbstractLegendsManager {
 
+    private static final Logger logger = Logger
+	    .getLogger(DBLegendsManager.class);
+
     private boolean tableStylesExists, tableOvStylesExists;
     private String notConnected = PluginServices.getText(this, "notConnectedError");
     private String schema, styleTable = DBStructure.getMapStyleTable(), styleOvTable = DBStructure.getOverviewStyleTable();
+
 
     public DBLegendsManager(String leyendGroupName) throws WizardException {
 	super(leyendGroupName);
@@ -69,8 +75,7 @@ public class DBLegendsManager extends AbstractLegendsManager {
 		try {
 		    DBSession.reconnect();
 		} catch (DBException e1) {
-		    // TODO Auto-generated catch block
-		    e1.printStackTrace();
+		    logger.error(e1.getStackTrace(), e1);
 		}
 		throw new WizardException(e);
 	    }

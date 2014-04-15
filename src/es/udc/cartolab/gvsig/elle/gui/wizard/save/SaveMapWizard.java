@@ -26,6 +26,7 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardComponent;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 
+@SuppressWarnings("serial")
 public class SaveMapWizard extends WizardWindow {
 
     public final static String PROPERTY_VIEW = "view";
@@ -37,11 +38,8 @@ public class SaveMapWizard extends WizardWindow {
 
     public SaveMapWizard(View view) {
 	super();
-
 	properties.put(PROPERTY_VIEW, view);
-
     }
-
 
     public WindowInfo getWindowInfo() {
 	if (viewInfo == null) {
@@ -53,11 +51,9 @@ public class SaveMapWizard extends WizardWindow {
 	return viewInfo;
     }
 
-
     public Object getWindowProfile() {
 	return WindowInfo.DIALOG_PROFILE;
     }
-
 
     protected void addWizardComponents() {
 	views.add(new SaveMapWizardComponent(properties));
