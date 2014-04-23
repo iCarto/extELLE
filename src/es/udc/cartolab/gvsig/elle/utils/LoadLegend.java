@@ -328,6 +328,14 @@ public abstract class LoadLegend {
 	if (style.length == 1) {
 	    String type = style[0][2];
 	    String def = style[0][3];
+	    // gvSIG uses an old postresql jar. This jar escapes \ characters 
+	    // (converting it in \\) before commiting to the server, but in
+	    // postgresql version > 9.1 the default behavior is not escape
+	    // this characters.
+	    // http://www.postgresql.org/docs/9.1/static/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-ESCAPE
+	    // So when reading the jar expected only a \ and it 
+	    // receives \\
+	    def = def.replace("\\\\", "\\");
 	    
 	    File tmpLegend = File.createTempFile("style", layerName + "." + type);
 	    FileWriter writer = new FileWriter(tmpLegend);

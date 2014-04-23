@@ -252,14 +252,18 @@ public class LoadLegendWizardComponent extends WizardComponent {
 	    View view = (View) aux;
 
 	    if ((databaseRB.isSelected() && dbCB.getSelectedItem()!=null) || (fileRB.isSelected() && fileCB.getSelectedItem()!=null)) {
-		try {
+		
 		    FLayers layers = view.getMapControl().getMapContext().getLayers();
-		    loadLegends(layers, false);
-		    layers = view.getMapOverview().getMapContext().getLayers();
-		    loadLegends(layers, true);
-		} catch (Exception e) {
-		    throw new WizardException(e);
-		}
+		    try {
+			loadLegends(layers, false);
+			layers = view.getMapOverview().getMapContext().getLayers();
+			loadLegends(layers, true);
+		    } catch (SQLException e) {
+			throw new WizardException(e);
+		    } catch (IOException e) {
+			throw new WizardException(e);
+		    }
+		
 	    }
 	} else {
 	    throw new WizardException(PluginServices.getText(this, "no_view_error"));
