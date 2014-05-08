@@ -92,9 +92,6 @@ public class MapDAO {
 	if (dbs != null) {
 	    String where = "WHERE mapa='" + mapName + "'";
 
-	    System.out.println(where);
-
-	    /////////////// MapControl
 	    String[][] layers = dbs.getTable(DBStructure.getMapTable(), DBStructure.getSchema(), where, new String[]{"posicion"}, false);
 
 	    for (int i=0; i<layers.length; i++) {
@@ -134,7 +131,7 @@ public class MapDAO {
 
 		int position = 0;
 		try {
-		    position = Integer.parseInt(layers[i][4]);
+		    position = Integer.parseInt(layers[i][3]);
 		} catch (NumberFormatException e) {
 		    //do nothing
 		}
