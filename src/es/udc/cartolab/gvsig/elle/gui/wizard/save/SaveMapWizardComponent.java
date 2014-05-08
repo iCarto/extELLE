@@ -48,6 +48,7 @@ import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.fmap.drivers.ConnectionJDBC;
 import com.iver.cit.gvsig.fmap.drivers.DBException;
 import com.iver.cit.gvsig.fmap.drivers.DBLayerDefinition;
+import com.iver.cit.gvsig.fmap.drivers.DefaultJDBCDriver;
 import com.iver.cit.gvsig.fmap.drivers.VectorialDriver;
 import com.iver.cit.gvsig.fmap.drivers.jdbc.postgis.PostGisDriver;
 import com.iver.cit.gvsig.fmap.layers.FLayer;
@@ -585,34 +586,18 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	    FLayer layer = layers.getLayer(i);
 	    if (layer instanceof FLyrVect) {
 		VectorialDriver driver = ((FLyrVect) layer).getSource().getDriver();
-		if (driver instanceof PostGisDriver) {
+		if (driver instanceof DefaultJDBCDriver) {
 
 		    DBLayerDefinition layerDef = ((VectorialDBAdapter) ((FLyrVect) layer).getSource()).getLyrDef();
-
-		    DBSession dbc = DBSession.getCurrentSession();
-		    String user;
-		    try {
-			user = ((ConnectionJDBC)((PostGisDriver) driver).getConnection()).getConnection().getMetaData().getUserName();
-
-			if (user != null && user.equals(dbc.getUserName())) {
-			    if (!knownTables.contains(layerDef.getComposedTableName())) {
-				String tablename = layerDef.getTableName();
-				String schema = layerDef.getSchema();
-				String layerName = layer.getName();
-				String position = Integer.toString(i);
-				String[] row = { tablename, schema, layerName,
-					position };
-				rows.add(row);
-				knownTables.add(layerDef.getComposedTableName());
-			    }
-			}
-		    } catch (SQLException e) {
-			try {
-			    logger.error(e.getStackTrace(), e);
-			    DBSession.reconnect();
-			} catch (DBException e1) {
-			    logger.error(e1.getStackTrace(), e1);
-			}
+		  
+		    if (!knownTables.contains(layerDef.getComposedTableName())) {
+			String tablename = layerDef.getTableName();
+			String schema = layerDef.getSchema();
+			String layerName = layer.getName();
+			String position = Integer.toString(i);
+			String[] row = { tablename, schema, layerName, position };
+			rows.add(row);
+			knownTables.add(layerDef.getComposedTableName());
 		    }
 		}
 	    }
