@@ -133,10 +133,10 @@ public class DBLegendsManager extends AbstractLegendsManager {
     private String getLabelAsXML(FLyrVect layer) {
 	String label = null;
 	if (layer.isLabeled()) {
-        	final ILabelingStrategy labelingStrategy = layer.getLabelingStrategy();
-        	if (labelingStrategy != null) {
-        	    label = labelingStrategy.getXMLEntity().toString();
-        	}
+	    final ILabelingStrategy labelingStrategy = layer.getLabelingStrategy();
+	    if (labelingStrategy != null) {
+		label = labelingStrategy.getXMLEntity().toString();
+	    }
 	}
 	return label;
     }
