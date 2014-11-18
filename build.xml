@@ -17,7 +17,6 @@
   <target name="init">
     <tstamp/>
     <mkdir dir="${dist}"/>
-  	 <mkdir dir="${dist}/lib" />
   </target>
 
 	<target name="compile" description="compile the source" >
@@ -51,13 +50,6 @@
 	  	</copy>
 	</target>
 
-	<target name="copy-libs">
-    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-	<copy todir="${dist}/lib">
-  	    	<fileset dir="lib" includes="*"/>
-  	</copy>
-	</target>
-
 	<target name="move-to-andami">
 	   <move todir="${extensionsDir}/${plugin}/">
 	    	<fileset dir="${dist}" includes="**/**"/>
@@ -66,7 +58,7 @@
 
   <target name="generate-without-source"
   		description="generate the distribution without the source file"
-  	depends="init, create-jar, copy-data-files, copy-libs, move-to-andami" >
+  	depends="init, create-jar, copy-data-files, move-to-andami" >
   </target>
 
 <!--
@@ -90,7 +82,7 @@
 		<delete dir="${build}"/>
 	</target>
 
-	<target name="batch-build" depends="init, compile, create-jar, copy-data-files, copy-libs, move-to-andami">
+	<target name="batch-build" depends="init, compile, create-jar, copy-data-files, move-to-andami">
 		</target>
 </project>
 
