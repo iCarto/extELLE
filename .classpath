@@ -7,7 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/libFMap"/>
 	<classpathentry kind="lib" path="/libFMap/lib/gt2-main.jar"/>
 	<classpathentry kind="lib" path="/_fwAndami/lib/iver-utiles.jar" sourcepath="/Utiles/src"/>
-	<classpathentry kind="lib" path="/libFMap/lib/driver-manager-1.1.jar" sourcepath="/libDriverManager"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/_fwAndami"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/appgvSIG"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/extJDBC"/>
@@ -18,10 +17,12 @@
 	<classpathentry kind="lib" path="/_fwAndami/lib/org.gvsig.ui.jar" sourcepath="/libUIComponent/src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/extSymbology"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/extDBConnection"/>
-	<classpathentry kind="lib" path="/libFMap/lib/org.cresques.cts.jar" sourcepath="/libProjection/src"/>
 	<classpathentry kind="lib" path="/_fwAndami/lib/org.gvsig.exceptions.jar" sourcepath="/libExceptions/src"/>
 	<classpathentry kind="lib" path="/_fwAndami/lib/log4j-1.2.14.jar"/>
 	<classpathentry kind="lib" path="/es.icarto.gvsig.commons/lib/miglayout-3.7.3.1.jar"/>
 	<classpathentry kind="lib" path="/es.icarto.gvsig.commons/lib/formsrt.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/libDriverManager"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/libJCRS"/>
+	<classpathentry kind="src" path="/libProjection"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
