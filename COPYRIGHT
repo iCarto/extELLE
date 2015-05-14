@@ -1,4 +1,6 @@
-Copyright (C) 2010  Cartolab (Universade da Coruña)
+Copyright (C) 2010-2014  Cartolab (Universade da Coruña)
+Copyright (C) 2013-2015  iCarto
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,6 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-ELLE is a software developed by CartoLab (Laboratory of Cartography) of the Universidade da Coruña (Spain).
+ELLE is a software originally developed by CartoLab (Laboratory of Cartography) of the Universidade da Coruña (Spain).
 CartoLab is directed by Francisco Alberto Varela García (avarela (at) udc (dot) es)
+
+Now ELLE is mantained by iCarto (icarto.es)
 
