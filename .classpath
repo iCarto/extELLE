@@ -19,10 +19,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/extDBConnection"/>
 	<classpathentry kind="lib" path="/_fwAndami/lib/org.gvsig.exceptions.jar" sourcepath="/libExceptions/src"/>
 	<classpathentry kind="lib" path="/_fwAndami/lib/log4j-1.2.14.jar"/>
-	<classpathentry kind="lib" path="/es.icarto.gvsig.commons/lib/miglayout-3.7.3.1.jar"/>
 	<classpathentry kind="lib" path="/es.icarto.gvsig.commons/lib/formsrt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/libDriverManager"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/libJCRS"/>
 	<classpathentry kind="src" path="/libProjection"/>
+	<classpathentry kind="lib" path="/es.icarto.gvsig.commons/lib/miglayout-swing-5.1-20150404.220019-96.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
