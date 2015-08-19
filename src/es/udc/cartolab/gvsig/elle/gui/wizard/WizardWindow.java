@@ -57,6 +57,11 @@ public abstract class WizardWindow extends JPanel implements IWindow, WizardList
 
     }
 
+    public WizardWindow(List<WizardComponent> views) {
+	this();
+	this.views = views;
+    }
+
     protected abstract void addWizardComponents();
 
     public void open() {
