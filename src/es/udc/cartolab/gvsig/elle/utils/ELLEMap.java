@@ -341,7 +341,14 @@ public class ELLEMap {
     }
 
     public void load(IProjection proj) {
-	load(proj, new String[0]);
+	List<String> allLayerNames = new ArrayList<String>();
+	for (LayerProperties lp : this.layers) {
+	    allLayerNames.add(lp.getLayername());
+	}
+	for (LayerProperties lp : this.overviewLayers) {
+	    allLayerNames.add(lp.getLayername());
+	}
+	load(proj, allLayerNames.toArray(new String[0]));
     }
     
     public void load(IProjection proj, String[] layersAffectedByConstant) {
