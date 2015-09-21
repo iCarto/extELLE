@@ -79,15 +79,17 @@ public class SaveMapWizard extends WizardWindow {
 	    }
 	    e.printStackTrace();
 	}
-	if (close) {
-	    close();
-	}
+
 	if (success) {
 	    JOptionPane.showMessageDialog(
 		    this,
 		    PluginServices.getText(this, "map_saved_correctly"),
 		    "",
 		    JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	if (close) {
+	    close();
 	}
     }
 
