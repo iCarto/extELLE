@@ -6,8 +6,7 @@ import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
 
 import es.icarto.gvsig.elle.db.DBStructure;
-import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
-import es.udc.cartolab.gvsig.elle.gui.wizard.delete.DeleteMapWizard;
+import es.udc.cartolab.gvsig.elle.gui.wizard.delete.DeleteMapWindow;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 public class DeleteMapExtension extends Extension {
@@ -24,8 +23,8 @@ public class DeleteMapExtension extends Extension {
     }
 
     public void execute(String actionCommand) {
-	WizardWindow wizard = new DeleteMapWizard();
-	wizard.open();
+	DeleteMapWindow window = new DeleteMapWindow();
+	window.openDialog();
     }
 
     public boolean isEnabled() {
