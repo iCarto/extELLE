@@ -49,10 +49,12 @@ public class DeleteMapWindow extends AbstractIWindow implements ActionListener {
 		    this, "Choose_Map"));
 	    this.add(mapLabel, "wrap");
 	    mapList = new JList();
-	    mapList.setPrototypeCellValue("XXXXXXXXXXXXXXXXXXXXXXXXXX");
-	    mapList.setVisibleRowCount(20);
-	    JScrollPane s = new JScrollPane();
-	    this.add(new JScrollPane(mapList));
+
+	    mapList.setVisibleRowCount(10);
+
+	    this.add(new JScrollPane(mapList,
+		    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+		    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), "grow");
 
 	    dbs = DBSession.getCurrentSession();
 
@@ -62,6 +64,8 @@ public class DeleteMapWindow extends AbstractIWindow implements ActionListener {
 			    DBStructure.getOverviewTable())) {
 
 		String[] maps = MapDAO.getInstance().getMaps();
+
+		setScrollPaneWidth(maps);
 
 		mapList.setListData(maps);
 		mapList.addListSelectionListener(new ListSelectionListener() {
@@ -84,6 +88,24 @@ public class DeleteMapWindow extends AbstractIWindow implements ActionListener {
 	    }
 	    e.printStackTrace();
 	}
+    }
+
+    /**
+     * There is a bug in ScrollPane Layout that makes that the horizontal bar is
+     * always shown. As the name of the maps should always be "short" there is
+     * not problem with set the width of the window bigger enough to show the
+     * full name and never show horizontal bar
+     * http://stackoverflow.com/questions/11587292/jscrollpane-not-
+     * wide-enough-when-vertical-scrollbar-appears
+     *
+     */
+    private void setScrollPaneWidth(String[] maps) {
+	String prototypeCellValue = "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+	for (String map : maps) {
+	    prototypeCellValue = map.length() > prototypeCellValue.length() ? map
+		    : prototypeCellValue;
+	}
+	mapList.setPrototypeCellValue(prototypeCellValue);
     }
 
     @Override
