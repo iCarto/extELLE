@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.cresques.cts.IProjection;
 
 import com.iver.cit.gvsig.fmap.drivers.DBException;
@@ -38,6 +39,9 @@ import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 public class ELLEMap {
 
+    
+    private static final Logger logger = Logger.getLogger(ELLEMap.class);
+    
     private String name;
     private int styleSource = LoadLegend.NO_LEGEND;
     private final List<LayerProperties> layers;
@@ -262,10 +266,9 @@ public class ELLEMap {
 		    try {
 			DBSession.reconnect();
 		    } catch (DBException e1) {
-			e1.printStackTrace();
 		    }
 		}
-		e.printStackTrace(); //TODO change this to logger
+		logger.error(e.getStackTrace(), e);
 	    }
 	}
     }
@@ -323,10 +326,9 @@ public class ELLEMap {
 		    try {
 			DBSession.reconnect();
 		    } catch (DBException e1) {
-			e1.printStackTrace();
 		    }
 		}
-		e.printStackTrace(); //TODO change this to logger
+		logger.error(e.getStackTrace(), e);
 	    }
 	}
     }
