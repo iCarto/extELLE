@@ -46,7 +46,6 @@ public class ELLEMap {
     private boolean loaded = false;
     private final List<LayerProperties> overviewLayers;
     private IProjection projection;
-    private static boolean filtered = false;
     private static String[] constantValuesSelected = new String[0];
 
     public ELLEMap(String name, BaseView view) {
@@ -108,14 +107,6 @@ public class ELLEMap {
 
     private void setView(BaseView view) {
 	this.view = view;
-    }
-
-    public static boolean getFiltered() {
-	return filtered;
-    }
-
-    public static void setFiltered(boolean filter) {
-	filtered = filter;
     }
 
     public static String[] getConstantValuesSelected() {
