@@ -22,6 +22,7 @@ package es.udc.cartolab.gvsig.elle.utils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class ELLEMap {
     private boolean loaded = false;
     private final List<LayerProperties> overviewLayers;
     private IProjection projection;
-    private static String[] constantValuesSelected = new String[0];
+    private static List<String> constantValuesSelected = new ArrayList<String>();
 
     public ELLEMap(String name, BaseView view) {
 	this.setName(name);
@@ -113,11 +114,11 @@ public class ELLEMap {
 	this.view = view;
     }
 
-    public static String[] getConstantValuesSelected() {
+    public static List<String> getConstantValuesSelected() {
 	return constantValuesSelected;
     }
 
-    public static void setConstantValuesSelected(String[] values) {
+    public static void setConstantValuesSelected(List<String> values) {
 	constantValuesSelected = values;
     }
 
@@ -231,22 +232,16 @@ public class ELLEMap {
     }
 
     @SuppressWarnings("unchecked")
-    private void loadViewLayers(IProjection proj, String[] layersAffectedByConstant) {
-	//load view layers
+    private void loadViewLayers(IProjection proj, Collection<String> tablesAffectedByConstant) {
 	Collections.sort(layers);
 	for (LayerProperties lp : layers) {
 	    FLayer layer;
 	    FLayers group = getGroup(lp);
 	    try {
-		boolean coincidence = false;
-		for (int i=0; i<layersAffectedByConstant.length; i++) {
-		    if (lp.getTablename().equalsIgnoreCase(layersAffectedByConstant[i])) {
-			coincidence = true;
-		    }
-		}
-		if (!coincidence) {
+		if (! tablesAffectedByConstant.contains(lp.getTablename())) {
 		    lp.setWhere("");
 		}
+
 		layer = getMapDAO().getLayer(lp, proj);
 		if (layer!=null) {
 		    if (lp.getMaxScale()>-1) {
@@ -296,17 +291,11 @@ public class ELLEMap {
     }
 
     @SuppressWarnings("unchecked")
-    private void loadOverviewLayers(IProjection proj, String[] layersAffectedByConstant) {
+    private void loadOverviewLayers(IProjection proj, Collection<String> tablesAffectedByConstant) {
 	Collections.sort(overviewLayers);
 	for (LayerProperties lp : overviewLayers) {
 	    try {
-		boolean coincidence = false;
-		for (int i=0; i<layersAffectedByConstant.length; i++) {
-		    if (lp.getTablename().equalsIgnoreCase(layersAffectedByConstant[i])) {
-			coincidence = true;
-		    }
-		}
-		if (!coincidence) {
+		if (! tablesAffectedByConstant.contains(lp.getTablename())) {
 		    lp.setWhere("");
 		}
 		FLayer ovLayer = getMapDAO().getLayer(lp, proj);
@@ -341,13 +330,13 @@ public class ELLEMap {
 	for (LayerProperties lp : this.overviewLayers) {
 	    allLayerNames.add(lp.getLayername());
 	}
-	load(proj, allLayerNames.toArray(new String[0]));
+	load(proj, allLayerNames);
     }
     
-    public void load(IProjection proj, String[] layersAffectedByConstant) {
+    public void load(IProjection proj, Collection<String> tablesAffectedByConstant) {
 	if (!loaded) {
-	    loadViewLayers(proj, layersAffectedByConstant);
-	    loadOverviewLayers(proj, layersAffectedByConstant);
+	    loadViewLayers(proj, tablesAffectedByConstant);
+	    loadOverviewLayers(proj, tablesAffectedByConstant);
 	    getMapDAO().addLoadedMap(this);
 	    loaded = true;
 	    projection = proj;
@@ -364,13 +353,13 @@ public class ELLEMap {
     }
 
     public void reload() {
-	reload(new String[0]);
+	reload(new ArrayList<String>());
     }
     
-    public void reload(String[] layersAffectedByConstant) {
+    public void reload(Collection<String> list) {
 	if (loaded) {
 	    removeViewLayers();
-	    loadViewLayers(projection, layersAffectedByConstant);
+	    loadViewLayers(projection, list);
 	}
     }
 
