@@ -16,6 +16,7 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,8 +29,6 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.miginfocom.swing.MigLayout;
-
 import org.apache.log4j.Logger;
 
 import com.iver.andami.PluginServices;
@@ -37,7 +36,7 @@ import com.iver.andami.ui.mdiManager.IWindow;
 
 @SuppressWarnings("serial")
 public abstract class WizardWindow extends JPanel implements IWindow,
-WizardListener, ActionListener {
+	WizardListener, ActionListener {
 
     private static final Logger logger = Logger.getLogger(WizardWindow.class);
 
@@ -48,6 +47,7 @@ WizardListener, ActionListener {
     protected Map<String, Object> properties = new HashMap<String, Object>();
 
     public WizardWindow() {
+	super(new BorderLayout(5, 5));
 	nextButton = new JButton(PluginServices.getText(this, "next"));
 	nextButton.addActionListener(this);
 	prevButton = new JButton(PluginServices.getText(this, "previous"));
@@ -69,15 +69,12 @@ WizardListener, ActionListener {
     protected abstract void addWizardComponents();
 
     public void open() {
-	MigLayout layout = new MigLayout("inset 0 45 0 5, align center");
-
-	setLayout(layout);
 
 	mainPanel = getMainPanel();
 	changeView(0);
 
-	add(mainPanel, "shrink, growx, growy, wrap");
-	add(getSouthPanel(), "shrink, align center");
+	add(mainPanel, BorderLayout.CENTER);
+	add(getSouthPanel(), BorderLayout.SOUTH);
 	PluginServices.getMDIManager().addCentredWindow(this);
     }
 
@@ -127,7 +124,7 @@ WizardListener, ActionListener {
 	WizardComponent currentView = views.get(currentPos);
 	int nViews = views.size();
 	nextButton
-	.setEnabled(currentPos != nViews - 1 && currentView.canNext());
+		.setEnabled(currentPos != nViews - 1 && currentView.canNext());
 	prevButton.setEnabled(currentPos > 0);
 	finishButton.setEnabled(currentView.canFinish());
     }

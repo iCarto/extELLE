@@ -38,8 +38,8 @@ public class LoadMapWizard extends WizardWindow {
 	    viewInfo = new WindowInfo(WindowInfo.MODELESSDIALOG
 		    | WindowInfo.PALETTE);
 	    viewInfo.setTitle(PluginServices.getText(this, "Load_map"));
-	    viewInfo.setWidth(525);
-	    viewInfo.setHeight(520);
+	    viewInfo.setWidth(600);
+	    viewInfo.setHeight(800);
 	}
 	return viewInfo;
     }
