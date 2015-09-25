@@ -30,18 +30,22 @@ import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
+import org.apache.log4j.Logger;
+
 import com.iver.andami.PluginServices;
 import com.iver.andami.ui.mdiManager.IWindow;
 
 @SuppressWarnings("serial")
-public abstract class WizardWindow extends JPanel implements IWindow, WizardListener, ActionListener {
+public abstract class WizardWindow extends JPanel implements IWindow,
+WizardListener, ActionListener {
+
+    private static final Logger logger = Logger.getLogger(WizardWindow.class);
 
     protected JButton nextButton, prevButton, cancelButton, finishButton;
     private JPanel mainPanel;
     protected List<WizardComponent> views = new ArrayList<WizardComponent>();
     protected int currentPos;
-    protected Map <String, Object> properties = new HashMap<String, Object>();
-
+    protected Map<String, Object> properties = new HashMap<String, Object>();
 
     public WizardWindow() {
 	nextButton = new JButton(PluginServices.getText(this, "next"));
@@ -99,7 +103,7 @@ public abstract class WizardWindow extends JPanel implements IWindow, WizardList
 
     private void changeView(int position) {
 	try {
-	    if (position>=0 && position<views.size()) {
+	    if (position >= 0 && position < views.size()) {
 		views.get(currentPos).removeWizardListener(this);
 		currentPos = position;
 		WizardComponent newView = views.get(currentPos);
@@ -110,24 +114,25 @@ public abstract class WizardWindow extends JPanel implements IWindow, WizardList
 		updateButtons();
 	    }
 	} catch (WizardException e) {
-	    // TODO error y cerrar
-	    e.printStackTrace();
+	    logger.error(e.getStackTrace(), e);
 	}
     }
 
     public void updateButtons() {
-	if (views.size()<2) {
+	if (views.size() < 2) {
 	    prevButton.setVisible(false);
 	    nextButton.setVisible(false);
 	    finishButton.setText(PluginServices.getText(this, "ok"));
 	}
 	WizardComponent currentView = views.get(currentPos);
 	int nViews = views.size();
-	nextButton.setEnabled(currentPos!=nViews-1 && currentView.canNext() );
-	prevButton.setEnabled(currentPos>0);
+	nextButton
+	.setEnabled(currentPos != nViews - 1 && currentView.canNext());
+	prevButton.setEnabled(currentPos > 0);
 	finishButton.setEnabled(currentView.canFinish());
     }
 
+    @Override
     public void wizardChanged() {
 	updateButtons();
     }
@@ -145,13 +150,10 @@ public abstract class WizardWindow extends JPanel implements IWindow, WizardList
 	} catch (WizardException e) {
 	    close = e.closeWizard();
 	    if (e.showMessage()) {
-		JOptionPane.showMessageDialog(
-			this,
-			e.getMessage(),
-			"",
+		JOptionPane.showMessageDialog(this, e.getMessage(), "",
 			JOptionPane.ERROR_MESSAGE);
 	    }
-	    e.printStackTrace();
+	    logger.error(e.getStackTrace(), e);
 	}
 	if (close) {
 	    close();
@@ -161,21 +163,19 @@ public abstract class WizardWindow extends JPanel implements IWindow, WizardList
     protected void next() {
 	try {
 	    views.get(currentPos).setProperties();
-	    changeView(currentPos+1);
+	    changeView(currentPos + 1);
 	    views.get(currentPos).showComponent();
 	} catch (WizardException e) {
-	    JOptionPane.showMessageDialog(
-		    this,
-		    e.getMessage(),
-		    "",
+	    JOptionPane.showMessageDialog(this, e.getMessage(), "",
 		    JOptionPane.ERROR_MESSAGE);
 	}
     }
 
     protected void previous() {
-	changeView(currentPos-1);
+	changeView(currentPos - 1);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
 	if (e.getSource() == cancelButton) {
 	    close();
@@ -190,7 +190,6 @@ public abstract class WizardWindow extends JPanel implements IWindow, WizardList
 	    finish();
 	}
     }
-
 
     public void add(WizardComponent component) {
 	views.add(component);
