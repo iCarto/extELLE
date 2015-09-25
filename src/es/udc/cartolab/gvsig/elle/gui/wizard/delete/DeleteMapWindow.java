@@ -50,7 +50,7 @@ public class DeleteMapWindow extends AbstractIWindow implements ActionListener {
 	    this.add(mapLabel, "wrap");
 	    mapList = new JList();
 
-	    mapList.setVisibleRowCount(10);
+	    mapList.setVisibleRowCount(16);
 
 	    this.add(new JScrollPane(mapList,
 		    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
