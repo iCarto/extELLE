@@ -1,5 +1,6 @@
 package es.udc.cartolab.gvsig.elle.gui.wizard.delete;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -138,6 +139,16 @@ public class DeleteMapWindow extends AbstractIWindow implements ActionListener {
 		}
 	    }
 	}
+    }
+
+    @Override
+    protected JButton getDefaultButton() {
+	return okBtn;
+    }
+
+    @Override
+    protected Component getDefaultFocusComponent() {
+	return null;
     }
 
 }
