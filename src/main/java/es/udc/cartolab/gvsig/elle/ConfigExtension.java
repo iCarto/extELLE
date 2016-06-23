@@ -1,6 +1,6 @@
 package es.udc.cartolab.gvsig.elle;
 
-import org.gvsig.about.AboutManager;
+import org.gvsig.about.AboutManager; 
 import org.gvsig.andami.plugins.Extension;
 import org.gvsig.andami.preferences.IPreference;
 import org.gvsig.andami.preferences.IPreferenceExtension;

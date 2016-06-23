@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import es.icarto.gvsig.commons.gui.AbstractIWindow;
 import es.icarto.gvsig.commons.gui.OkCancelPanel;
 import es.icarto.gvsig.commons.gui.WidgetFactory;
-import es.icarto.gvsig.commons.gvsig2.DBException;
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.utils.LoadLegend;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;

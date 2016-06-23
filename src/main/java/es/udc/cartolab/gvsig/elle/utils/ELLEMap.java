@@ -233,6 +233,7 @@ private static final Logger logger = LoggerFactory.getLogger(ELLEMap.class);
     @SuppressWarnings("unchecked")
     private void loadViewLayers(IProjection proj, Collection<String> tablesAffectedByConstant) {
 	Collections.sort(layers);
+	LoadLegend legendLoader = new LoadLegend();
 	for (LayerProperties lp : layers) {
 	    FLayer layer;
 	    FLayers group = getGroup(lp);
@@ -252,7 +253,8 @@ private static final Logger logger = LoggerFactory.getLogger(ELLEMap.class);
 		    layer.setVisible(lp.visible());
 		    group.addLayer(layer);
 		    if (layer instanceof FLyrVect && styleSource != LoadLegend.NO_LEGEND) {
-			LoadLegend.loadLegend((FLyrVect) layer, styleName, false, styleSource);
+		    	legendLoader.loadDBLegend((FLyrVect) layer, styleName, false);
+//			LoadLegend.loadLegend((FLyrVect) layer, styleName, false, styleSource);
 		    }
 		}
 	    } catch (Exception e) {
@@ -292,6 +294,7 @@ private static final Logger logger = LoggerFactory.getLogger(ELLEMap.class);
     @SuppressWarnings("unchecked")
     private void loadOverviewLayers(IProjection proj, Collection<String> tablesAffectedByConstant) {
 	Collections.sort(overviewLayers);
+	LoadLegend legendLoader = new LoadLegend();
 	for (LayerProperties lp : overviewLayers) {
 	    try {
 		if (! tablesAffectedByConstant.contains(lp.getTablename())) {
@@ -306,8 +309,9 @@ private static final Logger logger = LoggerFactory.getLogger(ELLEMap.class);
 		view.getMapOverview().getMapContext().endAtomicEvent();
 		if (ovLayer instanceof FLyrVect
 			&& styleSource != LoadLegend.NO_LEGEND) {
-		    LoadLegend.loadLegend((FLyrVect) ovLayer, styleName, true,
-			    styleSource);
+			legendLoader.loadDBLegend((FLyrVect) ovLayer, styleName, true);
+//		    LoadLegend.loadLegend((FLyrVect) ovLayer, styleName, true,
+//			    styleSource);
 		}
 	    } catch (Exception e) {
 		if (e instanceof SQLException || e instanceof DataException) {

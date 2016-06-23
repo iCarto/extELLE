@@ -16,9 +16,12 @@
  */
 package es.udc.cartolab.gvsig.elle.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,12 +33,22 @@ import java.util.List;
 import java.util.Set;
 
 import org.gvsig.andami.PluginServices;
+import org.gvsig.fmap.mapcontext.exceptions.LegendLayerException;
+import org.gvsig.fmap.mapcontext.exceptions.WriteLegendException;
 import org.gvsig.fmap.mapcontext.layers.FLayer;
 import org.gvsig.fmap.mapcontext.layers.vectorial.FLyrVect;
 import org.gvsig.fmap.mapcontext.rendering.legend.ILegend;
 import org.gvsig.fmap.mapcontext.rendering.legend.IVectorLegend;
+import org.gvsig.fmap.mapcontext.rendering.legend.driver.ILegendReader;
+import org.gvsig.fmap.mapcontext.rendering.legend.driver.ILegendWriter;
 import org.gvsig.fmap.mapcontext.rendering.legend.styling.ILabelingStrategy;
+import org.gvsig.symbology.fmap.mapcontext.rendering.legend.driver.impl.PersistenceBasedLegendReader;
+import org.gvsig.symbology.fmap.mapcontext.rendering.legend.driver.impl.PersistenceBasedLegendWriter;
 import org.gvsig.symbology.fmap.mapcontext.rendering.legend.styling.LabelingFactory;
+import org.gvsig.tools.ToolsLocator;
+import org.gvsig.tools.exception.BaseException;
+import org.gvsig.tools.persistence.PersistenceManager;
+import org.gvsig.tools.persistence.xml.XMLPersistenceManager;
 import org.gvsig.utils.XMLEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +61,7 @@ import es.udc.cartolab.gvsig.users.utils.DBSession;
  * This ELLE class can load legends (styles) on the layers. This styles are
  * 'gvl' files placed on a folder defined by the user on the config panel.
  */
-public abstract class LoadLegend {
+public class LoadLegend {
 
 	
 	private static final Logger logger = LoggerFactory
@@ -59,13 +72,16 @@ public abstract class LoadLegend {
     public static final int FILE_LEGEND = 2;
 
     private static String legendPath;
-    private static HashMap<String, Class<? extends IFMapLegendDriver>> drivers = new HashMap<String, Class<? extends IFMapLegendDriver>>();
+    private static HashMap<String, Class<? extends ILegendReader>> readDrivers = new HashMap<String, Class<? extends ILegendReader>>();
+    private static HashMap<String, Class<? extends ILegendWriter>> writeDrivers = new HashMap<String, Class<? extends ILegendWriter>>();
     private static String configLegendDir;
 
     
     static {
-	drivers.put("gvl", FMapGVLDriver.class);
-	drivers.put("sld", FMapSLDDriver.class);
+    	readDrivers.put("gvl", PersistenceBasedLegendReader.class);
+    	readDrivers.put("sld", PersistenceBasedLegendReader.class); // FIXME
+    	writeDrivers.put("gvl", PersistenceBasedLegendWriter.class);
+    	writeDrivers.put("sld", PersistenceBasedLegendWriter.class); // FIXME
 
 	//get config
 	XMLEntity xml = PluginServices.getPluginServices("es.udc.cartolab.gvsig.elle").getPersistentXML();
@@ -77,6 +93,25 @@ public abstract class LoadLegend {
 	}
     }
 
+	private final XMLPersistenceManager persistenceManager;
+
+    public LoadLegend() {
+		this.persistenceManager = initXMLPersistenceManager();
+	}
+    
+    private XMLPersistenceManager initXMLPersistenceManager() {
+    	PersistenceManager defaultManager = ToolsLocator.getPersistenceManager();
+    	XMLPersistenceManager manager = new XMLPersistenceManager();
+    	// Al crear el XMLPersistenceManager de esta forma no están instanciadas
+    	// en el manager las factorias que hacen falta para crear el state así
+    	// que las cogemos del ZIPXMLPersistenceManager
+		Iterator it = defaultManager.getFactories().iterator();
+		while (it.hasNext()) {
+			manager.registerFactory((org.gvsig.tools.persistence.PersistenceFactory)it.next()); 
+		}
+		return manager;
+    }
+    
     public static boolean setLegendStyleName(String stylesName) {
 	if (configLegendDir!=null) {
 	    File f = new File(configLegendDir + stylesName);
@@ -107,12 +142,13 @@ public abstract class LoadLegend {
 
 	    String ext = legendFile.getName().substring(legendFile.getName().lastIndexOf('.') +1);
 	    try {
-		if (drivers.containsKey(ext.toLowerCase())) {
-		    IFMapLegendDriver driver = drivers.get(ext.toLowerCase()).newInstance();
-		    Hashtable<FLayer, ILegend> table = driver.read(lyr.getMapContext().getLayers(),lyr, legendFile);
-		    ILegend legend = table.get(lyr);
+		if (readDrivers.containsKey(ext.toLowerCase())) {
+		    ILegendReader driver = readDrivers.get(ext.toLowerCase()).newInstance();
+		    ILegend legend = driver.read(legendFile, lyr.getShapeType());
+		    
+		    
 		    if (legend != null && legend instanceof IVectorLegend) {
-			lyr.setLegend((IVectorLegend)table.get(lyr));
+			lyr.setLegend((IVectorLegend)legend);
 			System.out.println("Cargado el style: "+ legendFile.getAbsolutePath());
 			return true;
 		    }
@@ -131,21 +167,23 @@ public abstract class LoadLegend {
 	return false;
     }
 
-    public static void saveLegend(FLyrVect layer, File legendFile) throws LegendDriverException {
+    public static void saveLegend(FLyrVect layer, File legendFile) {
 	String ext = legendFile.getName().substring(legendFile.getName().lastIndexOf('.') +1);
-	if (drivers.containsKey(ext.toLowerCase())) {
+	if (readDrivers.containsKey(ext.toLowerCase())) {
 	    try {
-		IFMapLegendDriver driver = drivers.get(ext.toLowerCase()).newInstance();
-		//workaround for driver version... we hope that when supportedVersions array grows (it has one element
-		//for gvl and sld), gvsIG people will put the newer versions at the last position
-		ArrayList<String> supportedVersions = driver.getSupportedVersions();
-		String version = supportedVersions.get(supportedVersions.size()-1);
-		driver.write(layer.getMapContext().getLayers(),layer, layer.getLegend(), legendFile, version);
+		ILegendWriter driver = writeDrivers.get(ext.toLowerCase()).newInstance();
+		
+		driver.write(layer.getLegend(), legendFile, "gvsleg");
+		
 	    } catch (InstantiationException e) {
 	    	logger.error(e.getMessage(), e);
 	    } catch (IllegalAccessException e) {
 	    	logger.error(e.getMessage(), e);
-	    }
+	    } catch (WriteLegendException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
 	}
     }
 
@@ -191,7 +229,7 @@ public abstract class LoadLegend {
     }
 
     private static boolean hasExtension(String fileName) {
-	for (String ext : drivers.keySet()) {
+	for (String ext : readDrivers.keySet()) {
 	    if (fileName.toLowerCase().endsWith("." + ext.toLowerCase())) {
 		return true;
 	    }
@@ -294,7 +332,7 @@ public abstract class LoadLegend {
 	}
 
 	result.add(type);
-	Set<String> set = drivers.keySet();
+	Set<String> set = readDrivers.keySet();
 	Iterator<String> it = set.iterator();
 	while (it.hasNext()) {
 	    String aux = it.next().toLowerCase();
@@ -307,7 +345,54 @@ public abstract class LoadLegend {
 
     }
 
-    private static void loadDBLegend(FLyrVect layer, String styleName, boolean overview) throws SQLException, IOException {
+    public void loadDBLegend(FLyrVect layer, String styleName, boolean overview) {
+    	String table;
+    	if (overview) {
+    	    table = DBStructure.getOverviewStyleTable();
+    	} else {
+    	    table = DBStructure.getMapStyleTable();
+    	}
+
+    	DBSession dbs = DBSession.getCurrentSession();
+    	String layerName = layer.getName();
+    	String[][] style = new String[0][0];
+		try {
+			style = dbs.getTable(table, DBStructure.getSchema(),
+				"where nombre_capa='" + layerName + "' and nombre_estilo='"
+					+ styleName + "'");
+		} catch (SQLException e1) {
+			logger.error(e1.getMessage(), e1);
+		}
+    	if (style.length == 1) {
+    	    String type = style[0][2];
+    	    String def = style[0][3];
+    	    // gvSIG uses an old postresql jar. This jar escapes \ characters 
+    	    // (converting it in \\) before commiting to the server, but in
+    	    // postgresql version > 9.1 the default behavior is not escape
+    	    // this characters.
+    	    // http://www.postgresql.org/docs/9.1/static/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-ESCAPE
+    	    // So when reading the jar expected only a \ and it 
+    	    // receives \\
+    	    def = def.replace("\\\\", "\\");
+    	    try {
+    	    	InputStream is = new ByteArrayInputStream(def.getBytes("UTF-8"));
+        	    IVectorLegend legend = (IVectorLegend) persistenceManager.getObject(is);
+            	is.close();
+        		layer.setLegend(legend);
+    	    } catch (UnsupportedEncodingException e) {
+				logger.error(e.getMessage(), e);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			} catch (LegendLayerException e) {
+				logger.error(e.getMessage(), e);
+			}
+    	    
+    	}
+    	setLabel(layer, style[0][4]);
+    }
+    
+    @Deprecated
+    public static void loadstaticDBLegend(FLyrVect layer, String styleName, boolean overview) throws SQLException, IOException {
 
 	String table;
 	if (overview) {
@@ -339,36 +424,25 @@ public abstract class LoadLegend {
 	    writer.close();
 	    setLegend(layer, tmpLegend.getAbsolutePath(), true);
 
-	    // fpuga. April 15, 2014
-	    // This if is here only for compatible reasons with old version of
-	    // ELLE without support for labelling. The if can be safely
-	    // removed when all projects have added to the database a "label"
-	    // column to _map_style and _map_overview_style
-	    if (style[0].length == 5) {
-		setLabel(layer, style[0][4]);
-	    }
+//		setLabel(layer, style[0][4]);
+
 	}
     }
 
-    public static boolean setLabel(FLyrVect layer, String label) {
-	boolean labeled = false;
-	if ((label != null) && (label.length() > 0)) {
-	    try {
-		XMLEntity parse = XMLEntity.parse(label);
-		ILabelingStrategy strategy = LabelingFactory
-			.createStrategyFromXML(parse, layer);
-		layer.setLabelingStrategy(strategy);
-		layer.setIsLabeled(true);
-		labeled = true;
-	    } catch (MarshalException e) {
-	    	logger.error(e.getMessage(), e);
-	    } catch (ValidationException e) {
-	    	logger.error(e.getMessage(), e);
-	    } catch (ReadDriverException e) {
-	    	logger.error(e.getMessage(), e);
-	    }
-	}
-	return labeled;
+    public boolean setLabel(FLyrVect layer, String label) {
+    	
+    	if ((label != null) && (label.length() > 0)) {
+			try {
+				InputStream isLb = new ByteArrayInputStream(label.getBytes("UTF-8"));
+				ILabelingStrategy labelStrategy = (ILabelingStrategy) persistenceManager.getObject(isLb);
+				layer.setLabelingStrategy(labelStrategy);
+				layer.setIsLabeled(true);
+				return true;
+			} catch (UnsupportedEncodingException e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+    	return false;
     }
 
     private static void loadFileLegend(FLyrVect layer, String styleName, boolean overview) {
@@ -382,23 +456,23 @@ public abstract class LoadLegend {
 	}
     }
 
-    public static void loadLegend(FLyrVect layer, String styleName, boolean overview, int source) throws SQLException, IOException {
-
-	switch (source) {
-	case DB_LEGEND : loadDBLegend(layer, styleName, overview);
-	break;
-	case FILE_LEGEND : loadFileLegend(layer, styleName, overview);
-	break;
-
-	}
-
-	for (ELLEMap map : MapDAO.getInstance().getLoadedMaps()) {
-	    if (map.layerInMap(layer.getName())) {
-		map.setStyleSource(source);
-		map.setStyleName(styleName);
-	    }
-	}
-
-    }
+//    public static void loadLegend(FLyrVect layer, String styleName, boolean overview, int source) throws SQLException, IOException {
+//
+//	switch (source) {
+//	case DB_LEGEND : loadDBLegend(layer, styleName, overview);
+//	break;
+//	case FILE_LEGEND : loadFileLegend(layer, styleName, overview);
+//	break;
+//
+//	}
+//
+//	for (ELLEMap map : MapDAO.getInstance().getLoadedMaps()) {
+//	    if (map.layerInMap(layer.getName())) {
+//		map.setStyleSource(source);
+//		map.setStyleName(styleName);
+//	    }
+//	}
+//
+//    }
 
 }

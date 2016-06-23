@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import com.jeta.forms.components.panel.FormPanel;
 import com.jeta.forms.gui.common.FormException;
 
-import es.icarto.gvsig.commons.gvsig2.DBException;
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardComponent;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;

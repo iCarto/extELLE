@@ -60,11 +60,9 @@ public class FileLegendsManager extends AbstractLegendsManager {
 	    }
 	    for (LayerProperties lp : layers) {
 		File legendFile = new File(path + lp.getLayername() + "." + lp.getLegendType());
-		try {
-		    LoadLegend.saveLegend(lp.getLayer(), legendFile);
-		} catch (LegendDriverException e) {
-		    throw new WizardException(e);
-		}
+		
+		LoadLegend.saveLegend(lp.getLayer(), legendFile);
+		
 	    }
 	} else {
 	    throw new WizardException(PluginServices.getText(this, "no_config_error"));
@@ -123,11 +121,7 @@ public class FileLegendsManager extends AbstractLegendsManager {
 	}
 	for (FLyrVect layer : overviewLayers) {
 	    File legendFile = new File(path + layer.getName() + "." + type);
-	    try {
 		LoadLegend.saveLegend(layer, legendFile);
-	    } catch (LegendDriverException e) {
-		throw new WizardException(e);
-	    }
 	}
 
     }

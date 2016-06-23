@@ -3,12 +3,12 @@ package es.icarto.gvsig.elle.db;
 
 public class DBStructure {
 
-    public static String MAP_TABLE = "_map";
-    public static String OVERVIEW_TABLE = "_map_overview";
-    public static String MAP_STYLE_TABLE = "_map_style";
-    public static String OVERVIEW_STYLE_TABLE = "_map_overview_style";
-    public static String WMS_TABLE = "_wms";
-    public static String SCHEMA_NAME = "elle";
+    public final static String MAP_TABLE = "_map";
+    public final static String OVERVIEW_TABLE = "_map_overview";
+    public final static String MAP_STYLE_TABLE = "_map_style";
+    public final static String OVERVIEW_STYLE_TABLE = "_map_overview_style";
+    public final static String WMS_TABLE = "_wms";
+    public final static String SCHEMA_NAME = "elle";
 
     public static String getMapTable() {
 	return MAP_TABLE;

@@ -21,6 +21,8 @@ import javax.swing.JOptionPane;
 import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.ui.mdiManager.WindowInfo;
 import org.gvsig.app.project.documents.view.gui.IView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardComponent;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
@@ -28,6 +30,9 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 
 @SuppressWarnings("serial")
 public class SaveMapWizard extends WizardWindow {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(SaveMapWizard.class);
 
     public final static String PROPERTY_VIEW = "view";
 
@@ -77,7 +82,12 @@ public class SaveMapWizard extends WizardWindow {
 			"",
 			JOptionPane.ERROR_MESSAGE);
 	    }
-	    e.printStackTrace();
+	    logger.error(e.getMessage(), e);
+	} catch (RuntimeException e) {
+		success = false;
+		JOptionPane.showMessageDialog(this, "Error guardando el mapa", "", JOptionPane.ERROR_MESSAGE);
+		logger.error(e.getMessage(), e);
+		PluginServices.getMDIManager().restoreCursor();
 	}
 
 	if (success) {

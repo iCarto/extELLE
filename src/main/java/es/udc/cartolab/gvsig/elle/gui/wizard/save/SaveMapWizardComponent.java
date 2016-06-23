@@ -150,11 +150,11 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		"[grow]");
 
 	upDownPanel.setLayout(layout);
-	java.net.URL imgURL = getClass().getResource("/go-up.png");
+	java.net.URL imgURL = getClass().getClassLoader().getResource("images/go-up.png");
 	upButton = new JButton(new ImageIcon(imgURL));
 	upButton.addActionListener(this);
 
-	imgURL = getClass().getResource("/go-down.png");
+	imgURL = getClass().getClassLoader().getResource("images/go-down.png");
 	downButton = new JButton(new ImageIcon(imgURL));
 	downButton.addActionListener(this);
 
@@ -561,6 +561,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		try {
 		    saveOverview(mapName);
 		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
 		    try {
 			DBSession.reconnect();
 		    } catch (DataException e1) {

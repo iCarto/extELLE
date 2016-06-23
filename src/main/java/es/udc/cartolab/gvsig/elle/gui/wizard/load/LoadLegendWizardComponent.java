@@ -276,6 +276,7 @@ public class LoadLegendWizardComponent extends WizardComponent {
     }
 
     private void loadLegends(FLayers layers, boolean overview) throws SQLException, IOException {
+    	LoadLegend legendLoader = new LoadLegend();
 	for (int i=0; i<layers.getLayersCount(); i++) {
 	    FLayer layer = layers.getLayer(i);
 	    if (layer instanceof FLyrVect) {
@@ -284,11 +285,13 @@ public class LoadLegendWizardComponent extends WizardComponent {
 		if (databaseRB.isSelected()) {
 		    source = LoadLegend.DB_LEGEND;
 		    styles = dbCB.getSelectedItem().toString();
+		    legendLoader.loadDBLegend((FLyrVect) layer, styles, overview);
 		} else {
 		    source = LoadLegend.FILE_LEGEND;
 		    styles = fileCB.getSelectedItem().toString();
+//		    LoadLegend.loadLegend((FLyrVect) layer, styles, overview, source);
 		}
-		LoadLegend.loadLegend((FLyrVect) layer, styles, overview, source);
+		
 	    } else if (layer instanceof FLayers) {
 		loadLegends((FLayers) layer, overview);
 	    }

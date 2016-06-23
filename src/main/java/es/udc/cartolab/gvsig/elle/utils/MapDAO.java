@@ -156,7 +156,6 @@ public class MapDAO {
 	if (dbs != null) {
 	    String where = "WHERE mapa='" + mapName + "'";
 
-	    System.out.println(where);
 	    String[][] layersOV = dbs.getTable(DBStructure.getOverviewTable(), DBStructure.getSchema(), where, new String[]{"posicion"}, false);
 
 	    for (int i = 0; i < layersOV.length; i++) {
@@ -344,18 +343,9 @@ public class MapDAO {
 		    rowToSave[1] =  rows[j][0]; // tablename
 		}
 
-		try {
-		    dbs.insertRow(DBStructure.getSchema(), DBStructure.getOverviewTable(), columns, rowToSave);
-		} catch (SQLException e) {
-		    //undo insertions
-		    try {
-			dbs = DBSession.reconnect();
-			dbs.deleteRows(DBStructure.getSchema(), DBStructure.getOverviewTable(), "where mapa='" + auxMapname + "'");
-			throw new SQLException(e);
-		    } catch (DataException e1) {
-			e1.printStackTrace();
-		    }
-		}
+		
+		dbs.insertRow(DBStructure.getSchema(), DBStructure.getOverviewTable(), columns, rowToSave);
+		
 	    }
 	}
 	//remove previous entries and rename aux table
@@ -387,26 +377,11 @@ public class MapDAO {
 	return true;
     }
 
-    /**
-     * 
-     * @return false if a SQLException is thrown, true otherwise (schema created
-     *         or nothing to do if it already exists)
-     */
-    public boolean createSchema() {
+    public void createSchema() {
 	if (!hasSchema()) {
 	    DBSession dbs = DBSession.getCurrentSession();
-	    Connection con = dbs.getJavaConnection();
-	    String sqlCreateSchema = "CREATE SCHEMA " + DBStructure.getSchema();
-	    try {
-		Statement stat = con.createStatement();
-		stat.execute(sqlCreateSchema);
-		con.commit();
-	    } catch (SQLException e) {
-		e.printStackTrace();
-		return false;
-	    }
+	    dbs.createSchema(DBStructure.getSchema());
 	}
-	return true;
     }
 
     /**
@@ -416,22 +391,7 @@ public class MapDAO {
      */
     public boolean hasSchema() {
 	DBSession dbs = DBSession.getCurrentSession();
-	Connection con = dbs.getJavaConnection();
-	String sqlHasSchema = "SELECT COUNT(*) AS schemaCount FROM information_schema.schemata WHERE schema_name = '"
-		+ DBStructure.getSchema() + "'";
-	try {
-	    Statement stat = con.createStatement();
-	    ResultSet rs = stat.executeQuery(sqlHasSchema);
-	    rs.next();
-	    int schemaCount = rs.getInt("schemaCount");
-	    if (schemaCount == 1) {
-		return true;
-	    }
-	    return false;
-	} catch (SQLException e) {
-	    e.printStackTrace();
-	    return false;
-	}
+	return dbs.schemaExists(DBStructure.getSchema());
     }
 
     public  void createMapTables() throws SQLException {
@@ -475,19 +435,16 @@ public class MapDAO {
 	    createSchema();
 	    stat.execute(sqlCreateMap);
 	    stat.execute(String.format(sqlGrant, DBStructure.getMapTable()));
-	    commit = true;
 	}
 
 	if (!dbs.tableExists(DBStructure.getSchema(), DBStructure.getOverviewTable())) {
 	    createSchema();
 	    stat.execute(sqlCreateMapOverview);
 	    stat.execute(String.format(sqlGrant, DBStructure.getOverviewTable()));
-	    commit = true;
+
 	}
 
-	if (commit) {
-	    con.commit();
-	}
+	con.close();
     }
 
     public  void deleteMap(String mapName) throws SQLException {
