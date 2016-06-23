@@ -17,12 +17,29 @@
 
 
 		<dependencies>
-		
-		
-			
-		  
-			
-			
+
+
+
+
+
+
+		<dependency>
+			<groupId>org.gvsig</groupId>
+			<artifactId>org.gvsig.about.api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.gvsig</groupId>
+			<artifactId>org.gvsig.andami</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.gvsig</groupId>
+			<artifactId>org.gvsig.app.mainplugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>es.udc</groupId>
+			<artifactId>es.udc.cartolab.gvsig.users</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 		</dependencies>
 	
 
