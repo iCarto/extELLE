@@ -29,14 +29,22 @@ import javax.swing.event.ListSelectionListener;
 
 import org.cresques.cts.IProjection;
 import org.gvsig.andami.PluginServices;
+import org.gvsig.app.ApplicationLocator;
+import org.gvsig.app.ApplicationManager;
 import org.gvsig.app.addlayer.AddLayerDialog;
+import org.gvsig.fmap.dal.DALLocator;
+import org.gvsig.fmap.dal.DataManager;
 import org.gvsig.fmap.dal.DataStoreParameters;
 import org.gvsig.fmap.dal.exception.DataException;
+import org.gvsig.fmap.dal.feature.FeatureStore;
+import org.gvsig.fmap.dal.store.jdbc.JDBCStoreParameters;
 import org.gvsig.app.gui.WizardPanel;
 import org.gvsig.app.gui.panels.CRSSelectPanel;
+import org.gvsig.app.project.documents.view.gui.DefaultViewPanel;
+import org.gvsig.fmap.mapcontext.MapContext;
 import org.gvsig.fmap.mapcontext.layers.FLayer;
 import org.gvsig.fmap.mapcontext.layers.FLayers;
-import org.gvsig.fmap.mapcontext.layers.vectorial.FLyrVect;
+import org.gvsig.fmap.mapcontrol.MapControl;
 import org.gvsig.tools.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +80,39 @@ public class ElleWizard extends WizardPanel {
     
     @Override
     public void execute() {
-
+    	executeWizard();
+    }
+    
+    @Override
+    public Object executeWizard() {
+    	JDBCStoreParameters[] params = (JDBCStoreParameters[]) getParameters();
+    	DataManager manager = DALLocator.getDataManager();
+    	ApplicationManager application = ApplicationLocator.getManager();
+    	
+    	MapControl mapControl = getMapCtrl();
+    	FLayers root = mapControl.getMapContext().getLayers();
+    	MapContext mc = mapControl.getMapContext();
+    	
+    	FLayers layersToAdd = new FLayers();
+    	
+    	try {
+    	layersToAdd.setMapContext(mc);
+    	layersToAdd.setParentLayer(root);
+    	layersToAdd.setName(getWizarTitle());
+    	int[] selectedPos = layerList.getSelectedIndices();
+    	for (int i=0; i<params.length; i++) {
+    		JDBCStoreParameters p = params[i];
+    		FeatureStore fs = (FeatureStore) manager.openStore(p.getDataStoreName(), p);
+    		int pos = selectedPos[i];
+    		FLayer layer = application.getMapContextManager().createLayer(layers[pos][1], fs);
+    		fs.dispose();
+    		layersToAdd.addLayer(layer);
+    	}
+    	} catch (Exception e) {
+    		logger.error(e.getMessage(), e);
+    	}
+    	mc.getLayers().addLayer(layersToAdd);
+    	return layersToAdd;
     }
 
     
@@ -82,50 +122,38 @@ public class ElleWizard extends WizardPanel {
 	return "";
     }
 
-    private FLayer getLayer(int pos, IProjection proj) throws BaseException {
-	String layerName = layers[pos][1];
-	String tableName = layers[pos][2];
-
-	String schema = null;
-	if (layers[pos].length > 8) {
-	    if (layers[pos][8].length()>0) {
-		schema = layers[pos][8];
-	    }
-	}
-
-	String whereClause = getWhereClause();
-
-	return dbs.getLayer(layerName, tableName, schema, whereClause, proj);
-    }
-
     @Override
     public void initWizard() {
+    	DefaultViewPanel view = (DefaultViewPanel) PluginServices.getMDIManager().getActiveWindow();
+    	setMapCtrl(view.getMapControl());
+    	
+    	dbs = DBSession.getCurrentSession();
+    	setTabName(getWizarTitle());
 
-	dbs = DBSession.getCurrentSession();
-	setTabName(getWizarTitle());
+    	setLayout(new BorderLayout());
+    	JPanel mainPanel = new JPanel();
+    	mainPanel.setLayout(new BorderLayout());
 
-	setLayout(new BorderLayout());
-	JPanel mainPanel = new JPanel();
-	mainPanel.setLayout(new BorderLayout());
+    	if (dbs != null) {
 
-	if (dbs != null) {
-
-	    mainPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(
-		    null, PluginServices.getText(this, "Choose_Layer"),
-		    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
-		    javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null));
+    	    mainPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(
+    		    null, PluginServices.getText(this, "Choose_Layer"),
+    		    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+    		    javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null));
 
 
-	    mainPanel.add(getListPanel(), BorderLayout.CENTER);
-	    mainPanel.add(getCRSPanel(), BorderLayout.SOUTH);
+    	    mainPanel.add(getListPanel(), BorderLayout.CENTER);
+    	    mainPanel.add(getCRSPanel(), BorderLayout.SOUTH);
 
-	} else {
-	    JLabel label = new JLabel(PluginServices.getText(this, "notConnectedError"));
-	    mainPanel.add(label, BorderLayout.NORTH);
-	}
-	add(mainPanel, BorderLayout.CENTER);
+    	} else {
+    	    JLabel label = new JLabel(PluginServices.getText(this, "notConnectedError"));
+    	    mainPanel.add(label, BorderLayout.NORTH);
+    	}
+    	add(mainPanel, BorderLayout.CENTER);
+	
 
     }
+
 
     private String getWizarTitle() {
 	return wizardTitle;
@@ -253,64 +281,39 @@ public class ElleWizard extends WizardPanel {
 	public void close() {
 	}
 
-	@Override
 	public DataStoreParameters[] getParameters() {
-		// FIXME
-		DataStoreParameters[] a = new DataStoreParameters[1];
-		a[0] = getLayer().getDataStore().getParameters();
-		return a;
-	}
-	
-	private FLyrVect getLayer() {
-
-		dbs = DBSession.getCurrentSession();
-		FLayer layer = null;
-		if (dbs != null) {
-		    PluginServices.getMDIManager().setWaitCursor();
-		    //load layer
-		    IProjection proj = crsPanel.getCurProj();
-		    int[] selectedPos = layerList.getSelectedIndices();
-		    if (selectedPos.length > 1) {
-			layer = new FLayers();
-			((FLayers) layer).setName(getWizarTitle());
-			((FLayers) layer).setMapContext(getMapCtrl().getMapContext());
-
-			try {
-			    for (int pos : selectedPos) {
-				((FLayers)layer).addLayer(getLayer(pos, proj));
-			    }
-			}  catch (DataException e) {
-			    JOptionPane.showMessageDialog(this,
-				    "SQLException: " + e.getMessage(),
-				    "DB Error",
-				    JOptionPane.ERROR_MESSAGE);
-			} catch (BaseException e) {
-				logger.error(e.getMessage(), e);
-			}
-
-		    } else {
-			int pos = layerList.getSelectedIndex();
-			try {
-			    layer = getLayer(pos, proj);
-			} catch (DataException e) {
-			    JOptionPane.showMessageDialog(this,
-				    "SQLException: " + e.getMessage(),
-				    "DB Error",
-				    JOptionPane.ERROR_MESSAGE);
-			} catch (BaseException e) {
-				logger.error(e.getMessage(), e);
-			}
-		    }
-		    PluginServices.getMDIManager().restoreCursor();
-		} else {
-		    //Show no connection error
-		    JOptionPane.showMessageDialog(this,
-			    PluginServices.getText(this, "notConnectedError"),
-			    PluginServices.getText(this, "notConnected"),
-			    JOptionPane.ERROR_MESSAGE);
+		IProjection proj = crsPanel.getCurProj();
+		int[] selectedPos = layerList.getSelectedIndices();
+		JDBCStoreParameters defaultParams = null;
+		JDBCStoreParameters[] params = new JDBCStoreParameters[selectedPos.length];
+		try {
+			defaultParams = DBSession.getCurrentSession().getConnectionWithParams().getStoreParams();
+		} catch (BaseException e) {
+			logger.error(e.getMessage(), e);
+			return new DataStoreParameters[0];
+		} 
+		if (selectedPos.length<1) {
+			return new DataStoreParameters[0];
 		}
+		for (int i=0; i< selectedPos.length; i++ ) {
+			int pos = selectedPos[i];
+			String layerName = layers[pos][1];
+			String tableName = layers[pos][2];
 
-		return (FLyrVect) layer;
-	    }
+			String schema = null;
+			if (layers[pos].length > 8) {
+			    if (layers[pos][8].length()>0) {
+				schema = layers[pos][8];
+			    }
+			}
 
+			String whereClause = getWhereClause();
+			params[i] = (JDBCStoreParameters) defaultParams.getCopy();
+			params[i].setTable(tableName);
+			params[i].setSchema(schema);
+			// params[i].setBaseFilter(whereClause);
+			params[i].setCRS(proj);
+		}
+		return params;
+	}
 }
