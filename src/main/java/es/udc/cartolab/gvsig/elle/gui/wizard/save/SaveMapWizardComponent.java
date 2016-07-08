@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard.save;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -88,7 +90,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	MigLayout layout = new MigLayout("inset 0, align center",
 		"10[grow]10",
 		"10[grow]");
-
 	setLayout(layout);
 
 	add(getMainPanel(), "shrink, growx, growy, wrap");
@@ -110,12 +111,12 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	tablePanel.add(getUpDownPanel(), "shrink, align right, wrap");
 
 	//map overview
-	overviewChb = new JCheckBox(PluginServices.getText(this, "save_overview"));
+	overviewChb = new JCheckBox(_("save_overview"));
 	overviewChb.setSelected(true);
 
 	//map name
 	JPanel namePanel = new JPanel();
-	namePanel.add(new JLabel(PluginServices.getText(this, "map_name")));
+	namePanel.add(new JLabel(_("map_name")));
 	mapNameField = new JTextField("", 20);
 
 	mapNameField.addKeyListener(new KeyListener() {
@@ -167,10 +168,10 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
     private void setMapTable() {
 
 	String[] header = {"",
-		PluginServices.getText(this, "layer"),
-		PluginServices.getText(this, "visible"),
-		PluginServices.getText(this, "max_scale"),
-		PluginServices.getText(this, "min_scale")};
+		_("layer"),
+		_("visible"),
+		_("max_scale"),
+		_("min_scale")};
 	DefaultTableModel model = new MapTableModel();
 	for (String columnName : header) {
 	    model.addColumn(columnName);
@@ -207,10 +208,9 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 	    }
 	}
 
-	String emptyNameError = PluginServices.getText(this, "error_empty_layer_name");
-	String parseError = PluginServices.getText(this, "error_numeric_scale");
-	String minGreaterError = PluginServices.getText(this, "error_min_greater_than_max");
-	String repeatedLayerNameError = PluginServices.getText(this, "error_repeated_layer_name");
+	String emptyNameError = _("error_empty_layer_name");
+	String parseError = _("error_numeric_scale");
+	String minGreaterError = _("error_min_greater_than_max");
 
 	List<String> errors = new ArrayList<String>();
 	int position = 1;
@@ -280,7 +280,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 		position++;
 	    } else {
-		errors.add(String.format(repeatedLayerNameError, name));
+		errors.add(_("error_repeated_layer_name", name));
 	    }
 	}
 
@@ -290,7 +290,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
     public void setProperties() throws WizardException {
 	List<String> errors = parse();
 	if (errors.size()>0) {
-	    String msg = PluginServices.getText(this, "errors_list");
+	    String msg = _("errors_list");
 	    for (String error : errors) {
 		msg = msg + "\n" + error;
 	    }
@@ -312,12 +312,12 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		view = (IView) aux;
 		createMapLayerList(view.getMapControl().getMapContext().getLayers());
 	    } else {
-		throw new WizardException(PluginServices.getText(this, "no_view_error"));
+		throw new WizardException(_("no_view_error"));
 	    }
 	} else if (aux instanceof List<?>) {
 	    mapLayers = (List<LayerProperties>) aux;
 	} else {
-	    throw new WizardException(PluginServices.getText(this, "no_layer_list_error"));
+	    throw new WizardException(_("no_layer_list_error"));
 	}
 
 	for (LayerProperties lp : mapLayers) {
@@ -353,7 +353,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 
 	    public void mouseEntered(MouseEvent e) {
-		System.out.println("mouse entered");
 	    }
 
 
@@ -454,12 +453,11 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 		if (!canCreate) {
 		    //[jestevez] I think this code is never reached due to the limitations of SaveMapExtension
-		    throw new WizardException(PluginServices.getText(this, "table_map_contact_admin"));
+		    throw new WizardException(_("table_map_contact_admin"));
 		} else {
-		    String message = String.format(PluginServices.getText(this, "tables_will_be_created"), DBStructure.getSchema());
 		    int answer = JOptionPane.showConfirmDialog(
 			    this,
-			    message,
+			    _("tables_will_be_created", DBStructure.getSchema()),
 			    "",
 			    JOptionPane.YES_NO_OPTION,
 			    JOptionPane.QUESTION_MESSAGE,
@@ -469,7 +467,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 			properties.put(SaveLegendsWizardComponent.PROPERTY_CREATE_TABLES_QUESTION, false);
 			JOptionPane.showMessageDialog(
 				this,
-				PluginServices.getText(this, "tables_created_correctly"),
+				_("tables_created_correctly"),
 				"",
 				JOptionPane.INFORMATION_MESSAGE);
 			tableMapExists = true;
@@ -483,12 +481,10 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 
 		boolean mapExists = MapDAO.getInstance().mapExists(mapName);
 		if (mapExists) {
-		    String question = PluginServices.getText(this, "overwrite_map_question");
-		    question = String.format(question, mapName);
 		    int answer = JOptionPane.showOptionDialog(
 			    this,
-			    question,
-			    PluginServices.getText(this, "overwrite_map"),
+			    _("overwrite_map_question", mapName),
+			    _("overwrite_map"),
 			    JOptionPane.YES_NO_OPTION,
 			    JOptionPane.QUESTION_MESSAGE,
 			    null,
@@ -507,7 +503,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		String[] errors = saveMap(mapName);
 		PluginServices.getMDIManager().restoreCursor();
 		if (errors.length>0) {
-		    String msg = PluginServices.getText(this, "errors_list");
+		    String msg = _("errors_list");
 		    for (String error : errors) {
 			msg = msg + "\n" + error;
 		    }
@@ -523,7 +519,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		
 	    }
 	    PluginServices.getMDIManager().restoreCursor();
-	    throw new WizardException(PluginServices.getText(this, "error_saving_map"), e1);
+	    throw new WizardException(_("error_saving"), e1);
 	}
     }
 
@@ -567,8 +563,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		    } catch (DataException e1) {
 			logger.error(e1.getMessage(), e1);
 		    }
-		    return new String[] { PluginServices.getText(this,
-			    "error_overview") };
+		    return new String[] { _("error_overview") };
 		}
 	    }
 	    MapDAO.getInstance().saveMap(rows.toArray(new Object[0][0]), mapName);

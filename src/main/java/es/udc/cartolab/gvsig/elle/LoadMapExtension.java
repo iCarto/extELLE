@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.sql.SQLException;
 
 import org.gvsig.andami.IconThemeHelper;
@@ -33,7 +35,7 @@ public class LoadMapExtension extends Extension  {
     
 
     public void execute(String actionCommand) {
-    	IView view = Andami.createViewIfNeeded("ELLE View", null);
+    	IView view = Andami.createViewIfNeeded(_("elle_view"), null);
 	WizardWindow wizard = new LoadMapWizard(view);
 	wizard.open();
     }

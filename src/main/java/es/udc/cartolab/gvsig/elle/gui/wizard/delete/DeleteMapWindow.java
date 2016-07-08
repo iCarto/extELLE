@@ -1,5 +1,7 @@
 package es.udc.cartolab.gvsig.elle.gui.wizard.delete;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,8 +54,7 @@ public class DeleteMapWindow extends AbstractIWindow implements ActionListener {
     private void setUpUI() {
 
 	try {
-	    JLabel mapLabel = WidgetFactory.labelTitled(PluginServices.getText(
-		    this, "Choose_Map"));
+	    JLabel mapLabel = WidgetFactory.labelTitled(_("Choose_Map"));
 	    this.add(mapLabel, "wrap");
 	    mapList = new JList();
 
@@ -82,8 +83,7 @@ public class DeleteMapWindow extends AbstractIWindow implements ActionListener {
 		    }
 		});
 	    } else {
-		JLabel label = new JLabel(PluginServices.getText(this,
-			"no_map_table_on_schema"));
+		JLabel label = new JLabel(_("no_map_table_on_schema"));
 		this.add(label);
 	    }
 
@@ -128,8 +128,8 @@ public class DeleteMapWindow extends AbstractIWindow implements ActionListener {
 	int[] indexes = mapList.getSelectedIndices();
 	if (indexes.length > 0) {
 	    int opt = JOptionPane.showOptionDialog(this,
-		    PluginServices.getText(this, "delete_maps_confirm_dialog"),
-		    PluginServices.getText(this, "delete_map"),
+		    _("delete_maps_confirm_dialog"),
+		    _("delete_map"),
 		    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
 		    null, null, null);
 	    if (opt == JOptionPane.OK_OPTION) {

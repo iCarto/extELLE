@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard.save;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,7 +113,7 @@ public class SaveLegendsWizard extends WizardWindow {
     public WindowInfo getWindowInfo() {
 	if (viewInfo == null) {
 	    viewInfo = new WindowInfo(WindowInfo.MODALDIALOG | WindowInfo.RESIZABLE);
-	    viewInfo.setTitle(PluginServices.getText(this, "Save_legends"));
+	    viewInfo.setTitle(_("Save_legends"));
 	    viewInfo.setWidth(width);
 	    viewInfo.setHeight(height);
 	}

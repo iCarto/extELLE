@@ -17,6 +17,8 @@
 
 package es.udc.cartolab.gvsig.elle.utils;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -195,7 +197,7 @@ public class DBLegendsManager extends AbstractLegendsManager {
 
     public String getConfirmationMessage() {
 	if (!tableStylesExists || !tableOvStylesExists) {
-	    return String.format(PluginServices.getText(this, "tables_will_be_created"), schema);
+	    return _("tables_will_be_created", schema);
 	} else {
 	    return null;
 	}

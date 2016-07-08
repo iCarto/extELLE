@@ -17,6 +17,8 @@
 
 package es.udc.cartolab.gvsig.elle.utils;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.io.File;
 
 import org.gvsig.andami.PluginServices;
@@ -50,8 +52,8 @@ public class FileLegendsManager extends AbstractLegendsManager {
 	if (dir != null) {
 	    if (!dir.exists()) {
 		if (!dir.mkdir()) {
-		    String message = PluginServices.getText(this, "legend_write_dir_error");
-		    throw new WizardException(String.format(message, dir.getAbsolutePath()));
+		    String message = _("legend_write_dir_error", dir.getAbsolutePath());
+		    throw new WizardException(message);
 		}
 	    }
 	    String path = dir.getAbsolutePath();
@@ -65,7 +67,7 @@ public class FileLegendsManager extends AbstractLegendsManager {
 		
 	    }
 	} else {
-	    throw new WizardException(PluginServices.getText(this, "no_config_error"));
+	    throw new WizardException(_("no_config_error"));
 	}
     }
 
@@ -111,13 +113,13 @@ public class FileLegendsManager extends AbstractLegendsManager {
 	File overviewDir = new File(path);
 	if (!overviewDir.exists()) {
 	    if (!overviewDir.mkdir()) {
-		String message = PluginServices.getText(this, "legend_write_dir_error");
-		throw new WizardException(String.format(message, path));
+		String message = _("legend_write_dir_error", path);
+		throw new WizardException(message);
 	    }
 	}
 	if (!overviewDir.isDirectory()) {
-	    String msg = PluginServices.getText(this, "legend_overview_error");
-	    throw new WizardException(String.format(msg, path));
+	    String msg = _("legend_overview_error", path);
+	    throw new WizardException(msg);
 	}
 	for (FLyrVect layer : overviewLayers) {
 	    File legendFile = new File(path + layer.getName() + "." + type);

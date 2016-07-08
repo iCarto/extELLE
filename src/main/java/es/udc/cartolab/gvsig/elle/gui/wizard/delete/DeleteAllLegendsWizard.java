@@ -1,6 +1,8 @@
 package es.udc.cartolab.gvsig.elle.gui.wizard.delete;
 
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.ui.mdiManager.WindowInfo;
 
@@ -18,7 +20,7 @@ public class DeleteAllLegendsWizard extends WizardWindow {
 	if (viewInfo == null) {
 	    viewInfo = new WindowInfo(WindowInfo.MODELESSDIALOG
 		    | WindowInfo.PALETTE);
-	    viewInfo.setTitle(PluginServices.getText(this, "delete_legends"));
+	    viewInfo.setTitle(_("delete_legends"));
 	    viewInfo.setWidth(240);
 	    viewInfo.setHeight(460);
 	}

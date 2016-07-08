@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard.load;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -71,9 +73,9 @@ public class LoadLegendWizardComponent extends WizardComponent {
 
 
 	//init components
-	noLegendRB = new JRadioButton(PluginServices.getText(this, "dont_load"));
-	databaseRB = new JRadioButton(PluginServices.getText(this, "load_from_db"));
-	fileRB = new JRadioButton(PluginServices.getText(this, "load_from_disk"));
+	noLegendRB = new JRadioButton(_("dont_load"));
+	databaseRB = new JRadioButton(_("load_from_db"));
+	fileRB = new JRadioButton(_("load_from_disk"));
 	dbCB = new JComboBox();
 	fileCB = new JComboBox();
 	dbPanel = getDBPanel();
@@ -153,12 +155,12 @@ public class LoadLegendWizardComponent extends WizardComponent {
 
 	if (DBSession.getCurrentSession()!=null) {
 	    dbCB.removeAllItems();
-	    JLabel label = new JLabel(PluginServices.getText(this, "legends_group_name"));
+	    JLabel label = new JLabel(_("legends_group_name"));
 	    label.setEnabled(DBSession.getCurrentSession() != null);
 	    panel.add(label);
 	    panel.add(dbCB, "wrap");
 	} else {
-	    panel.add(new JLabel(PluginServices.getText(this, "notConnectedError")));
+	    panel.add(new JLabel(_("notConnectedError")));
 	    databaseRB.setEnabled(false);
 	}
 
@@ -185,7 +187,7 @@ public class LoadLegendWizardComponent extends WizardComponent {
 			fileCB.addItem(files[i].getName());
 		    }
 		}
-		panel.add(new JLabel(PluginServices.getText(this, "legends_group_name")));
+		panel.add(new JLabel(_("legends_group_name")));
 		panel.add(fileCB, "wrap");
 		panelAdded = true;
 	    }
@@ -193,7 +195,7 @@ public class LoadLegendWizardComponent extends WizardComponent {
 
 	if (!panelAdded) {
 	    fileRB.setEnabled(false);
-	    panel.add(new JLabel(PluginServices.getText(this, "no_dir_config")), "span 2");
+	    panel.add(new JLabel(_("no_dir_config")), "span 2");
 	}
 
 	return panel;
@@ -208,7 +210,7 @@ public class LoadLegendWizardComponent extends WizardComponent {
     }
 
     public String getWizardComponentName() {
-	return "legend_wizard_component";
+	return "load_legend_wizard_component";
     }
 
     public void showComponent() {
@@ -271,7 +273,7 @@ public class LoadLegendWizardComponent extends WizardComponent {
 		
 	    }
 	} else {
-	    throw new WizardException(PluginServices.getText(this, "no_view_error"));
+	    throw new WizardException(_("no_view_error"));
 	}
     }
 

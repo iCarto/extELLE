@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard.save;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -89,9 +91,9 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 	}
 
 	//init components
-	noLegendRB = new JRadioButton(PluginServices.getText(this, "dont_save"));
-	databaseRB = new JRadioButton(PluginServices.getText(this, "save_to_db"));
-	fileRB = new JRadioButton(PluginServices.getText(this, "save_to_disk"));
+	noLegendRB = new JRadioButton(_("dont_save"));
+	databaseRB = new JRadioButton(_("save_to_db"));
+	fileRB = new JRadioButton(_("save_to_disk"));
 	dbPanel = getDBPanel();
 	filePanel = getFilePanel();
 	setTable();
@@ -163,7 +165,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 		"[grow, left][][shrink, right]",
 		"[]"));
 
-	overviewCHB = new JCheckBox(PluginServices.getText(this, "save_overview_legends"));
+	overviewCHB = new JCheckBox(_("save_overview_legends"));
 	overviewCHB.setSelected(true);
 	overviewCHB.addActionListener(new ActionListener() {
 
@@ -174,7 +176,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
 	});
 	overviewPanel.add(overviewCHB);
-	overviewPanel.add(new JLabel("Formato"));
+	overviewPanel.add(new JLabel(_("format")));
 
 	overviewCB = new JComboBox();
 	for (String type : types) {
@@ -190,9 +192,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
     }
 
     private void setTable() {
-	String[] header = {"",
-		PluginServices.getText(this, "name"),
-		PluginServices.getText(this, "type")
+	String[] header = {"",_("name"), _("type")
 	};
 	DefaultTableModel model = new LegendTableModel();
 	for (String h : header) {
@@ -236,7 +236,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
 	if (DBSession.getCurrentSession() != null) {
 
-	    JLabel label = new JLabel(PluginServices.getText(this, "legends_group_name"));
+	    JLabel label = new JLabel(_("legends_group_name"));
 	    label.setEnabled(DBSession.getCurrentSession() != null);
 
 	    Object mapName = properties
@@ -248,7 +248,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 	    panel.add(dbStyles, "shrink, right, wrap");
 
 	} else {
-	    panel.add(new JLabel(PluginServices.getText(this, "notConnectedError")));
+	    panel.add(new JLabel(_("notConnectedError")));
 	}
 
 	return panel;
@@ -264,10 +264,10 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
 	fileStyles = new JTextField("", 20);
 	if (legendDir != null) {
-	    panel.add(new JLabel(PluginServices.getText(this, "legend")));
+	    panel.add(new JLabel(_("legend")));
 	    panel.add(fileStyles, "shrink, right, wrap");
 	} else {
-	    panel.add(new JLabel(PluginServices.getText(this, "no_dir_config")), "span 2");
+	    panel.add(new JLabel(_("no_dir_config")), "span 2");
 	    fileRB.setEnabled(false);
 	}
 
@@ -284,10 +284,10 @@ public class SaveLegendsWizardComponent extends WizardComponent {
     }
 
     private boolean useNotGVL() {
-	Object[] options = {PluginServices.getText(this, "ok"),
-		PluginServices.getText(this, "cancel")};
+	Object[] options = {_("ok"),
+		_("cancel")};
 	int n = JOptionPane.showOptionDialog(this,
-		PluginServices.getText(this, "legend_format_question"),
+		_("legend_format_question"),
 		null,
 		JOptionPane.YES_NO_CANCEL_OPTION,
 		JOptionPane.WARNING_MESSAGE,
@@ -339,7 +339,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 		if (question) {
 		    JOptionPane.showMessageDialog(
 			    this,
-			    PluginServices.getText(this, "tables_created_correctly"),
+			    _("tables_created_correctly"),
 			    "",
 			    JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -355,12 +355,10 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 
     private boolean overwriteLegends(AbstractLegendsManager legendsManager) {
 	if (legendsManager.exists()) {
-	    Object[] options = {PluginServices.getText(this, "ok"),
-		    PluginServices.getText(this, "cancel")};
-	    String message = PluginServices.getText(this, "overwrite_legend_question");
-	    int n = JOptionPane.showOptionDialog(this,
-		    String.format(message, dbStyles.getText()),
-		    PluginServices.getText(this, "overwrite_legend"),
+	    Object[] options = {_("ok"), _("cancel")};
+	    String message = _("overwrite_legend_question", dbStyles.getText());
+	    int n = JOptionPane.showOptionDialog(this, message,
+		    _("overwrite_legend"),
 		    JOptionPane.YES_NO_CANCEL_OPTION,
 		    JOptionPane.WARNING_MESSAGE,
 		    null,
@@ -398,16 +396,14 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 	    if (!name.equals("")) {
 		legendsManager = new DBLegendsManager(name);
 	    } else {
-		throw new WizardException(PluginServices.getText(this,
-			"empty_legend_field"), false);
+		throw new WizardException(_("empty_legend_field"), false);
 	    }
 	} else {
 	    String name = fileStyles.getText().trim();
 	    if (!name.equals("")) {
 		legendsManager = new FileLegendsManager(name);
 	    } else {
-		throw new WizardException(PluginServices.getText(this,
-			"empty_legend_field"), false);
+		throw new WizardException(_("empty_legend_field"), false);
 	    }
 	}
 	DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -479,7 +475,7 @@ public class SaveLegendsWizardComponent extends WizardComponent {
 	if (aux != null && aux instanceof List<?>) {
 	    layers = (List<LayerProperties>) aux;
 	} else {
-	    throw new WizardException(PluginServices.getText(this, "no_layer_list_error"));
+	    throw new WizardException(_("no_layer_list_error"));
 	}
 
 	//table

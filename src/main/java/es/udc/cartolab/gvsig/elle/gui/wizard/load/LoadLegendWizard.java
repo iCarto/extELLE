@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard.load;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.ui.mdiManager.WindowInfo;
 import org.gvsig.app.project.documents.view.gui.IView;
@@ -30,7 +32,7 @@ public class LoadLegendWizard extends LoadMapWizard {
     public WindowInfo getWindowInfo() {
 	WindowInfo wi = super.getWindowInfo();
 	wi.setHeight(300);
-	wi.setTitle(PluginServices.getText(this, "load_legends"));
+	wi.setTitle(_("load_legends"));
 	return wi;
     }
 

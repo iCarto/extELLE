@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard.save;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -42,13 +44,13 @@ public class LayerListPopupMenu extends JPopupMenu implements ActionListener {
 	this.lp = lp;
 	this.wc = wc;
 
-	invertSelection = new JMenuItem(PluginServices.getText(this, "invert_selection"));
+	invertSelection = new JMenuItem(_("invert_selection"));
 	invertSelection.addActionListener(this);
-	selectAll = new JMenuItem(PluginServices.getText(this, "select_all_layers"));
+	selectAll = new JMenuItem(_("select_all_layers"));
 	selectAll.addActionListener(this);
-	selectVisibles = new JMenuItem(PluginServices.getText(this, "select_visible_layers"));
+	selectVisibles = new JMenuItem(_("select_visible_layers"));
 	selectVisibles.addActionListener(this);
-	selectActives = new JMenuItem(PluginServices.getText(this, "select_active_layers"));
+	selectActives = new JMenuItem(_("select_active_layers"));
 	selectActives.addActionListener(this);
 
 	add(selectAll);

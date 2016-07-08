@@ -17,6 +17,8 @@
 package es.udc.cartolab.gvsig.elle.gui.wizard.load;
 
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.ui.mdiManager.WindowInfo;
 import org.gvsig.app.project.documents.view.gui.IView;
@@ -38,7 +40,7 @@ public class LoadMapWizard extends WizardWindow {
 	if (viewInfo == null) {
 	    viewInfo = new WindowInfo(WindowInfo.MODELESSDIALOG
 		    | WindowInfo.PALETTE);
-	    viewInfo.setTitle(PluginServices.getText(this, "Load_map"));
+	    viewInfo.setTitle(_("load_map"));
 	    viewInfo.setWidth(600);
 	    viewInfo.setHeight(800);
 	}

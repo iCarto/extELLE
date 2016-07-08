@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard.save;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import javax.swing.JOptionPane;
 
 import org.gvsig.andami.PluginServices;
@@ -49,7 +51,7 @@ public class SaveMapWizard extends WizardWindow {
     public WindowInfo getWindowInfo() {
 	if (viewInfo == null) {
 	    viewInfo = new WindowInfo(WindowInfo.MODALDIALOG | WindowInfo.RESIZABLE);
-	    viewInfo.setTitle(PluginServices.getText(this, "save_map"));
+	    viewInfo.setTitle(_("save_map"));
 	    viewInfo.setWidth(width);
 	    viewInfo.setHeight(height);
 	}
@@ -85,7 +87,7 @@ public class SaveMapWizard extends WizardWindow {
 	    logger.error(e.getMessage(), e);
 	} catch (RuntimeException e) {
 		success = false;
-		JOptionPane.showMessageDialog(this, "Error guardando el mapa", "", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(this, _("error_saving"), "", JOptionPane.ERROR_MESSAGE);
 		logger.error(e.getMessage(), e);
 		PluginServices.getMDIManager().restoreCursor();
 	}
@@ -93,7 +95,7 @@ public class SaveMapWizard extends WizardWindow {
 	if (success) {
 	    JOptionPane.showMessageDialog(
 		    this,
-		    PluginServices.getText(this, "map_saved_correctly"),
+		    _("map_saved_correctly"),
 		    "",
 		    JOptionPane.INFORMATION_MESSAGE);
 	}

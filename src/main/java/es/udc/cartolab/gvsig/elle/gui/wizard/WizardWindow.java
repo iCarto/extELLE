@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
@@ -49,13 +51,13 @@ public abstract class WizardWindow extends JPanel implements IWindow,
 
     public WizardWindow() {
 	super(new BorderLayout(5, 5));
-	nextButton = new JButton(PluginServices.getText(this, "next"));
+	nextButton = new JButton(_("next"));
 	nextButton.addActionListener(this);
-	prevButton = new JButton(PluginServices.getText(this, "previous"));
+	prevButton = new JButton(_("previous"));
 	prevButton.addActionListener(this);
-	cancelButton = new JButton(PluginServices.getText(this, "cancel"));
+	cancelButton = new JButton(_("cancel"));
 	cancelButton.addActionListener(this);
-	finishButton = new JButton(PluginServices.getText(this, "finish"));
+	finishButton = new JButton(_("finish"));
 	finishButton.addActionListener(this);
 
 	addWizardComponents();
@@ -120,7 +122,7 @@ public abstract class WizardWindow extends JPanel implements IWindow,
 	if (views.size() < 2) {
 	    prevButton.setVisible(false);
 	    nextButton.setVisible(false);
-	    finishButton.setText(PluginServices.getText(this, "ok"));
+	    finishButton.setText(_("ok"));
 	}
 	WizardComponent currentView = views.get(currentPos);
 	int nViews = views.size();

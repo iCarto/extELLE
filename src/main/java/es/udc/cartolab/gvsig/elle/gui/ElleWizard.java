@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.BorderLayout;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -135,9 +137,8 @@ public class ElleWizard extends WizardPanel {
     	mainPanel.setLayout(new BorderLayout());
 
     	if (dbs != null) {
-
     	    mainPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(
-    		    null, PluginServices.getText(this, "Choose_Layer"),
+    		    null, _("Choose_Layer"),
     		    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
     		    javax.swing.border.TitledBorder.DEFAULT_POSITION, null, null));
 
@@ -146,7 +147,7 @@ public class ElleWizard extends WizardPanel {
     	    mainPanel.add(getCRSPanel(), BorderLayout.SOUTH);
 
     	} else {
-    	    JLabel label = new JLabel(PluginServices.getText(this, "notConnectedError"));
+    	    JLabel label = new JLabel(_("notConnectedError"));
     	    mainPanel.add(label, BorderLayout.NORTH);
     	}
     	add(mainPanel, BorderLayout.CENTER);
@@ -235,7 +236,7 @@ public class ElleWizard extends WizardPanel {
 		    });
 		} else {
 		    listPanel = new JPanel();
-		    JLabel label = new JLabel(PluginServices.getText(this, "no_map_table_on_schema"));
+		    JLabel label = new JLabel(_("no_map_table_on_schema"));
 		    listPanel.add(label);
 		}
 

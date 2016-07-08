@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard.load;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -136,8 +138,8 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 		    JLabel mapLabel = form.getLabel("mapLabel");
 		    JLabel layerLabel = form.getLabel("layerLabel");
 
-		    mapLabel.setText(PluginServices.getText(this, "map_load"));
-		    layerLabel.setText(PluginServices.getText(this, "layer_load"));
+		    mapLabel.setText(_("map_load"));
+		    layerLabel.setText(_("layer_load"));
 
 		    mapList.addListSelectionListener(new ListSelectionListener() {
 
@@ -179,7 +181,7 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 		    });
 		} else {
 		    listPanel = new JPanel();
-		    JLabel label = new JLabel(PluginServices.getText(this, "no_map_table_on_schema"));
+		    JLabel label = new JLabel(_("no_map_table_on_schema"));
 		    listPanel.add(label);
 		}
 
@@ -219,7 +221,7 @@ public class LoadMapWizardComponent extends WizardComponent implements ActionLis
 			mapList.getSelectedValue().toString());
 		map.load(crsPanel.getCurProj());
 		
-		if (view.getViewDocument().getName().equals("ELLE View")) {
+		if (view.getViewDocument().getName().equals(_("elle_view"))) {
 			view.getViewDocument().setName(mapList.getSelectedValue().toString());
 		}
 	    } catch (Exception e) {

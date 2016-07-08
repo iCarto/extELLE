@@ -8,33 +8,33 @@
 	<resourceBundle name="text"/>
 	<extensions>
 		<extension class-name="es.udc.cartolab.gvsig.elle.LoadMapExtension" active="true">
-			<menu text="data_base_menu/Load_map"
+			<menu text="data_base_menu/es.udc.cartolab.gvsig.elle.LoadMapExtension"
 				icon="es.udc.cartolab.gvsig.elle.LoadMapExtension"
 				action-command=""
 				position="04"/> 
 			<tool-bar name="ELLE">
-				<action-tool icon="es.udc.cartolab.gvsig.elle.LoadMapExtension" tooltip="Load_map"
-					action-command="" position="04" name="load-map" />
+				<action-tool icon="es.udc.cartolab.gvsig.elle.LoadMapExtension" tooltip="es.udc.cartolab.gvsig.elle.LoadMapExtension"
+					action-command="" position="04" />
 			</tool-bar>
 		</extension>
 		<extension class-name="es.udc.cartolab.gvsig.elle.SaveMapExtension" active="true">
-			<menu text="data_base_menu/save_map"
+			<menu text="data_base_menu/es.udc.cartolab.gvsig.elle.SaveMapExtension"
 				icon="es.udc.cartolab.gvsig.elle.SaveMapExtension"
 				action-command=""
 				position="05" />
 			<tool-bar name="ELLE">
-				<action-tool icon="es.udc.cartolab.gvsig.elle.SaveMapExtension" tooltip="save_map"
-					action-command="" position="05" name="save-map" />
+				<action-tool icon="es.udc.cartolab.gvsig.elle.SaveMapExtension" tooltip="es.udc.cartolab.gvsig.elle.SaveMapExtension"
+					action-command="" position="05" />
 			</tool-bar>
 		</extension>
 		<extension class-name="es.udc.cartolab.gvsig.elle.LoadAllLegendsExtension" active="true">
-			<menu text="data_base_menu/load_legends"
+			<menu text="data_base_menu/es.udc.cartolab.gvsig.elle.LoadAllLegendsExtension"
 				icon="es.udc.cartolab.gvsig.elle.LoadAllLegendsExtension"
 				action-command=""
 				position="06"/>
 			<tool-bar name="ELLE">
-				<action-tool icon="es.udc.cartolab.gvsig.elle.LoadAllLegendsExtension" tooltip="load_legends"
-					action-command="" position="06" name="load-legends" />
+				<action-tool icon="es.udc.cartolab.gvsig.elle.LoadAllLegendsExtension" tooltip="es.udc.cartolab.gvsig.elle.LoadAllLegendsExtension"
+					action-command="" position="06" />
 			</tool-bar>
 		</extension>
 		
@@ -54,12 +54,12 @@
 				position="0740"/>
 			<tool-bar name="ELLE">
 				<action-tool icon="es.udc.cartolab.gvsig.elle.SaveAllLegendsExtension" tooltip="Save_legends"
-					action-command="ALL" position="07" name="save-all-legends" />
+					action-command="ALL" position="07" />
 			</tool-bar>
 		</extension>
 		
 		<extension class-name="es.udc.cartolab.gvsig.elle.DeleteMapExtension" active="true">
-			<menu text="data_base_menu/delete_map"
+			<menu text="data_base_menu/es.udc.cartolab.gvsig.elle.DeleteMapExtension"
 				icon="es.udc.cartolab.gvsig.elle.DeleteMapExtension"
 				action-command=""
 				position="08" />
@@ -67,7 +67,7 @@
 		
 		
 		<extension class-name="es.udc.cartolab.gvsig.elle.DeleteAllLegendsExtension" active="true">
-			<menu text="data_base_menu/delete_legends"
+			<menu text="data_base_menu/des.udc.cartolab.gvsig.elle.DeleteAllLegendsExtension"
 				icon="es.udc.cartolab.gvsig.elle.DeleteAllLegendsExtension"
 				action-command="DeleteAllLegends"
 				position="09" />

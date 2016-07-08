@@ -16,6 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -83,8 +85,7 @@ public class EllePreferencesPage extends AbstractPreferencePage implements Actio
 	    xml.putProperty(DEFAULT_LEGEND_DIR_KEY_NAME,
 		    legendDir);
 	} else {
-	    String message = String.format("%s no es un directorio v�lido", legendDir);
-	    throw new StoreException(message);
+	    throw new StoreException(_("invalid_folder", legendDir));
 	}
     }
 
@@ -117,14 +118,14 @@ public class EllePreferencesPage extends AbstractPreferencePage implements Actio
 		form.setFocusTraversalPolicyProvider(true);
 
 		    JLabel legendLabel = form.getLabel("legendLabel");
-		    legendLabel.setText(PluginServices.getText(this, "legend_directory"));
+		    legendLabel.setText(_("legend_directory"));
 
 		    legendDirField = form.getTextField("legendField");
 		    legendDirButton = (JButton) form.getButton("legendButton");
 		    legendDirButton.addActionListener(this);
 
 		    JLabel legendTypeLabel = form.getLabel("legendTypeLabel");
-		    legendTypeLabel.setText(PluginServices.getText(this, "legend_type_pref"));
+		    legendTypeLabel.setText(_("legend_type_pref"));
 
 		    legendTypeCBox = form.getComboBox("legendTypeCB");
 		    legendTypeCBox.addItem("gvl");

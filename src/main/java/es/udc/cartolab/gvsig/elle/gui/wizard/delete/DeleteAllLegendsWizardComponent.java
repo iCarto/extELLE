@@ -1,5 +1,7 @@
 package es.udc.cartolab.gvsig.elle.gui.wizard.delete;
 
+import static es.icarto.gvsig.commons.i18n.I18n._;
+
 import java.awt.BorderLayout;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -71,9 +73,9 @@ public class DeleteAllLegendsWizardComponent extends WizardComponent {
     public void finish() throws WizardException {
 	int[] indexes = legendsList.getSelectedIndices();
 	if (indexes.length > 0) {
-	    int opt = JOptionPane.showOptionDialog(this,
-		    PluginServices.getText(this, "delete_legends_confirm_dialog"),
-		    PluginServices.getText(this, "delete_legends"),
+		int opt = JOptionPane.showOptionDialog(this,
+		    _("delete_legends_confirm_dialog"),
+		    _("delete_legends"),
 		    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
 		    null, null);
 	    if (opt == JOptionPane.OK_OPTION) {
@@ -105,7 +107,7 @@ public class DeleteAllLegendsWizardComponent extends WizardComponent {
 		FormPanel form = new FormPanel(stream);
 		form.setFocusTraversalPolicyProvider(true);
 		JLabel legendsLabel = form.getLabel("itemsLabel");
-		legendsLabel.setText(PluginServices.getText(this, "Choose_Legend"));
+		legendsLabel.setText(_("Choose_Legend"));
 
 		listPanel.add(form);
 
@@ -126,8 +128,7 @@ public class DeleteAllLegendsWizardComponent extends WizardComponent {
 		    });
 		} else {
 		    listPanel = new JPanel();
-		    JLabel label = new JLabel(PluginServices.getText(this,
-			    "no_legend_table_on_schema"));
+		    JLabel label = new JLabel(_("no_legend_table_on_schema"));
 		    listPanel.add(label);
 		}
 
