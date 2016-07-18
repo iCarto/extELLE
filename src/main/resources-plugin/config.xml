@@ -53,7 +53,7 @@
 				action-command="ALL"
 				position="0740"/>
 			<tool-bar name="ELLE">
-				<action-tool icon="es.udc.cartolab.gvsig.elle.SaveAllLegendsExtension" tooltip="Save_legends"
+				<action-tool icon="es.udc.cartolab.gvsig.elle.SaveAllLegendsExtension" tooltip="es.udc.cartolab.gvsig.elle.Save_legends"
 					action-command="ALL" position="07" />
 			</tool-bar>
 		</extension>
@@ -67,7 +67,7 @@
 		
 		
 		<extension class-name="es.udc.cartolab.gvsig.elle.DeleteAllLegendsExtension" active="true">
-			<menu text="data_base_menu/des.udc.cartolab.gvsig.elle.DeleteAllLegendsExtension"
+			<menu text="data_base_menu/es.udc.cartolab.gvsig.elle.DeleteAllLegendsExtension"
 				icon="es.udc.cartolab.gvsig.elle.DeleteAllLegendsExtension"
 				action-command="DeleteAllLegends"
 				position="09" />
