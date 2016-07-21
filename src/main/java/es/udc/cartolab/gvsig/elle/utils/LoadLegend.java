@@ -383,7 +383,7 @@ public class LoadLegend {
 				logger.error(e.getMessage(), e);
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
-			} catch (LegendLayerException e) {
+			} catch (BaseException e) {
 				logger.error(e.getMessage(), e);
 			}
     	    
