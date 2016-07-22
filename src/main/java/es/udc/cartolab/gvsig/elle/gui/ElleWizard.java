@@ -46,6 +46,7 @@ import org.gvsig.app.project.documents.view.gui.DefaultViewPanel;
 import org.gvsig.fmap.mapcontext.MapContext;
 import org.gvsig.fmap.mapcontext.layers.FLayer;
 import org.gvsig.fmap.mapcontext.layers.FLayers;
+import org.gvsig.fmap.mapcontext.layers.vectorial.FLyrVect;
 import org.gvsig.fmap.mapcontrol.MapControl;
 import org.gvsig.tools.exception.BaseException;
 import org.slf4j.Logger;
@@ -56,6 +57,7 @@ import com.jeta.forms.gui.common.FormException;
 
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.ConfigExtension;
+import es.udc.cartolab.gvsig.elle.utils.LoadLegend;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
 import es.udc.cartolab.gvsig.elle.utils.MapFilter;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
@@ -97,6 +99,8 @@ public class ElleWizard extends WizardPanel {
     	
     	FLayers layersToAdd = new FLayers();
     	
+    	LoadLegend loadLegend = new LoadLegend();
+    	String styleName = groupList.getSelectedValue() == null ? "" : groupList.getSelectedValue().toString();
     	try {
     	layersToAdd.setMapContext(mc);
     	layersToAdd.setParentLayer(root);
@@ -107,6 +111,7 @@ public class ElleWizard extends WizardPanel {
     		FeatureStore fs = (FeatureStore) manager.openStore(p.getDataStoreName(), p);
     		int pos = selectedPos[i];
     		FLayer layer = application.getMapContextManager().createLayer(layers[pos][1], fs);
+    		loadLegend.loadDBLegend((FLyrVect) layer, styleName, false);
     		fs.dispose();
     		layersToAdd.addLayer(layer);
     	}
