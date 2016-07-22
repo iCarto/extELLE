@@ -363,7 +363,9 @@ public class LoadLegend {
 		} catch (SQLException e1) {
 			logger.error(e1.getMessage(), e1);
 		}
-    	if (style.length == 1) {
+    	if (style.length != 1) {
+    		return;
+    	}
     	    String type = style[0][2];
     	    String def = style[0][3];
     	    // gvSIG uses an old postresql jar. This jar escapes \ characters 
@@ -387,7 +389,7 @@ public class LoadLegend {
 				logger.error(e.getMessage(), e);
 			}
     	    
-    	}
+    	
     	setLabel(layer, style[0][4]);
     }
     
