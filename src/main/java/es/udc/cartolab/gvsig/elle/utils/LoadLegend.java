@@ -59,7 +59,7 @@ import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 /**
  * This ELLE class can load legends (styles) on the layers. This styles are
- * 'gvl' files placed on a folder defined by the user on the config panel.
+ * 'gvl' files placed on a tmpFolder defined by the user on the config panel.
  */
 public class LoadLegend {
 
