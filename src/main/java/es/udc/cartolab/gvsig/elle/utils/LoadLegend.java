@@ -278,8 +278,8 @@ public class LoadLegend {
 		+ "  nombre_capa character varying NOT NULL,"
 		+ "  nombre_estilo character varying NOT NULL,"
 		+ "  type character varying(3),"
-		+ "  definicion xml,"
-		+ "  label xml"
+		+ "  definicion text,"
+		+ "  label text"
 		+ "  PRIMARY KEY (nombre_capa, nombre_estilo)"
 		+ ")"
 		+ "WITH ("
@@ -291,8 +291,8 @@ public class LoadLegend {
 		+ "  nombre_capa character varying NOT NULL,"
 		+ "  nombre_estilo character varying NOT NULL,"
 		+ "  tipo character varying(3),"
-		+ "  definicion xml,"
-		+ "  label xml"
+		+ "  definicion text,"
+		+ "  label text"
 		+ "  PRIMARY KEY (nombre_capa, nombre_estilo)"
 		+ ")";
 
