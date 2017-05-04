@@ -245,7 +245,7 @@ public abstract class LoadLegend {
 		+ "  nombre_estilo character varying NOT NULL,"
 		+ "  type character varying(3),"
 		+ "  definicion text,"
-		+ "  label text"
+		+ "  label text,"
 		+ "  PRIMARY KEY (nombre_capa, nombre_estilo)"
 		+ ")"
 		+ "WITH ("
@@ -258,7 +258,7 @@ public abstract class LoadLegend {
 		+ "  nombre_estilo character varying NOT NULL,"
 		+ "  tipo character varying(3),"
 		+ "  definicion text,"
-		+ "  label text"
+		+ "  label text,"
 		+ "  PRIMARY KEY (nombre_capa, nombre_estilo)"
 		+ ")";
 

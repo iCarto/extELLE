@@ -224,8 +224,9 @@ public class ElleWizard extends WizardPanel {
 					    layers = dbs.getTable(
 						    DBStructure.getMapTable(),
 						    DBStructure.getSchema(),
-						    where,
-						    new String[] {"posicion", "nombre_capa",
+						    where, new String[] {
+							    "posicion",
+							    "nombre_capa" },
 						    true);
 				} catch (SQLException e) {
 				    JOptionPane.showMessageDialog(null,
