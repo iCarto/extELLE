@@ -200,7 +200,7 @@ public class ElleWizard extends WizardPanel {
 						    DBStructure.getMapTable(),
 						    DBStructure.getSchema(),
 						    where,
-						    new String[] {"posicion", "nombre_campa",
+						    new String[] {"posicion", "nombre_capa"},
 						    true);
 				} catch (SQLException e) {
 				    JOptionPane.showMessageDialog(null,
