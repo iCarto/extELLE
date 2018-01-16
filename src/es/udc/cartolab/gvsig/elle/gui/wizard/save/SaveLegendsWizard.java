@@ -24,10 +24,12 @@ import com.iver.andami.ui.mdiManager.WindowInfo;
 import com.iver.cit.gvsig.fmap.layers.FLayer;
 import com.iver.cit.gvsig.fmap.layers.FLayers;
 import com.iver.cit.gvsig.fmap.layers.FLyrVect;
+import com.iver.cit.gvsig.project.documents.view.gui.BaseView;
 import com.iver.cit.gvsig.project.documents.view.gui.View;
 
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
+import es.udc.cartolab.gvsig.elle.utils.TOCGroupsHandler;
 
 public class SaveLegendsWizard extends WizardWindow {
 
@@ -65,7 +67,9 @@ public class SaveLegendsWizard extends WizardWindow {
 
     private List<LayerProperties> getList(FLayers layers) {
 	List<LayerProperties> list = new ArrayList<LayerProperties>();
-
+    
+	BaseView view = (BaseView) properties.get(SaveMapWizard.PROPERTY_VIEW);
+    TOCGroupsHandler tocGroupsHandler = new TOCGroupsHandler(view.getMapControl().getMapContext());
 	for (int i=layers.getLayersCount()-1; i>=0; i--) {
 	    FLayer layer = layers.getLayer(i);
 	    if (layer instanceof FLayers) {
@@ -90,7 +94,7 @@ public class SaveLegendsWizard extends WizardWindow {
 			    lp.setSave(true);
 			}
 
-			lp.setGroup(layer.getParentLayer().getName());
+			lp.setGroup(tocGroupsHandler.getGroup(layer));
 			lp.setMaxScale(layer.getMaxScale());
 			lp.setMinScale(layer.getMinScale());
 			lp.setPosition(layers.getLayersCount()-i);

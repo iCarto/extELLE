@@ -62,6 +62,7 @@ import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardComponent;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.utils.MapDAO;
+import es.udc.cartolab.gvsig.elle.utils.TOCGroupsHandler;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 @SuppressWarnings("serial")
@@ -378,30 +379,9 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
     }
 
 
-    /*
-     * This method is used in order to retrieve the name of all the nested
-     * groups as a string, each of them separated by '/'. Therefore, we have to
-     * escape that character ('\/'), which also means duplicating the
-     * backslashes.
-     */
-    private String getGroupCompositeName(FLayers group) {
-	// We check whether the layer has a parent group or it doesn't.
-	if ((group.getName() == null) || (group.getName().equals("root layer") && (group.getParentLayer() == null))) {
-	    return "";
-	}
-	// We duplicate previously existing backslashes and escape the slashes.
-	String groupName = group.getName().replace("\\", "\\\\").replace("/", "\\/");
-	if (group.getParentLayer() != null) {
-	    String parentName = getGroupCompositeName(group.getParentLayer());
-	    if (parentName.length() > 0) {
-		groupName =  parentName + "/" + groupName;
-	    }
-	}
-	return groupName;
-    }
-
     private void createMapLayerList(FLayers layers) {
 
+    TOCGroupsHandler tocGroupsHandler = new TOCGroupsHandler(view.getMapControl().getMapContext());
 	for (int i=layers.getLayersCount()-1; i>=0; i--) {
 	    FLayer layer = layers.getLayer(i);
 	    if (layer instanceof FLayers) {
@@ -410,10 +390,6 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 		try {
 		    LayerProperties lp = new LayerProperties((FLyrVect) layer);
 			//layer data to fill the table
-			String group = "";
-			if (layer.getParentLayer() != null) {
-			    group = getGroupCompositeName(layer.getParentLayer());
-			}
 			double maxScale = layer.getMaxScale();
 			if (maxScale >= 0) {
 			    lp.setMaxScale(maxScale);
@@ -425,7 +401,7 @@ public class SaveMapWizardComponent extends WizardComponent implements ActionLis
 			boolean visible = layer.isVisible();
 
 			lp.setVisible(visible);
-			lp.setGroup(group);
+			lp.setGroup(tocGroupsHandler.getGroup(layer));
 			lp.setPosition(mapLayers.size());
 			lp.setSave(true);
 
