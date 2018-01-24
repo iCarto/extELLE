@@ -65,10 +65,6 @@ public class DBLegendsManager extends AbstractLegendsManager {
 
     }
 
-    public void loadLegends() {
-	// TODO Auto-generated method stub
-
-    }
 
     public void prepare() throws WizardException {
 	DBSession dbs = DBSession.getCurrentSession();
@@ -184,16 +180,11 @@ public class DBLegendsManager extends AbstractLegendsManager {
     }
 
     public boolean canRead() {
-	// TODO canRead
 	return true;
     }
 
     public boolean canWrite() {
-	// TODO canWrite
 	return true;
-    }
-
-    public void loadOverviewLegends() {
     }
 
     public void saveOverviewLegends(String type) throws WizardException {

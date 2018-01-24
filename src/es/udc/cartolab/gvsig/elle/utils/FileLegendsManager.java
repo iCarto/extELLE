@@ -42,10 +42,6 @@ public class FileLegendsManager extends AbstractLegendsManager {
 	super.setLeyendGroupName(leyendGroupName);
     }
 
-    public void loadLegends() {
-
-
-    }
 
     public void saveLegends() throws WizardException {
 	if (dir != null) {
@@ -97,10 +93,6 @@ public class FileLegendsManager extends AbstractLegendsManager {
 	    }
 	    this.dir = new File(path);
 	}
-    }
-
-    public void loadOverviewLegends() {
-
     }
 
     public void saveOverviewLegends(String type) throws WizardException {

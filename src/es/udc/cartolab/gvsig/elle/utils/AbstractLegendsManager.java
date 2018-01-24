@@ -68,10 +68,6 @@ public abstract class AbstractLegendsManager {
 	}
     }
 
-    public abstract void loadLegends();
-
-    public abstract void loadOverviewLegends();
-
     public abstract void saveOverviewLegends(String type) throws WizardException;
 
     public abstract void saveLegends() throws WizardException;
