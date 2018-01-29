@@ -17,11 +17,6 @@
 
 package es.udc.cartolab.gvsig.elle.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -30,9 +25,10 @@ import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.fmap.drivers.DBException;
 import com.iver.cit.gvsig.fmap.drivers.legend.LegendDriverException;
 import com.iver.cit.gvsig.fmap.layers.FLyrVect;
-import com.iver.cit.gvsig.fmap.rendering.styling.labeling.ILabelingStrategy;
 
 import es.icarto.gvsig.elle.db.DBStructure;
+import es.icarto.gvsig.elle.style.LayerLabeling;
+import es.icarto.gvsig.elle.style.LayerSimbology;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.gui.wizard.save.LayerProperties;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
@@ -89,8 +85,8 @@ public class DBLegendsManager extends AbstractLegendsManager {
 
 	DBSession dbs = DBSession.getCurrentSession();
 	try {
-	    String symbology = getSymbologyAsXML(layer, type);
-	    String label = getLabelAsXML(layer);
+	    String symbology = new LayerSimbology(layer).getAs(type);
+	    String label = new LayerLabeling(layer).get();
 
 	    // fpuga. April 15, 2014
 	    // This if is here only for compatible reasons with old version of
@@ -117,41 +113,11 @@ public class DBLegendsManager extends AbstractLegendsManager {
 	    }
 	} catch (SQLException e) {
 	    throw new WizardException(e);
-	} catch (FileNotFoundException e) {
-	    throw new WizardException(e);
-	} catch (IOException e) {
-	    throw new WizardException(e);
 	} catch (LegendDriverException e) {
 	    throw new WizardException(e);
 	}
     }
-
-    private String getLabelAsXML(FLyrVect layer) {
-	String label = null;
-	if (layer.isLabeled()) {
-	    final ILabelingStrategy labelingStrategy = layer.getLabelingStrategy();
-	    if (labelingStrategy != null) {
-		label = labelingStrategy.getXMLEntity().toString();
-	    }
-	}
-	return label;
-    }
-
-    private String getSymbologyAsXML(FLyrVect layer, String type)
-	    throws IOException, LegendDriverException, FileNotFoundException {
-	File legendFile = File.createTempFile("style", "." + type);
-	LoadLegend.saveLegend(layer, legendFile);
-	BufferedReader reader = new BufferedReader(new FileReader(legendFile.getAbsolutePath()));
-	StringBuffer buffer = new StringBuffer();
-	String line = reader.readLine();
-	while (line != null) {
-	buffer.append(line).append("\n");
-	line = reader.readLine();
-	}
-	String xml = buffer.toString();
-	legendFile.delete();
-	return xml;
-    }
+    
 
     public void saveLegends() throws WizardException {
 

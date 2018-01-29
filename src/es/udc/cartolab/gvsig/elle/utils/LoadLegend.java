@@ -24,30 +24,22 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.exolab.castor.xml.MarshalException;
-import org.exolab.castor.xml.ValidationException;
 import org.gvsig.symbology.fmap.drivers.sld.FMapSLDDriver;
 
-import com.hardcode.gdbms.driver.exceptions.ReadDriverException;
 import com.iver.andami.PluginServices;
 import com.iver.cit.gvsig.fmap.drivers.gvl.FMapGVLDriver;
 import com.iver.cit.gvsig.fmap.drivers.legend.IFMapLegendDriver;
 import com.iver.cit.gvsig.fmap.drivers.legend.LegendDriverException;
-import com.iver.cit.gvsig.fmap.layers.FLayer;
 import com.iver.cit.gvsig.fmap.layers.FLyrVect;
-import com.iver.cit.gvsig.fmap.rendering.ILegend;
-import com.iver.cit.gvsig.fmap.rendering.IVectorLegend;
-import com.iver.cit.gvsig.fmap.rendering.styling.labeling.ILabelingStrategy;
-import com.iver.cit.gvsig.fmap.rendering.styling.labeling.LabelingFactory;
 import com.iver.utiles.XMLEntity;
 
 import es.icarto.gvsig.elle.db.DBStructure;
+import es.icarto.gvsig.elle.style.LayerLabeling;
+import es.icarto.gvsig.elle.style.LayerSimbology;
 import es.udc.cartolab.gvsig.elle.gui.EllePreferencesPage;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
@@ -65,7 +57,6 @@ public abstract class LoadLegend {
     private static HashMap<String, Class<? extends IFMapLegendDriver>> drivers = new HashMap<String, Class<? extends IFMapLegendDriver>>();
     private static String configLegendDir;
 
-    private static Logger logger = Logger.getLogger(LoadLegend.class);
     
     static {
 	drivers.put("gvl", FMapGVLDriver.class);
@@ -100,58 +91,15 @@ public abstract class LoadLegend {
 	return legendPath + "overview" + File.separator;
     }
 
-    private static boolean setLegend(FLyrVect lyr, File legendFile){
-
-	if (lyr == null) {
-	    System.out.println("[LoadLegend] La capa es null: " + lyr + " legend: " + legendFile);
-	    return false;
-	}
-
-	if (legendFile.exists()){
-
-	    String ext = legendFile.getName().substring(legendFile.getName().lastIndexOf('.') +1);
-	    try {
-		if (drivers.containsKey(ext.toLowerCase())) {
-		    IFMapLegendDriver driver = drivers.get(ext.toLowerCase()).newInstance();
-		    Hashtable<FLayer, ILegend> table = driver.read(lyr.getMapContext().getLayers(),lyr, legendFile);
-		    ILegend legend = table.get(lyr);
-		    if (legend != null && legend instanceof IVectorLegend) {
-			lyr.setLegend((IVectorLegend)table.get(lyr));
-			System.out.println("Cargado el style: "+ legendFile.getAbsolutePath());
-			return true;
-		    }
-		} else {
-		    System.out.println("Tipo de leyenda no soportado");
-
-		}
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
-
-	} else {
-	    System.out.println("No existe el style: "+ legendFile.getAbsolutePath());
-
-	}
-	return false;
+    private static boolean setLegend(FLyrVect layer, File legendFile){
+        try {
+            new LayerSimbology(layer).set(legendFile);
+            return true;
+        } catch (LegendDriverException e) {
+            return false;
+        }
     }
 
-    public static void saveLegend(FLyrVect layer, File legendFile) throws LegendDriverException {
-	String ext = legendFile.getName().substring(legendFile.getName().lastIndexOf('.') +1);
-	if (drivers.containsKey(ext.toLowerCase())) {
-	    try {
-		IFMapLegendDriver driver = drivers.get(ext.toLowerCase()).newInstance();
-		//workaround for driver version... we hope that when supportedVersions array grows (it has one element
-		//for gvl and sld), gvsIG people will put the newer versions at the last position
-		ArrayList<String> supportedVersions = driver.getSupportedVersions();
-		String version = supportedVersions.get(supportedVersions.size()-1);
-		driver.write(layer.getMapContext().getLayers(),layer, layer.getLegend(), legendFile, version);
-	    } catch (InstantiationException e) {
-		logger.error(e.getStackTrace(), e);
-	    } catch (IllegalAccessException e) {
-		logger.error(e.getStackTrace(), e);
-	    }
-	}
-    }
 
     public static void setOverviewLegend(FLyrVect lyr, String legendFilename){
 	if (legendFilename == null) {
@@ -188,10 +136,6 @@ public abstract class LoadLegend {
 	if (!setLegend(lyr, lyr.getName() + ".gvl", false)) {
 	    setLegend(lyr, lyr.getName() + ".sld", false);
 	}
-    }
-
-    public static void setOverviewLegend(FLyrVect lyr){
-	setOverviewLegend(lyr, (String)null);
     }
 
     private static boolean hasExtension(String fileName) {
@@ -349,37 +293,17 @@ public abstract class LoadLegend {
 	    // removed when all projects have added to the database a "label"
 	    // column to _map_style and _map_overview_style
 	    if (style[0].length == 5) {
-		setLabel(layer, style[0][4]);
+	        new LayerLabeling(layer).set(style[0][4]);
 	    }
 	}
     }
 
-    public static boolean setLabel(FLyrVect layer, String label) {
-	boolean labeled = false;
-	if ((label != null) && (label.length() > 0)) {
-	    try {
-		XMLEntity parse = XMLEntity.parse(label);
-		ILabelingStrategy strategy = LabelingFactory
-			.createStrategyFromXML(parse, layer);
-		layer.setLabelingStrategy(strategy);
-		layer.setIsLabeled(true);
-		labeled = true;
-	    } catch (MarshalException e) {
-		logger.error(e.getStackTrace(), e);
-	    } catch (ValidationException e) {
-		logger.error(e.getStackTrace(), e);
-	    } catch (ReadDriverException e) {
-		logger.error(e.getStackTrace(), e);
-	    }
-	}
-	return labeled;
-    }
 
     private static void loadFileLegend(FLyrVect layer, String styleName, boolean overview) {
 
 	if (setLegendStyleName(styleName)) {
 	    if (overview) {
-		setOverviewLegend(layer);
+		setOverviewLegend(layer, (String)null);
 	    } else {
 		setLegend(layer);
 	    }
