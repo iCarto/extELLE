@@ -21,6 +21,7 @@ import static es.icarto.gvsig.commons.i18n.I18n._;
 import javax.swing.JOptionPane;
 
 import org.gvsig.andami.PluginServices;
+import org.gvsig.andami.ui.mdiManager.MDIManagerFactory;
 import org.gvsig.andami.ui.mdiManager.WindowInfo;
 import org.gvsig.app.project.documents.view.gui.IView;
 import org.slf4j.Logger;
@@ -89,7 +90,7 @@ public class SaveMapWizard extends WizardWindow {
 		success = false;
 		JOptionPane.showMessageDialog(this, _("error_saving"), "", JOptionPane.ERROR_MESSAGE);
 		logger.error(e.getMessage(), e);
-		PluginServices.getMDIManager().restoreCursor();
+		MDIManagerFactory.getManager().restoreCursor();
 	}
 
 	if (success) {

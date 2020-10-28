@@ -31,6 +31,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.cresques.cts.IProjection;
 import org.gvsig.andami.PluginServices;
+import org.gvsig.andami.ui.mdiManager.MDIManagerFactory;
 import org.gvsig.app.ApplicationLocator;
 import org.gvsig.app.ApplicationManager;
 import org.gvsig.app.addlayer.AddLayerDialog;
@@ -131,7 +132,7 @@ public class ElleWizard extends WizardPanel {
 
     @Override
     public void initWizard() {
-    	DefaultViewPanel view = (DefaultViewPanel) PluginServices.getMDIManager().getActiveWindow();
+    	DefaultViewPanel view = (DefaultViewPanel) MDIManagerFactory.getManager().getActiveWindow();
     	setMapCtrl(view.getMapControl());
     	
     	dbs = DBSession.getCurrentSession();

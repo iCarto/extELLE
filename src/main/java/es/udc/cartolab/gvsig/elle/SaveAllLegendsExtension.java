@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import org.gvsig.andami.IconThemeHelper;
 import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.plugins.Extension;
+import org.gvsig.andami.ui.mdiManager.MDIManagerFactory;
 import org.gvsig.app.project.documents.view.gui.IView;
 import org.gvsig.fmap.mapcontext.layers.FLayers;
 
@@ -44,7 +45,7 @@ public class SaveAllLegendsExtension extends Extension {
 	if (actionCommand.equals("ALL")) {
 	    option = SaveLegendsWizard.ALL;
 	}
-	IView view = (IView) PluginServices.getMDIManager().getActiveWindow();
+	IView view = (IView) MDIManagerFactory.getManager().getActiveWindow();
 	WizardWindow w = new SaveLegendsWizard(view, option);
 	w.open();
 
@@ -79,11 +80,11 @@ public class SaveAllLegendsExtension extends Extension {
     }
 
     private boolean activeWindowIsIWindow() {
-	return PluginServices.getMDIManager().getActiveWindow() instanceof IView;
+	return MDIManagerFactory.getManager().getActiveWindow() instanceof IView;
     }
 
     private boolean areLayersInTOC() {
-    	IView view = ((IView) PluginServices.getMDIManager().getActiveWindow());
+    	IView view = ((IView) MDIManagerFactory.getManager().getActiveWindow());
 	FLayers layers = view.getMapControl().getMapContext().getLayers();
 	return layers.getLayersCount() > 0;
     }

@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 
 import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.ui.mdiManager.IWindow;
+import org.gvsig.andami.ui.mdiManager.MDIManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,7 @@ public abstract class WizardWindow extends JPanel implements IWindow,
 
 	add(mainPanel, BorderLayout.CENTER);
 	add(getSouthPanel(), BorderLayout.SOUTH);
-	PluginServices.getMDIManager().addCentredWindow(this);
+	MDIManagerFactory.getManager().addCentredWindow(this);
     }
 
     private JPanel getMainPanel() {
@@ -138,7 +139,7 @@ public abstract class WizardWindow extends JPanel implements IWindow,
     }
 
     public void close() {
-	PluginServices.getMDIManager().closeWindow(this);
+    	MDIManagerFactory.getManager().closeWindow(this);
     }
 
     protected void finish() {
