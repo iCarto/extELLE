@@ -41,269 +41,247 @@ import org.gvsig.utils.XMLEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.miginfocom.swing.MigLayout;
 import es.icarto.gvsig.elle.db.DBStructure;
 import es.udc.cartolab.gvsig.elle.gui.EllePreferencesPage;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardComponent;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.utils.LoadLegend;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
+import net.miginfocom.swing.MigLayout;
 
 public class LoadLegendWizardComponent extends WizardComponent {
-	
-	
-	private static final Logger logger = LoggerFactory
-			.getLogger(LoadLegendWizardComponent.class);
 
-    private JRadioButton noLegendRB, databaseRB, fileRB;
-    private JPanel dbPanel;
-    private JPanel filePanel;
-    private JComboBox dbCB, fileCB;
+	private static final Logger logger = LoggerFactory.getLogger(LoadLegendWizardComponent.class);
 
-    private String legendDir = null;
+	private JRadioButton noLegendRB, databaseRB, fileRB;
+	private JPanel dbPanel;
+	private JPanel filePanel;
+	private JComboBox dbCB, fileCB;
 
-    public LoadLegendWizardComponent(Map<String, Object> properties) {
-	super(properties);
+	private String legendDir = null;
 
-	//get config
-	XMLEntity xml = PluginServices.getPluginServices("es.udc.cartolab.gvsig.elle").getPersistentXML();
-	if (xml.contains(EllePreferencesPage.DEFAULT_LEGEND_DIR_KEY_NAME)) {
-	    legendDir = xml.getStringProperty(EllePreferencesPage.DEFAULT_LEGEND_DIR_KEY_NAME);
-	}
+	public LoadLegendWizardComponent(Map<String, Object> properties) {
+		super(properties);
 
-
-	//init components
-	noLegendRB = new JRadioButton(_("dont_load"));
-	databaseRB = new JRadioButton(_("load_from_db"));
-	fileRB = new JRadioButton(_("load_from_disk"));
-	dbCB = new JComboBox();
-	fileCB = new JComboBox();
-	dbPanel = getDBPanel();
-	filePanel = getFilePanel();
-	ButtonGroup group = new ButtonGroup();
-	group.add(noLegendRB);
-	group.add(databaseRB);
-	group.add(fileRB);
-
-
-	//components placement
-	setLayout(new MigLayout("inset 0, align center",
-		"20[grow]",
-		"[]15[][]15[][]"));
-	add(noLegendRB, "wrap");
-	add(databaseRB, "wrap");
-	add(dbPanel, "shrink, growx, growy, wrap");
-	add(fileRB, "wrap");
-	add(filePanel, "shrink, growx, growy, wrap");
-
-
-
-	//listeners
-	noLegendRB.addActionListener(new ActionListener() {
-
-
-	    public void actionPerformed(ActionEvent e) {
-		dbSetEnabled(false);
-		fileSetEnabled(false);
-	    }
-
-	});
-
-	databaseRB.addActionListener(new ActionListener() {
-
-
-	    public void actionPerformed(ActionEvent e) {
-		dbSetEnabled(true);
-		fileSetEnabled(false);
-	    }
-
-	});
-
-	fileRB.addActionListener(new ActionListener() {
-
-
-	    public void actionPerformed(ActionEvent e) {
-		dbSetEnabled(false);
-		fileSetEnabled(true);
-	    }
-
-	});
-
-	//initial values
-	noLegendRB.setSelected(true);
-	dbSetEnabled(false);
-	fileSetEnabled(false);
-
-
-    }
-
-    private void dbSetEnabled(boolean enabled) {
-	dbCB.setEnabled(enabled);
-    }
-
-    private void fileSetEnabled(boolean enabled) {
-	fileCB.setEnabled(enabled);
-    }
-
-    private JPanel getDBPanel() {
-
-	JPanel panel = new JPanel();
-	MigLayout layout = new MigLayout("inset 0, align center",
-		"10[grow][]50",
-		"5[grow]5");
-	panel.setLayout(layout);
-
-	if (DBSession.getCurrentSession()!=null) {
-	    dbCB.removeAllItems();
-	    JLabel label = new JLabel(_("legends_group_name"));
-	    label.setEnabled(DBSession.getCurrentSession() != null);
-	    panel.add(label);
-	    panel.add(dbCB, "wrap");
-	} else {
-	    panel.add(new JLabel(_("notConnectedError")));
-	    databaseRB.setEnabled(false);
-	}
-
-
-	return panel;
-    }
-
-    private JPanel getFilePanel() {
-
-	JPanel panel = new JPanel();
-	MigLayout layout = new MigLayout("inset 0, align center",
-		"10[grow][]50",
-		"5[grow]5");
-	panel.setLayout(layout);
-
-	boolean panelAdded = false;
-	if (legendDir != null) {
-	    File f = new File(legendDir);
-	    if (f.isDirectory()) {
-		fileCB.removeAllItems();
-		File[] files = f.listFiles();
-		for (int i=0; i<files.length; i++) {
-		    if (files[i].isDirectory() && !files[i].isHidden()) {
-			fileCB.addItem(files[i].getName());
-		    }
+		// get config
+		XMLEntity xml = PluginServices.getPluginServices("es.udc.cartolab.gvsig.elle").getPersistentXML();
+		if (xml.contains(EllePreferencesPage.DEFAULT_LEGEND_DIR_KEY_NAME)) {
+			legendDir = xml.getStringProperty(EllePreferencesPage.DEFAULT_LEGEND_DIR_KEY_NAME);
 		}
-		panel.add(new JLabel(_("legends_group_name")));
-		panel.add(fileCB, "wrap");
-		panelAdded = true;
-	    }
-	}
 
-	if (!panelAdded) {
-	    fileRB.setEnabled(false);
-	    panel.add(new JLabel(_("no_dir_config")), "span 2");
-	}
+		// init components
+		noLegendRB = new JRadioButton(_("dont_load"));
+		databaseRB = new JRadioButton(_("load_from_db"));
+		fileRB = new JRadioButton(_("load_from_disk"));
+		dbCB = new JComboBox();
+		fileCB = new JComboBox();
+		dbPanel = getDBPanel();
+		filePanel = getFilePanel();
+		ButtonGroup group = new ButtonGroup();
+		group.add(noLegendRB);
+		group.add(databaseRB);
+		group.add(fileRB);
 
-	return panel;
-    }
+		// components placement
+		setLayout(new MigLayout("inset 0, align center", "20[grow]", "[]15[][]15[][]"));
+		add(noLegendRB, "wrap");
+		add(databaseRB, "wrap");
+		add(dbPanel, "shrink, growx, growy, wrap");
+		add(fileRB, "wrap");
+		add(filePanel, "shrink, growx, growy, wrap");
 
-    public boolean canFinish() {
-	return true;
-    }
+		// listeners
+		noLegendRB.addActionListener(new ActionListener() {
 
-    public boolean canNext() {
-	return true;
-    }
-
-    public String getWizardComponentName() {
-	return "load_legend_wizard_component";
-    }
-
-    public void showComponent() {
-	dbCB.removeAllItems();
-
-	DBSession dbs = DBSession.getCurrentSession();
-	if (dbs!=null) {
-	    try {
-		if (dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapStyleTable())) {
-		    String[] legends = dbs.getDistinctValues(DBStructure.getMapStyleTable(), DBStructure.getSchema(), "nombre_estilo", true, false);
-		    Object tmp = properties
-			    .get(LoadMapWizardComponent.PROPERTY_MAP_NAME);
-		    boolean exists = false;
-		    String legendName = (tmp == null ? "" : tmp.toString());
-		    for (String legend : legends) {
-			dbCB.addItem(legend);
-			if (legendName.equals(legend)) {
-			    exists = true;
+			public void actionPerformed(ActionEvent e) {
+				dbSetEnabled(false);
+				fileSetEnabled(false);
 			}
-		    }
-		    if (exists) {
-			dbCB.setSelectedItem(legendName);
-			databaseRB.setSelected(true);
-			dbSetEnabled(true);
-		    }
 
-		}
-	    } catch (SQLException e) {
-		try {
-		    dbs = DBSession.reconnect();
-		} catch (DataException e1) {
-			logger.error(e1.getMessage(), e1);
-		}
-		logger.error(e.getMessage(), e);
-	    }
+		});
+
+		databaseRB.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				dbSetEnabled(true);
+				fileSetEnabled(false);
+			}
+
+		});
+
+		fileRB.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				dbSetEnabled(false);
+				fileSetEnabled(true);
+			}
+
+		});
+
+		// initial values
+		noLegendRB.setSelected(true);
+		dbSetEnabled(false);
+		fileSetEnabled(false);
+
 	}
-    }
 
-
-
-
-
-    public void finish() throws WizardException {
-	Object aux = properties.get(LoadMapWizardComponent.PROPERTY_VEW);
-	if (aux!=null && aux instanceof IView) {
-	    IView view = (IView) aux;
-
-	    if ((databaseRB.isSelected() && dbCB.getSelectedItem()!=null) || (fileRB.isSelected() && fileCB.getSelectedItem()!=null)) {
-		
-		    FLayers layers = view.getMapControl().getMapContext().getLayers();
-		    try {
-			loadLegends(layers, false);
-			layers = view.getMapOverview().getMapContext().getLayers();
-			loadLegends(layers, true);
-		    } catch (SQLException e) {
-			throw new WizardException(e);
-		    } catch (IOException e) {
-			throw new WizardException(e);
-		    }
-		
-	    }
-	} else {
-	    throw new WizardException(_("no_view_error"));
+	private void dbSetEnabled(boolean enabled) {
+		dbCB.setEnabled(enabled);
 	}
-    }
 
-    private void loadLegends(FLayers layers, boolean overview) throws SQLException, IOException {
-    	LoadLegend legendLoader = new LoadLegend();
-	for (int i=0; i<layers.getLayersCount(); i++) {
-	    FLayer layer = layers.getLayer(i);
-	    if (layer instanceof FLyrVect) {
-		int source;
-		String styles;
-		if (databaseRB.isSelected()) {
-		    source = LoadLegend.DB_LEGEND;
-		    styles = dbCB.getSelectedItem().toString();
-		    legendLoader.loadDBLegend((FLyrVect) layer, styles, overview);
+	private void fileSetEnabled(boolean enabled) {
+		fileCB.setEnabled(enabled);
+	}
+
+	private JPanel getDBPanel() {
+
+		JPanel panel = new JPanel();
+		MigLayout layout = new MigLayout("inset 0, align center", "10[grow][]50", "5[grow]5");
+		panel.setLayout(layout);
+
+		if (DBSession.getCurrentSession() != null) {
+			dbCB.removeAllItems();
+			JLabel label = new JLabel(_("legends_group_name"));
+			label.setEnabled(DBSession.getCurrentSession() != null);
+			panel.add(label);
+			panel.add(dbCB, "wrap");
 		} else {
-		    source = LoadLegend.FILE_LEGEND;
-		    styles = fileCB.getSelectedItem().toString();
-//		    LoadLegend.loadLegend((FLyrVect) layer, styles, overview, source);
+			panel.add(new JLabel(_("notConnectedError")));
+			databaseRB.setEnabled(false);
 		}
-		
-	    } else if (layer instanceof FLayers) {
-		loadLegends((FLayers) layer, overview);
-	    }
+
+		return panel;
 	}
-    }
 
-    public void setProperties() {
-	// Nothing to do
-    }
+	private JPanel getFilePanel() {
 
+		JPanel panel = new JPanel();
+		MigLayout layout = new MigLayout("inset 0, align center", "10[grow][]50", "5[grow]5");
+		panel.setLayout(layout);
 
+		boolean panelAdded = false;
+		if (legendDir != null) {
+			File f = new File(legendDir);
+			if (f.isDirectory()) {
+				fileCB.removeAllItems();
+				File[] files = f.listFiles();
+				for (int i = 0; i < files.length; i++) {
+					if (files[i].isDirectory() && !files[i].isHidden()) {
+						fileCB.addItem(files[i].getName());
+					}
+				}
+				panel.add(new JLabel(_("legends_group_name")));
+				panel.add(fileCB, "wrap");
+				panelAdded = true;
+			}
+		}
+
+		if (!panelAdded) {
+			fileRB.setEnabled(false);
+			panel.add(new JLabel(_("no_dir_config")), "span 2");
+		}
+
+		return panel;
+	}
+
+	public boolean canFinish() {
+		return true;
+	}
+
+	public boolean canNext() {
+		return true;
+	}
+
+	public String getWizardComponentName() {
+		return "load_legend_wizard_component";
+	}
+
+	public void showComponent() {
+		dbCB.removeAllItems();
+
+		DBSession dbs = DBSession.getCurrentSession();
+		if (dbs != null) {
+			try {
+				if (dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapStyleTable())) {
+					String[] legends = dbs.getDistinctValues(DBStructure.getMapStyleTable(), DBStructure.getSchema(),
+							"nombre_estilo", true, false);
+					Object tmp = properties.get(LoadMapWizardComponent.PROPERTY_MAP_NAME);
+					boolean exists = false;
+					String legendName = (tmp == null ? "" : tmp.toString());
+					for (String legend : legends) {
+						dbCB.addItem(legend);
+						if (legendName.equals(legend)) {
+							exists = true;
+						}
+					}
+					if (exists) {
+						dbCB.setSelectedItem(legendName);
+						databaseRB.setSelected(true);
+						dbSetEnabled(true);
+					}
+
+				}
+			} catch (SQLException e) {
+				try {
+					dbs = DBSession.reconnect();
+				} catch (DataException e1) {
+					logger.error(e1.getMessage(), e1);
+				}
+				logger.error(e.getMessage(), e);
+			}
+		}
+	}
+
+	public void finish() throws WizardException {
+		Object aux = properties.get(LoadMapWizardComponent.PROPERTY_VEW);
+		if (aux != null && aux instanceof IView) {
+			IView view = (IView) aux;
+
+			if ((databaseRB.isSelected() && dbCB.getSelectedItem() != null)
+					|| (fileRB.isSelected() && fileCB.getSelectedItem() != null)) {
+
+				FLayers layers = view.getMapControl().getMapContext().getLayers();
+				try {
+					loadLegends(layers, false);
+					layers = view.getMapOverview().getMapContext().getLayers();
+					loadLegends(layers, true);
+				} catch (SQLException e) {
+					throw new WizardException(e);
+				} catch (IOException e) {
+					throw new WizardException(e);
+				}
+
+			}
+		} else {
+			throw new WizardException(_("no_view_error"));
+		}
+	}
+
+	private void loadLegends(FLayers layers, boolean overview) throws SQLException, IOException {
+		LoadLegend legendLoader = new LoadLegend();
+		for (int i = 0; i < layers.getLayersCount(); i++) {
+			FLayer layer = layers.getLayer(i);
+			if (layer instanceof FLyrVect) {
+				int source;
+				String styles;
+				if (databaseRB.isSelected()) {
+					source = LoadLegend.DB_LEGEND;
+					styles = dbCB.getSelectedItem().toString();
+					legendLoader.loadDBLegend((FLyrVect) layer, styles, overview);
+				} else {
+					source = LoadLegend.FILE_LEGEND;
+					styles = fileCB.getSelectedItem().toString();
+//		    LoadLegend.loadLegend((FLyrVect) layer, styles, overview, source);
+				}
+
+			} else if (layer instanceof FLayers) {
+				loadLegends((FLayers) layer, overview);
+			}
+		}
+	}
+
+	public void setProperties() {
+		// Nothing to do
+	}
 
 }

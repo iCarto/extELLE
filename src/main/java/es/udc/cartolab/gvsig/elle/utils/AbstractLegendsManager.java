@@ -26,70 +26,68 @@ import org.gvsig.fmap.mapcontext.layers.vectorial.FLyrVect;
 import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 import es.udc.cartolab.gvsig.elle.gui.wizard.save.LayerProperties;
 
-
-
 public abstract class AbstractLegendsManager {
 
-    protected ArrayList<LayerProperties> layers;
-    protected ArrayList<FLyrVect> overviewLayers;
-    private String legendGroupName;
+	protected ArrayList<LayerProperties> layers;
+	protected ArrayList<FLyrVect> overviewLayers;
+	private String legendGroupName;
 
-    public AbstractLegendsManager(String legendGroupName) {
-	layers = new ArrayList<LayerProperties>();
-	overviewLayers = new ArrayList<FLyrVect>();
-	this.legendGroupName = legendGroupName;
-    }
-
-    public void setLeyendGroupName(String legendGroupName) {
-	this.legendGroupName = legendGroupName;
-    }
-
-    public String getLegendGroupName() {
-	return this.legendGroupName;
-    }
-
-    public void addLayer(LayerProperties layer) {
-	layers.add(layer);
-    }
-
-    public void addLayers(List<LayerProperties> layers) {
-	layers.addAll(layers);
-    }
-
-    public void addOverviewLayer(FLyrVect layer) {
-	overviewLayers.add(layer);
-    }
-
-    public void addOverviewLayers(FLayers layers) {
-	for (int i=0; i<layers.getLayersCount(); i++) {
-	    if (layers.getLayer(i) instanceof FLyrVect) {
-		overviewLayers.add((FLyrVect) layers.getLayer(i));
-	    }
+	public AbstractLegendsManager(String legendGroupName) {
+		layers = new ArrayList<LayerProperties>();
+		overviewLayers = new ArrayList<FLyrVect>();
+		this.legendGroupName = legendGroupName;
 	}
-    }
 
-    public abstract void loadLegends();
+	public void setLeyendGroupName(String legendGroupName) {
+		this.legendGroupName = legendGroupName;
+	}
 
-    public abstract void loadOverviewLegends();
+	public String getLegendGroupName() {
+		return this.legendGroupName;
+	}
 
-    public abstract void saveOverviewLegends(String type) throws WizardException;
+	public void addLayer(LayerProperties layer) {
+		layers.add(layer);
+	}
 
-    public abstract void saveLegends() throws WizardException;
+	public void addLayers(List<LayerProperties> layers) {
+		layers.addAll(layers);
+	}
 
-    public abstract boolean exists();
+	public void addOverviewLayer(FLyrVect layer) {
+		overviewLayers.add(layer);
+	}
 
-    public abstract boolean canRead();
+	public void addOverviewLayers(FLayers layers) {
+		for (int i = 0; i < layers.getLayersCount(); i++) {
+			if (layers.getLayer(i) instanceof FLyrVect) {
+				overviewLayers.add((FLyrVect) layers.getLayer(i));
+			}
+		}
+	}
 
-    public abstract boolean canWrite();
+	public abstract void loadLegends();
 
-    /**
-     * Returns a question to ask to the user before saving. Null if none.
-     */
-    public abstract String getConfirmationMessage();
+	public abstract void loadOverviewLegends();
 
-    /**
-     * Prepares the infrastructure before saving.
-     */
-    public abstract void prepare() throws WizardException;
+	public abstract void saveOverviewLegends(String type) throws WizardException;
+
+	public abstract void saveLegends() throws WizardException;
+
+	public abstract boolean exists();
+
+	public abstract boolean canRead();
+
+	public abstract boolean canWrite();
+
+	/**
+	 * Returns a question to ask to the user before saving. Null if none.
+	 */
+	public abstract String getConfirmationMessage();
+
+	/**
+	 * Prepares the infrastructure before saving.
+	 */
+	public abstract void prepare() throws WizardException;
 
 }

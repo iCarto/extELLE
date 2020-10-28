@@ -30,43 +30,41 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 import es.udc.cartolab.gvsig.elle.gui.wizard.load.LoadMapWizard;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
-public class LoadMapExtension extends Extension  {
+public class LoadMapExtension extends Extension {
 
-    
+	public void execute(String actionCommand) {
+		IView view = Andami.createViewIfNeeded(_("elle_view"), null);
+		WizardWindow wizard = new LoadMapWizard(view);
+		wizard.open();
+	}
 
-    public void execute(String actionCommand) {
-    	IView view = Andami.createViewIfNeeded(_("elle_view"), null);
-	WizardWindow wizard = new LoadMapWizard(view);
-	wizard.open();
-    }
+	public void initialize() {
+		registerIcons();
+	}
 
-    public void initialize() {
-	registerIcons();
-    }
-    
-    protected void registerIcons() {
+	protected void registerIcons() {
 		final String id = this.getClass().getName();
 		IconThemeHelper.registerIcon("action", id, this);
 	}
 
-    public boolean isEnabled() {
-	if (DBSession.isActive() && canUseELLE()) {
-	    return true;
+	public boolean isEnabled() {
+		if (DBSession.isActive() && canUseELLE()) {
+			return true;
+		}
+		return false;
 	}
-	return false;
-    }
 
-    private boolean canUseELLE() {
-	DBSession dbs = DBSession.getCurrentSession();
-	try {
-	    return dbs.getDBUser().canUseSchema(DBStructure.SCHEMA_NAME);
-	} catch (SQLException e) {
-	    return false;
+	private boolean canUseELLE() {
+		DBSession dbs = DBSession.getCurrentSession();
+		try {
+			return dbs.getDBUser().canUseSchema(DBStructure.SCHEMA_NAME);
+		} catch (SQLException e) {
+			return false;
+		}
 	}
-    }
 
-    public boolean isVisible() {
-	return true;
-    }
+	public boolean isVisible() {
+		return true;
+	}
 
 }

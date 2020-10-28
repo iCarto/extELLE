@@ -18,8 +18,6 @@ package es.udc.cartolab.gvsig.elle.gui.wizard.save;
 
 import java.sql.SQLException;
 
-import org.gvsig.fmap.dal.DataStoreParameters;
-import org.gvsig.fmap.dal.store.db.DBStoreParameters;
 import org.gvsig.fmap.dal.store.jdbc.JDBCStoreParameters;
 import org.gvsig.fmap.mapcontext.layers.vectorial.FLyrVect;
 
@@ -27,128 +25,127 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardException;
 
 public class LayerProperties implements Comparable {
 
-
-    private String schema, tablename, layername;
-    private FLyrVect layer;
-    private String group = "";
-    private String sqlWhere = "";
-    private boolean save = true, visible = false;
-    private double maxScale = -1, minScale = -1;
-    private int position;
-    private String legendType;
+	private String schema, tablename, layername;
+	private FLyrVect layer;
+	private String group = "";
+	private String sqlWhere = "";
+	private boolean save = true, visible = false;
+	private double maxScale = -1, minScale = -1;
+	private int position;
+	private String legendType;
 	private String username;
 
-
-    public LayerProperties(FLyrVect layer) throws WizardException {
-    	JDBCStoreParameters parameters = (JDBCStoreParameters) layer.getDataStore().getParameters();
-	    this.layer = layer;
-	    this.schema = parameters.getSchema();
-	    this.tablename = parameters.getTable();
-	    this.username = parameters.getUser();
-	    this.layername = layer.getName();
-    }
-
-    public LayerProperties(String schema, String tablename, String layername) {
-
-	this.schema = schema;
-	this.tablename = tablename;
-	this.layername = layername;
-
-    }
-
-    public String getSchema() {
-	return schema;
-    }
-
-    public String getTablename() {
-	return tablename;
-    }
-
-    public String getUserName() throws SQLException {
-    	return username;
-    }
-
-    public FLyrVect getLayer() {
-	return layer;
-    }
-
-    /**
-     * It returns the layer name on the current view.
-     * @return
-     */
-    public String getLayername() {
-	return layername;
-    }
-
-    public boolean save() {
-	return save;
-    }
-
-    public void setSave(boolean save) {
-	this.save = save;
-    }
-
-    public boolean visible() {
-	return visible;
-    }
-
-    public void setVisible(boolean visible) {
-	this.visible = visible;
-    }
-
-    public String getGroup() {
-	return group;
-    }
-
-    public void setGroup(String group) {
-	this.group = group;
-    }
-
-    public double getMaxScale() {
-	return maxScale;
-    }
-
-    public void setMaxScale(double maxScale) {
-	this.maxScale = maxScale;
-    }
-
-    public double getMinScale() {
-	return minScale;
-    }
-
-    public void setMinScale(double minScale) {
-	this.minScale = minScale;
-    }
-
-    public int getPosition() {
-	return position;
-    }
-
-    public void setPosition(int position) {
-	this.position = position;
-    }
-
-    public void setLegendType(String type) {
-	legendType = type;
-    }
-
-    public String getLegendType() {
-	return legendType;
-    }
-
-    public void setWhere(String sqlWhere) {
-	this.sqlWhere = sqlWhere;
-    }
-
-    public String getWhere() {
-	return this.sqlWhere;
-    }
-
-    public int compareTo(Object o) {
-	if (o instanceof LayerProperties) {
-	    LayerProperties lp = (LayerProperties) o;
-	    return position - lp.getPosition();
+	public LayerProperties(FLyrVect layer) throws WizardException {
+		JDBCStoreParameters parameters = (JDBCStoreParameters) layer.getDataStore().getParameters();
+		this.layer = layer;
+		this.schema = parameters.getSchema();
+		this.tablename = parameters.getTable();
+		this.username = parameters.getUser();
+		this.layername = layer.getName();
 	}
-	return 0;
-    }
+
+	public LayerProperties(String schema, String tablename, String layername) {
+
+		this.schema = schema;
+		this.tablename = tablename;
+		this.layername = layername;
+
+	}
+
+	public String getSchema() {
+		return schema;
+	}
+
+	public String getTablename() {
+		return tablename;
+	}
+
+	public String getUserName() throws SQLException {
+		return username;
+	}
+
+	public FLyrVect getLayer() {
+		return layer;
+	}
+
+	/**
+	 * It returns the layer name on the current view.
+	 * 
+	 * @return
+	 */
+	public String getLayername() {
+		return layername;
+	}
+
+	public boolean save() {
+		return save;
+	}
+
+	public void setSave(boolean save) {
+		this.save = save;
+	}
+
+	public boolean visible() {
+		return visible;
+	}
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	public double getMaxScale() {
+		return maxScale;
+	}
+
+	public void setMaxScale(double maxScale) {
+		this.maxScale = maxScale;
+	}
+
+	public double getMinScale() {
+		return minScale;
+	}
+
+	public void setMinScale(double minScale) {
+		this.minScale = minScale;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+
+	public void setLegendType(String type) {
+		legendType = type;
+	}
+
+	public String getLegendType() {
+		return legendType;
+	}
+
+	public void setWhere(String sqlWhere) {
+		this.sqlWhere = sqlWhere;
+	}
+
+	public String getWhere() {
+		return this.sqlWhere;
+	}
+
+	public int compareTo(Object o) {
+		if (o instanceof LayerProperties) {
+			LayerProperties lp = (LayerProperties) o;
+			return position - lp.getPosition();
+		}
+		return 0;
+	}
 }

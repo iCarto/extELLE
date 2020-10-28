@@ -16,10 +16,8 @@
  */
 package es.udc.cartolab.gvsig.elle.gui.wizard.load;
 
-
 import static es.icarto.gvsig.commons.i18n.I18n._;
 
-import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.ui.mdiManager.WindowInfo;
 import org.gvsig.app.project.documents.view.gui.IView;
 
@@ -28,34 +26,33 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 @SuppressWarnings("serial")
 public class LoadMapWizard extends WizardWindow {
 
-    private WindowInfo viewInfo;
+	private WindowInfo viewInfo;
 
-    public LoadMapWizard(IView view) {
-	super();
-	properties.put(LoadMapWizardComponent.PROPERTY_VEW, view);
-    }
-
-    @Override
-    public WindowInfo getWindowInfo() {
-	if (viewInfo == null) {
-	    viewInfo = new WindowInfo(WindowInfo.MODELESSDIALOG
-		    | WindowInfo.PALETTE);
-	    viewInfo.setTitle(_("load_map"));
-	    viewInfo.setWidth(525);
-	    viewInfo.setHeight(520);
+	public LoadMapWizard(IView view) {
+		super();
+		properties.put(LoadMapWizardComponent.PROPERTY_VEW, view);
 	}
-	return viewInfo;
-    }
 
-    @Override
-    public Object getWindowProfile() {
-	return WindowInfo.DIALOG_PROFILE;
-    }
+	@Override
+	public WindowInfo getWindowInfo() {
+		if (viewInfo == null) {
+			viewInfo = new WindowInfo(WindowInfo.MODELESSDIALOG | WindowInfo.PALETTE);
+			viewInfo.setTitle(_("load_map"));
+			viewInfo.setWidth(525);
+			viewInfo.setHeight(520);
+		}
+		return viewInfo;
+	}
 
-    @Override
-    protected void addWizardComponents() {
-	views.add(new LoadMapWizardComponent(properties));
-	views.add(new LoadLegendWizardComponent(properties));
-    }
+	@Override
+	public Object getWindowProfile() {
+		return WindowInfo.DIALOG_PROFILE;
+	}
+
+	@Override
+	protected void addWizardComponents() {
+		views.add(new LoadMapWizardComponent(properties));
+		views.add(new LoadLegendWizardComponent(properties));
+	}
 
 }

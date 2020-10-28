@@ -19,27 +19,17 @@ package es.udc.cartolab.gvsig.elle.utils;
 
 import static es.icarto.gvsig.commons.i18n.I18n._;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Iterator;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.gvsig.andami.PluginServices;
-import org.gvsig.andami.PluginsManager;
 import org.gvsig.fmap.dal.exception.DataException;
 import org.gvsig.fmap.mapcontext.layers.vectorial.FLyrVect;
 import org.gvsig.fmap.mapcontext.rendering.legend.ILegend;
 import org.gvsig.fmap.mapcontext.rendering.legend.styling.ILabelingStrategy;
 import org.gvsig.tools.ToolsLocator;
 import org.gvsig.tools.persistence.PersistenceManager;
-import org.gvsig.tools.persistence.PersistentState;
-import org.gvsig.tools.persistence.exception.PersistenceException;
 import org.gvsig.tools.persistence.xml.XMLPersistenceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,34 +41,32 @@ import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 public class DBLegendsManager extends AbstractLegendsManager {
 
-    
-	private static final Logger logger = LoggerFactory
-			.getLogger(DBLegendsManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(DBLegendsManager.class);
 
-    private boolean tableStylesExists, tableOvStylesExists;
-    private String schema, styleTable = DBStructure.getMapStyleTable(), styleOvTable = DBStructure.getOverviewStyleTable();
+	private boolean tableStylesExists, tableOvStylesExists;
+	private String schema, styleTable = DBStructure.getMapStyleTable(),
+			styleOvTable = DBStructure.getOverviewStyleTable();
 	private final XMLPersistenceManager persistenceManager;
 
+	public DBLegendsManager(String leyendGroupName) throws WizardException {
+		super(leyendGroupName);
+		this.persistenceManager = initXMLPersistenceManager();
 
-    public DBLegendsManager(String leyendGroupName) throws WizardException {
-	super(leyendGroupName);
-	this.persistenceManager = initXMLPersistenceManager();
-	
-	try {
-		DBSession dbs = DBSession.getCurrentSession();
-		tableStylesExists = dbs.tableExists(DBStructure.getSchema(), styleTable);
-		tableOvStylesExists = dbs.tableExists(DBStructure.getSchema(), styleOvTable);
-		schema = DBStructure.getSchema();
-	} catch (RuntimeException e) {
-		throw new WizardException(e);
+		try {
+			DBSession dbs = DBSession.getCurrentSession();
+			tableStylesExists = dbs.tableExists(DBStructure.getSchema(), styleTable);
+			tableOvStylesExists = dbs.tableExists(DBStructure.getSchema(), styleOvTable);
+			schema = DBStructure.getSchema();
+		} catch (RuntimeException e) {
+			throw new WizardException(e);
+		}
+
 	}
 
-    }
+	public void loadLegends() {
+		// TODO Auto-generated method stub
 
-    public void loadLegends() {
-	// TODO Auto-generated method stub
-
-    }
+	}
 
 	public void prepare() throws WizardException {
 		DBSession dbs = DBSession.getCurrentSession();
@@ -96,66 +84,61 @@ public class DBLegendsManager extends AbstractLegendsManager {
 
 	}
 
-    private void saveLeyend(FLyrVect layer, String layerName, String table, String type) throws WizardException {
+	private void saveLeyend(FLyrVect layer, String layerName, String table, String type) throws WizardException {
 
-	DBSession dbs = DBSession.getCurrentSession();
-	try {
-	    String symbology = getSymbologyAsXML(layer, type, persistenceManager);
-	    String label = getLabelAsXML(layer, persistenceManager);
-	    
-		String[] row = {
-		    layer.getName(),
-		    getLegendGroupName(),
-		    type,
-		    symbology,
-		    label
-		};
-		dbs.insertRow(DBStructure.getSchema(), table, row);
-	    
-	} catch (SQLException e) {
-	    throw new WizardException(e);
-	} 
-    }
+		DBSession dbs = DBSession.getCurrentSession();
+		try {
+			String symbology = getSymbologyAsXML(layer, type, persistenceManager);
+			String label = getLabelAsXML(layer, persistenceManager);
 
-    private String getLabelAsXML(FLyrVect layer, PersistenceManager manager) {
-	String label = null;
-	if (layer.isLabeled()) {
-	    final ILabelingStrategy labelingStrategy = layer.getLabelingStrategy();
-	    if (labelingStrategy != null) {
-	    	label = serializeObject(labelingStrategy, manager);
-	    }
+			String[] row = { layer.getName(), getLegendGroupName(), type, symbology, label };
+			dbs.insertRow(DBStructure.getSchema(), table, row);
+
+		} catch (SQLException e) {
+			throw new WizardException(e);
+		}
 	}
-	return label;
-    }
-    
-    private XMLPersistenceManager initXMLPersistenceManager() {
-    	PersistenceManager defaultManager = ToolsLocator.getPersistenceManager();
-    	XMLPersistenceManager manager = new XMLPersistenceManager();
-    	// Al crear el XMLPersistenceManager de esta forma no están instanciadas
-    	// en el manager las factorias que hacen falta para crear el state así
-    	// que las cogemos del ZIPXMLPersistenceManager
+
+	private String getLabelAsXML(FLyrVect layer, PersistenceManager manager) {
+		String label = null;
+		if (layer.isLabeled()) {
+			final ILabelingStrategy labelingStrategy = layer.getLabelingStrategy();
+			if (labelingStrategy != null) {
+				label = serializeObject(labelingStrategy, manager);
+			}
+		}
+		return label;
+	}
+
+	private XMLPersistenceManager initXMLPersistenceManager() {
+		PersistenceManager defaultManager = ToolsLocator.getPersistenceManager();
+		XMLPersistenceManager manager = new XMLPersistenceManager();
+		// Al crear el XMLPersistenceManager de esta forma no están instanciadas
+		// en el manager las factorias que hacen falta para crear el state así
+		// que las cogemos del ZIPXMLPersistenceManager
 		Iterator it = defaultManager.getFactories().iterator();
 		while (it.hasNext()) {
-			manager.registerFactory((org.gvsig.tools.persistence.PersistenceFactory)it.next()); 
+			manager.registerFactory((org.gvsig.tools.persistence.PersistenceFactory) it.next());
 		}
 		return manager;
-    }
-    private String serializeObject(Object o, PersistenceManager manager) {
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	manager.putObject(baos, o);
-    	try {
+	}
+
+	private String serializeObject(Object o, PersistenceManager manager) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		manager.putObject(baos, o);
+		try {
 			return baos.toString("UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			logger.error(e.getMessage(), e);
 		}
-    	return "";
-    }
+		return "";
+	}
 
-    // TODO. Only default gvsig simbology is supported
-    private String getSymbologyAsXML(FLyrVect layer, String type, PersistenceManager manager) {
-    	ILegend legend = layer.getLegend();
-    	return serializeObject(legend, manager);
-    }
+	// TODO. Only default gvsig simbology is supported
+	private String getSymbologyAsXML(FLyrVect layer, String type, PersistenceManager manager) {
+		ILegend legend = layer.getLegend();
+		return serializeObject(legend, manager);
+	}
 
 	public void saveLegends() throws WizardException {
 		for (LayerProperties lp : layers) {
@@ -163,31 +146,31 @@ public class DBLegendsManager extends AbstractLegendsManager {
 		}
 	}
 
-    public boolean exists() {
-	try {
-	    return tableStylesExists && LoadLegend.legendExistsDB(getLegendGroupName());
-	} catch (SQLException e) {
-	    try {
-		DBSession.reconnect();
-	    } catch (DataException e1) {
-	    	logger.error(e1.getMessage(), e1);
-	    }
-	    return false;
+	public boolean exists() {
+		try {
+			return tableStylesExists && LoadLegend.legendExistsDB(getLegendGroupName());
+		} catch (SQLException e) {
+			try {
+				DBSession.reconnect();
+			} catch (DataException e1) {
+				logger.error(e1.getMessage(), e1);
+			}
+			return false;
+		}
 	}
-    }
 
-    public boolean canRead() {
-	// TODO canRead
-	return true;
-    }
+	public boolean canRead() {
+		// TODO canRead
+		return true;
+	}
 
-    public boolean canWrite() {
-	// TODO canWrite
-	return true;
-    }
+	public boolean canWrite() {
+		// TODO canWrite
+		return true;
+	}
 
-    public void loadOverviewLegends() {
-    }
+	public void loadOverviewLegends() {
+	}
 
 	public void saveOverviewLegends(String type) throws WizardException {
 		for (FLyrVect layer : overviewLayers) {
@@ -195,12 +178,12 @@ public class DBLegendsManager extends AbstractLegendsManager {
 		}
 	}
 
-    public String getConfirmationMessage() {
-	if (!tableStylesExists || !tableOvStylesExists) {
-	    return _("tables_will_be_created", schema);
-	} else {
-	    return null;
+	public String getConfirmationMessage() {
+		if (!tableStylesExists || !tableOvStylesExists) {
+			return _("tables_will_be_created", schema);
+		} else {
+			return null;
+		}
 	}
-    }
 
 }

@@ -31,172 +31,165 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.ui.mdiManager.IWindow;
 import org.gvsig.andami.ui.mdiManager.MDIManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
-public abstract class WizardWindow extends JPanel implements IWindow,
-	WizardListener, ActionListener {
+public abstract class WizardWindow extends JPanel implements IWindow, WizardListener, ActionListener {
 
-    
-	private static final Logger logger = LoggerFactory
-			.getLogger(WizardWindow.class);
-    protected JButton nextButton, prevButton, cancelButton, finishButton;
-    private JPanel mainPanel;
-    protected List<WizardComponent> views = new ArrayList<WizardComponent>();
-    protected int currentPos;
-    protected Map<String, Object> properties = new HashMap<String, Object>();
+	private static final Logger logger = LoggerFactory.getLogger(WizardWindow.class);
+	protected JButton nextButton, prevButton, cancelButton, finishButton;
+	private JPanel mainPanel;
+	protected List<WizardComponent> views = new ArrayList<WizardComponent>();
+	protected int currentPos;
+	protected Map<String, Object> properties = new HashMap<String, Object>();
 
-    public WizardWindow() {
-	super(new BorderLayout(5, 5));
-	nextButton = new JButton(_("next"));
-	nextButton.addActionListener(this);
-	prevButton = new JButton(_("previous"));
-	prevButton.addActionListener(this);
-	cancelButton = new JButton(_("cancel"));
-	cancelButton.addActionListener(this);
-	finishButton = new JButton(_("finish"));
-	finishButton.addActionListener(this);
+	public WizardWindow() {
+		super(new BorderLayout(5, 5));
+		nextButton = new JButton(_("next"));
+		nextButton.addActionListener(this);
+		prevButton = new JButton(_("previous"));
+		prevButton.addActionListener(this);
+		cancelButton = new JButton(_("cancel"));
+		cancelButton.addActionListener(this);
+		finishButton = new JButton(_("finish"));
+		finishButton.addActionListener(this);
 
-	addWizardComponents();
+		addWizardComponents();
 
-    }
-
-    public WizardWindow(List<WizardComponent> views) {
-	this();
-	this.views = views;
-    }
-
-    protected abstract void addWizardComponents();
-
-    public void open() {
-
-	mainPanel = getMainPanel();
-	changeView(0);
-
-	add(mainPanel, BorderLayout.CENTER);
-	add(getSouthPanel(), BorderLayout.SOUTH);
-	MDIManagerFactory.getManager().addCentredWindow(this);
-    }
-
-    private JPanel getMainPanel() {
-	JPanel panel = new JPanel(new CardLayout());
-
-	for (WizardComponent view : views) {
-	    panel.add(view, view.getWizardComponentName());
 	}
 
-	return panel;
-    }
+	public WizardWindow(List<WizardComponent> views) {
+		this();
+		this.views = views;
+	}
 
-    private JPanel getSouthPanel() {
+	protected abstract void addWizardComponents();
 
-	JPanel panel = new JPanel();
-	panel.add(cancelButton);
-	panel.add(prevButton);
-	panel.add(nextButton);
-	panel.add(finishButton);
-	return panel;
-    }
+	public void open() {
 
-    private void changeView(int position) {
-	try {
-	    if (position >= 0 && position < views.size()) {
-		views.get(currentPos).removeWizardListener(this);
-		currentPos = position;
-		WizardComponent newView = views.get(currentPos);
-		newView.addWizardListener(this);
-		CardLayout cl = (CardLayout) mainPanel.getLayout();
-		cl.show(mainPanel, newView.getWizardComponentName());
-		newView.showComponent();
+		mainPanel = getMainPanel();
+		changeView(0);
+
+		add(mainPanel, BorderLayout.CENTER);
+		add(getSouthPanel(), BorderLayout.SOUTH);
+		MDIManagerFactory.getManager().addCentredWindow(this);
+	}
+
+	private JPanel getMainPanel() {
+		JPanel panel = new JPanel(new CardLayout());
+
+		for (WizardComponent view : views) {
+			panel.add(view, view.getWizardComponentName());
+		}
+
+		return panel;
+	}
+
+	private JPanel getSouthPanel() {
+
+		JPanel panel = new JPanel();
+		panel.add(cancelButton);
+		panel.add(prevButton);
+		panel.add(nextButton);
+		panel.add(finishButton);
+		return panel;
+	}
+
+	private void changeView(int position) {
+		try {
+			if (position >= 0 && position < views.size()) {
+				views.get(currentPos).removeWizardListener(this);
+				currentPos = position;
+				WizardComponent newView = views.get(currentPos);
+				newView.addWizardListener(this);
+				CardLayout cl = (CardLayout) mainPanel.getLayout();
+				cl.show(mainPanel, newView.getWizardComponentName());
+				newView.showComponent();
+				updateButtons();
+			}
+		} catch (WizardException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	public void updateButtons() {
+		if (views.size() < 2) {
+			prevButton.setVisible(false);
+			nextButton.setVisible(false);
+			finishButton.setText(_("ok"));
+		}
+		WizardComponent currentView = views.get(currentPos);
+		int nViews = views.size();
+		nextButton.setEnabled(currentPos != nViews - 1 && currentView.canNext());
+		prevButton.setEnabled(currentPos > 0);
+		finishButton.setEnabled(currentView.canFinish());
+	}
+
+	@Override
+	public void wizardChanged() {
 		updateButtons();
-	    }
-	} catch (WizardException e) {
-	    logger.error(e.getMessage(), e);
 	}
-    }
 
-    public void updateButtons() {
-	if (views.size() < 2) {
-	    prevButton.setVisible(false);
-	    nextButton.setVisible(false);
-	    finishButton.setText(_("ok"));
+	public void close() {
+		MDIManagerFactory.getManager().closeWindow(this);
 	}
-	WizardComponent currentView = views.get(currentPos);
-	int nViews = views.size();
-	nextButton
-		.setEnabled(currentPos != nViews - 1 && currentView.canNext());
-	prevButton.setEnabled(currentPos > 0);
-	finishButton.setEnabled(currentView.canFinish());
-    }
 
-    @Override
-    public void wizardChanged() {
-	updateButtons();
-    }
-
-    public void close() {
-    	MDIManagerFactory.getManager().closeWindow(this);
-    }
-
-    protected void finish() {
-	boolean close = true;
-	try {
-	    for (WizardComponent wc : views) {
-		wc.finish();
-	    }
-	} catch (WizardException e) {
-	    close = e.closeWizard();
-	    if (e.showMessage()) {
-		JOptionPane.showMessageDialog(this, e.getMessage(), "",
-			JOptionPane.ERROR_MESSAGE);
-	    }
-	    logger.error(e.getMessage(), e);
+	protected void finish() {
+		boolean close = true;
+		try {
+			for (WizardComponent wc : views) {
+				wc.finish();
+			}
+		} catch (WizardException e) {
+			close = e.closeWizard();
+			if (e.showMessage()) {
+				JOptionPane.showMessageDialog(this, e.getMessage(), "", JOptionPane.ERROR_MESSAGE);
+			}
+			logger.error(e.getMessage(), e);
+		}
+		if (close) {
+			close();
+		}
 	}
-	if (close) {
-	    close();
-	}
-    }
 
-    protected void next() {
-	try {
-	    views.get(currentPos).setProperties();
-	    changeView(currentPos + 1);
-	    views.get(currentPos).showComponent();
-	} catch (WizardException e) {
-	    JOptionPane.showMessageDialog(this, e.getMessage(), "",
-		    JOptionPane.ERROR_MESSAGE);
+	protected void next() {
+		try {
+			views.get(currentPos).setProperties();
+			changeView(currentPos + 1);
+			views.get(currentPos).showComponent();
+		} catch (WizardException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(), "", JOptionPane.ERROR_MESSAGE);
+		}
 	}
-    }
 
-    protected void previous() {
-	changeView(currentPos - 1);
-    }
+	protected void previous() {
+		changeView(currentPos - 1);
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-	if (e.getSource() == cancelButton) {
-	    close();
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == cancelButton) {
+			close();
+		}
+		if (e.getSource() == prevButton) {
+			previous();
+		}
+		if (e.getSource() == nextButton) {
+			next();
+		}
+		if (e.getSource() == finishButton) {
+			finish();
+		}
 	}
-	if (e.getSource() == prevButton) {
-	    previous();
-	}
-	if (e.getSource() == nextButton) {
-	    next();
-	}
-	if (e.getSource() == finishButton) {
-	    finish();
-	}
-    }
 
-    public void add(WizardComponent component) {
-	views.add(component);
-    }
+	public void add(WizardComponent component) {
+		views.add(component);
+	}
 
-    public void remove(WizardComponent component) {
-	views.remove(component);
-    }
+	public void remove(WizardComponent component) {
+		views.remove(component);
+	}
 }

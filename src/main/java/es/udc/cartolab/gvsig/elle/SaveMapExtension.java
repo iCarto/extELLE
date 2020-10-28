@@ -19,7 +19,6 @@ package es.udc.cartolab.gvsig.elle;
 import java.sql.SQLException;
 
 import org.gvsig.andami.IconThemeHelper;
-import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.plugins.Extension;
 import org.gvsig.andami.ui.mdiManager.MDIManagerFactory;
 import org.gvsig.app.project.documents.view.gui.IView;
@@ -32,54 +31,49 @@ import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 public class SaveMapExtension extends Extension {
 
+	public void execute(String actionCommand) {
+		IView view = (IView) MDIManagerFactory.getManager().getActiveWindow();
+		WizardWindow wizard = new SaveMapWizard(view);
+		wizard.open();
+	}
 
-    public void execute(String actionCommand) {
-	IView view = (IView) MDIManagerFactory.getManager().getActiveWindow();
-	WizardWindow wizard = new SaveMapWizard(view);
-	wizard.open();
-    }
+	public void initialize() {
+		registerIcons();
+	}
 
-
-    public void initialize() {
-	registerIcons();
-    }
-    
-    protected void registerIcons() {
+	protected void registerIcons() {
 		final String id = this.getClass().getName();
 		IconThemeHelper.registerIcon("action", id, this);
 	}
 
-    public boolean isEnabled() {
-	if (DBSession.isActive()
-		&& canUseELLE()
-		&& activeWindowIsIWindow()
-		&& areLayersInTOC()) {
-	    return true;
+	public boolean isEnabled() {
+		if (DBSession.isActive() && canUseELLE() && activeWindowIsIWindow() && areLayersInTOC()) {
+			return true;
+		}
+		return false;
 	}
-	return false;
-    }
 
-    private boolean canUseELLE() {
-	DBSession dbs = DBSession.getCurrentSession();
-	try {
-	    return dbs.getDBUser().canUseSchema(DBStructure.SCHEMA_NAME);
-	} catch (SQLException e) {
-	    return false;
+	private boolean canUseELLE() {
+		DBSession dbs = DBSession.getCurrentSession();
+		try {
+			return dbs.getDBUser().canUseSchema(DBStructure.SCHEMA_NAME);
+		} catch (SQLException e) {
+			return false;
+		}
 	}
-    }
 
-    private boolean activeWindowIsIWindow() {
-	return MDIManagerFactory.getManager().getActiveWindow() instanceof IView;
-    }
+	private boolean activeWindowIsIWindow() {
+		return MDIManagerFactory.getManager().getActiveWindow() instanceof IView;
+	}
 
-    private boolean areLayersInTOC() {
-    	IView view = ((IView) MDIManagerFactory.getManager().getActiveWindow());
-	FLayers layers = view.getMapControl().getMapContext().getLayers();
-	return layers.getLayersCount() > 0;
-    }
+	private boolean areLayersInTOC() {
+		IView view = ((IView) MDIManagerFactory.getManager().getActiveWindow());
+		FLayers layers = view.getMapControl().getMapContext().getLayers();
+		return layers.getLayersCount() > 0;
+	}
 
-    public boolean isVisible() {
-	return true;
-    }
+	public boolean isVisible() {
+		return true;
+	}
 
 }

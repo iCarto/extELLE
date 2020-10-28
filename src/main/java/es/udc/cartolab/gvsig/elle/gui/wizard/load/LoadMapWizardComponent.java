@@ -33,7 +33,6 @@ import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.gvsig.andami.PluginServices;
 import org.gvsig.app.addlayer.AddLayerDialog;
 import org.gvsig.app.gui.panels.CRSSelectPanel;
 import org.gvsig.app.project.documents.view.gui.IView;
@@ -52,188 +51,181 @@ import es.udc.cartolab.gvsig.elle.utils.MapDAO;
 import es.udc.cartolab.gvsig.users.utils.DBSession;
 
 public class LoadMapWizardComponent extends WizardComponent implements ActionListener {
-	
-	
-	private static final Logger logger = LoggerFactory
-			.getLogger(LoadMapWizardComponent.class);
 
-    protected CRSSelectPanel crsPanel = null;
-    protected JList mapList;
-    private DBSession dbs;
-    private JPanel listPanel;
-    private JTextArea layerTextArea;
-    private String[][] layers;
+	private static final Logger logger = LoggerFactory.getLogger(LoadMapWizardComponent.class);
 
-    public final static String PROPERTY_VEW = "view";
-    public static final String PROPERTY_MAP_NAME = "property_map_name";
+	protected CRSSelectPanel crsPanel = null;
+	protected JList mapList;
+	private DBSession dbs;
+	private JPanel listPanel;
+	private JTextArea layerTextArea;
+	private String[][] layers;
 
-    public LoadMapWizardComponent(Map<String, Object> properties) {
-	super(properties);
+	public final static String PROPERTY_VEW = "view";
+	public static final String PROPERTY_MAP_NAME = "property_map_name";
 
-	dbs = DBSession.getCurrentSession();
-
-	setLayout(new BorderLayout());
-
-	add(getListPanel(), BorderLayout.CENTER);
-	add(getCRSPanel(), BorderLayout.SOUTH);
-    }
-
-    public boolean canFinish() {
-	return false;
-    }
-
-    public boolean canNext() {
-	if (mapList!=null) {
-	    return mapList.getSelectedIndices().length == 1;
-	}
-	return false;
-    }
-
-
-    public void actionPerformed(ActionEvent e) {
-	callStateChanged();
-    }
-
-    private JPanel getCRSPanel() {
-	if (crsPanel == null) {
-	    crsPanel = CRSSelectPanel.getPanel(AddLayerDialog.getLastProjection());
-	    crsPanel.addActionListener(new java.awt.event.ActionListener() {
-		public void actionPerformed(java.awt.event.ActionEvent e) {
-		    if (crsPanel.isOkPressed()) {
-			AddLayerDialog.setLastProjection(crsPanel.getCurProj());
-		    }
-		}
-	    });
-	}
-	return crsPanel;
-    }
-
-    private JPanel getListPanel() {
-	if (listPanel == null) {
-
-	    listPanel = new JPanel();
-
-	    try {
-
-		 InputStream stream = getClass().getClassLoader()
-			    .getResourceAsStream("forms/loadMap.jfrm");
-		FormPanel form = new FormPanel(stream);
-		form.setFocusTraversalPolicyProvider(true);
-
-		listPanel.add(form);
+	public LoadMapWizardComponent(Map<String, Object> properties) {
+		super(properties);
 
 		dbs = DBSession.getCurrentSession();
 
-		if (dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapTable()) && dbs.tableExists(DBStructure.getSchema(), DBStructure.getOverviewTable())) {
+		setLayout(new BorderLayout());
 
-		    String[] maps = MapDAO.getInstance().getMaps();
+		add(getListPanel(), BorderLayout.CENTER);
+		add(getCRSPanel(), BorderLayout.SOUTH);
+	}
 
-		    //layerList = form.getList("layerList");
-		    mapList = form.getList("mapList");
-		    mapList.setListData(maps);
+	public boolean canFinish() {
+		return false;
+	}
 
-		    layerTextArea = (JTextArea) form.getComponentByName("layerTextArea");
-		    layerTextArea.setEditable(false);
+	public boolean canNext() {
+		if (mapList != null) {
+			return mapList.getSelectedIndices().length == 1;
+		}
+		return false;
+	}
 
-		    JLabel mapLabel = form.getLabel("mapLabel");
-		    JLabel layerLabel = form.getLabel("layerLabel");
+	public void actionPerformed(ActionEvent e) {
+		callStateChanged();
+	}
 
-		    mapLabel.setText(_("map_load"));
-		    layerLabel.setText(_("layer_load"));
+	private JPanel getCRSPanel() {
+		if (crsPanel == null) {
+			crsPanel = CRSSelectPanel.getPanel(AddLayerDialog.getLastProjection());
+			crsPanel.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					if (crsPanel.isOkPressed()) {
+						AddLayerDialog.setLastProjection(crsPanel.getCurProj());
+					}
+				}
+			});
+		}
+		return crsPanel;
+	}
 
-		    mapList.addListSelectionListener(new ListSelectionListener() {
+	private JPanel getListPanel() {
+		if (listPanel == null) {
 
-			public void valueChanged(ListSelectionEvent arg0) {
-			    int[] selected = mapList.getSelectedIndices();
-			    callStateChanged();
+			listPanel = new JPanel();
 
-			    if (selected.length == 1) {
-				String selectedValue = (String) mapList.getSelectedValues()[0];
-				String where = String.format("WHERE mapa = '%s'", selectedValue);
-				try {
-				    layers = dbs.getTable(DBStructure.getMapTable(), DBStructure.getSchema(), where, new String[]{"posicion"}, true);
-				    String layerText = "";
-				    for (int i=0; i<layers.length; i++) {
-					layerText = layerText + layers[i][1] + "\n";
-				    }
+			try {
 
-				    layerTextArea.setText(layerText);
+				InputStream stream = getClass().getClassLoader().getResourceAsStream("forms/loadMap.jfrm");
+				FormPanel form = new FormPanel(stream);
+				form.setFocusTraversalPolicyProvider(true);
 
-				} catch (SQLException e) {
-				    // TODO Auto-generated catch block
-				    JOptionPane.showMessageDialog(null,
-					    "Error SQL: " + e.getMessage(),
-					    "SQL Exception",
-					    JOptionPane.ERROR_MESSAGE);
-				    try {
-					dbs = DBSession.reconnect();
-				    } catch (DataException e1) {
-				    	logger.error(e.getMessage(), e);
-				    }
+				listPanel.add(form);
+
+				dbs = DBSession.getCurrentSession();
+
+				if (dbs.tableExists(DBStructure.getSchema(), DBStructure.getMapTable())
+						&& dbs.tableExists(DBStructure.getSchema(), DBStructure.getOverviewTable())) {
+
+					String[] maps = MapDAO.getInstance().getMaps();
+
+					// layerList = form.getList("layerList");
+					mapList = form.getList("mapList");
+					mapList.setListData(maps);
+
+					layerTextArea = (JTextArea) form.getComponentByName("layerTextArea");
+					layerTextArea.setEditable(false);
+
+					JLabel mapLabel = form.getLabel("mapLabel");
+					JLabel layerLabel = form.getLabel("layerLabel");
+
+					mapLabel.setText(_("map_load"));
+					layerLabel.setText(_("layer_load"));
+
+					mapList.addListSelectionListener(new ListSelectionListener() {
+
+						public void valueChanged(ListSelectionEvent arg0) {
+							int[] selected = mapList.getSelectedIndices();
+							callStateChanged();
+
+							if (selected.length == 1) {
+								String selectedValue = (String) mapList.getSelectedValues()[0];
+								String where = String.format("WHERE mapa = '%s'", selectedValue);
+								try {
+									layers = dbs.getTable(DBStructure.getMapTable(), DBStructure.getSchema(), where,
+											new String[] { "posicion" }, true);
+									String layerText = "";
+									for (int i = 0; i < layers.length; i++) {
+										layerText = layerText + layers[i][1] + "\n";
+									}
+
+									layerTextArea.setText(layerText);
+
+								} catch (SQLException e) {
+									// TODO Auto-generated catch block
+									JOptionPane.showMessageDialog(null, "Error SQL: " + e.getMessage(), "SQL Exception",
+											JOptionPane.ERROR_MESSAGE);
+									try {
+										dbs = DBSession.reconnect();
+									} catch (DataException e1) {
+										logger.error(e.getMessage(), e);
+									}
+								}
+
+							} else {
+								layerTextArea.setText("");
+							}
+
+						}
+
+					});
+				} else {
+					listPanel = new JPanel();
+					JLabel label = new JLabel(_("no_map_table_on_schema"));
+					listPanel.add(label);
 				}
 
-			    } else {
-				layerTextArea.setText("");
-			    }
-
+			} catch (SQLException e) {
+				try {
+					dbs = DBSession.reconnect();
+				} catch (DataException e1) {
+					logger.error(e1.getMessage(), e1);
+				}
+				logger.error(e.getMessage(), e);
+			} catch (FormException e) {
+				logger.error(e.getMessage(), e);
 			}
+		}
 
-		    });
+		return listPanel;
+	}
+
+	public String getWizardComponentName() {
+		return "load_map_wizard_component";
+	}
+
+	public String getMapName() {
+		return mapList.getSelectedValue().toString();
+	}
+
+	public void showComponent() {
+	}
+
+	public void finish() throws WizardException {
+		Object aux = properties.get(PROPERTY_VEW);
+		if (aux != null && aux instanceof IView) {
+			IView view = (IView) aux;
+			try {
+				ELLEMap map = MapDAO.getInstance().getMap(view, mapList.getSelectedValue().toString());
+				map.load(crsPanel.getCurProj());
+
+				if (view.getViewDocument().getName().equals(_("elle_view"))) {
+					view.getViewDocument().setName(mapList.getSelectedValue().toString());
+				}
+			} catch (Exception e) {
+				throw new WizardException(e);
+			}
 		} else {
-		    listPanel = new JPanel();
-		    JLabel label = new JLabel(_("no_map_table_on_schema"));
-		    listPanel.add(label);
+			throw new WizardException("Couldn't retrieve the view");
 		}
-
-
-	    } catch (SQLException e) {
-		try {
-		    dbs = DBSession.reconnect();
-		} catch (DataException e1) {
-			logger.error(e1.getMessage(), e1);
-		}
-		logger.error(e.getMessage(), e);
-	    } catch (FormException e) {
-	    	logger.error(e.getMessage(), e);
-	    }
 	}
 
-	return listPanel;
-    }
-
-    public String getWizardComponentName() {
-	return "load_map_wizard_component";
-    }
-
-    public String getMapName() {
-	return mapList.getSelectedValue().toString();
-    }
-
-    public void showComponent() {
-    }
-
-    public void finish() throws WizardException {
-	Object aux = properties.get(PROPERTY_VEW);
-	if (aux!=null && aux instanceof IView) {
-	    IView view = (IView) aux;
-	    try {
-		ELLEMap map = MapDAO.getInstance().getMap(view,
-			mapList.getSelectedValue().toString());
-		map.load(crsPanel.getCurProj());
-		
-		if (view.getViewDocument().getName().equals(_("elle_view"))) {
-			view.getViewDocument().setName(mapList.getSelectedValue().toString());
-		}
-	    } catch (Exception e) {
-		throw new WizardException(e);
-	    }
-	} else {
-	    throw new WizardException("Couldn't retrieve the view");
+	public void setProperties() {
+		properties.put(LoadMapWizardComponent.PROPERTY_MAP_NAME, (String) mapList.getSelectedValue());
 	}
-    }
-
-    public void setProperties() {
-	properties.put(LoadMapWizardComponent.PROPERTY_MAP_NAME,
-		(String) mapList.getSelectedValue());
-    }
 }

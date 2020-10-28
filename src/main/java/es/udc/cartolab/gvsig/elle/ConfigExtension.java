@@ -1,6 +1,6 @@
 package es.udc.cartolab.gvsig.elle;
 
-import org.gvsig.about.AboutManager; 
+import org.gvsig.about.AboutManager;
 import org.gvsig.andami.plugins.Extension;
 import org.gvsig.andami.preferences.IPreference;
 import org.gvsig.andami.preferences.IPreferenceExtension;
@@ -15,58 +15,56 @@ import es.udc.cartolab.gvsig.elle.utils.NoFilter;
 
 public class ConfigExtension extends Extension implements IPreferenceExtension {
 
-    public static EllePreferencesPage ellePreferencesPage = new EllePreferencesPage();
-    
-    private String wizardTitle = "ELLE";
-    private MapFilter mapFilter = new NoFilter();
+	public static EllePreferencesPage ellePreferencesPage = new EllePreferencesPage();
 
-    @Override
-    public void initialize() {
-    	ApplicationManager application = ApplicationLocator.getManager();
-    	AboutManager about = application.getAbout();
-    	about.addDeveloper("ELLE", getClass().getClassLoader().getResource("/about.htm"), 1);
-   
+	private String wizardTitle = "ELLE";
+	private MapFilter mapFilter = new NoFilter();
 
-	// carga la pesta�a en a�adir capa
-	AddLayer.addWizard(ElleWizard.class);
-    }
+	@Override
+	public void initialize() {
+		ApplicationManager application = ApplicationLocator.getManager();
+		AboutManager about = application.getAbout();
+		about.addDeveloper("ELLE", getClass().getClassLoader().getResource("/about.htm"), 1);
 
-    @Override
-    public void execute(String actionCommand) {
-	throw new AssertionError("This extension should not be 'executed'");
-    }
+		// carga la pesta�a en a�adir capa
+		AddLayer.addWizard(ElleWizard.class);
+	}
 
-    @Override
-    public boolean isEnabled() {
-	return false;
-    }
+	@Override
+	public void execute(String actionCommand) {
+		throw new AssertionError("This extension should not be 'executed'");
+	}
 
-    @Override
-    public boolean isVisible() {
-	return false;
-    }
-    
-    public IPreference[] getPreferencesPages() {
-	IPreference[] preferences = new IPreference[1];
-	preferences[0] = ellePreferencesPage;
-	return preferences;
-    }
+	@Override
+	public boolean isEnabled() {
+		return false;
+	}
 
-    public String getWizardTitle() {
-	return this.wizardTitle;
-    }
-    
-    public void setWizardTitle (String wizardTitle) {
-	this.wizardTitle = wizardTitle;
-    }
-    
-    public MapFilter getMapFilter() {
-	return this.mapFilter;
-    }
-    
-    public void setMapFilter(MapFilter mapFilter) {
-	this.mapFilter = mapFilter;
-    }
-    
+	@Override
+	public boolean isVisible() {
+		return false;
+	}
+
+	public IPreference[] getPreferencesPages() {
+		IPreference[] preferences = new IPreference[1];
+		preferences[0] = ellePreferencesPage;
+		return preferences;
+	}
+
+	public String getWizardTitle() {
+		return this.wizardTitle;
+	}
+
+	public void setWizardTitle(String wizardTitle) {
+		this.wizardTitle = wizardTitle;
+	}
+
+	public MapFilter getMapFilter() {
+		return this.mapFilter;
+	}
+
+	public void setMapFilter(MapFilter mapFilter) {
+		this.mapFilter = mapFilter;
+	}
 
 }

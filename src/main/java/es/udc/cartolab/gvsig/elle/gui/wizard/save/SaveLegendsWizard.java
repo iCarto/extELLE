@@ -21,7 +21,6 @@ import static es.icarto.gvsig.commons.i18n.I18n._;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gvsig.andami.PluginServices;
 import org.gvsig.andami.ui.mdiManager.WindowInfo;
 import org.gvsig.app.project.documents.view.gui.IView;
 import org.gvsig.fmap.mapcontext.layers.FLayer;
@@ -33,96 +32,94 @@ import es.udc.cartolab.gvsig.elle.gui.wizard.WizardWindow;
 
 public class SaveLegendsWizard extends WizardWindow {
 
-    public final static String PROPERTY_VIEW = "view";
+	public final static String PROPERTY_VIEW = "view";
 
-    public final static int ACTIVES = 0;
-    public final static int VISIBLES = 1;
-    public final static int ALL = 2;
+	public final static int ACTIVES = 0;
+	public final static int VISIBLES = 1;
+	public final static int ALL = 2;
 
-    private WindowInfo viewInfo;
-    private int layersOption;
-    private final int width = 750;
-    private final int height = 500;
+	private WindowInfo viewInfo;
+	private int layersOption;
+	private final int width = 750;
+	private final int height = 500;
 
-    public SaveLegendsWizard(IView view, int layersOption) {
-	properties.put(SaveMapWizard.PROPERTY_VIEW, view);
+	public SaveLegendsWizard(IView view, int layersOption) {
+		properties.put(SaveMapWizard.PROPERTY_VIEW, view);
 
-	this.layersOption = layersOption;
-	setLayersProperties();
+		this.layersOption = layersOption;
+		setLayersProperties();
 
-    }
-
-    protected void addWizardComponents() {
-	views.add(new SaveLegendsWizardComponent(properties));
-    }
-
-    private void setLayersProperties() {
-	Object aux = properties.get(SaveMapWizard.PROPERTY_VIEW);
-	if (aux != null && aux instanceof IView) {
-	    FLayers layers = ((IView) aux).getMapControl().getMapContext().getLayers();
-	    List<LayerProperties> list = getList(layers);
-	    properties.put(SaveMapWizardComponent.PROPERTY_LAYERS_MAP, list);
 	}
-    }
 
-    private List<LayerProperties> getList(FLayers layers) {
-	List<LayerProperties> list = new ArrayList<LayerProperties>();
+	protected void addWizardComponents() {
+		views.add(new SaveLegendsWizardComponent(properties));
+	}
 
-	for (int i=layers.getLayersCount()-1; i>=0; i--) {
-	    FLayer layer = layers.getLayer(i);
-	    if (layer instanceof FLayers) {
-		list.addAll(getList((FLayers) layer));
-	    } else {
-		if (layer instanceof FLyrVect) {
-		    LayerProperties lp;
-		    try {
-			lp = new LayerProperties((FLyrVect) layer);
-
-			lp.setVisible(layer.isVisible());
-
-			switch (layersOption) {
-			case ACTIVES :
-			    lp.setSave(layer.isActive());
-			    break;
-			case VISIBLES :
-			    lp.setSave(layer.isVisible());
-			    break;
-			case ALL:
-			default:
-			    lp.setSave(true);
-			}
-
-			lp.setGroup(layer.getParentLayer().getName());
-			lp.setMaxScale(layer.getMaxScale());
-			lp.setMinScale(layer.getMinScale());
-			lp.setPosition(layers.getLayersCount()-i);
-
-			list.add(lp);
-		    } catch (WizardException e) {
-			// layer is not postgis, nothing to do
-		    }
+	private void setLayersProperties() {
+		Object aux = properties.get(SaveMapWizard.PROPERTY_VIEW);
+		if (aux != null && aux instanceof IView) {
+			FLayers layers = ((IView) aux).getMapControl().getMapContext().getLayers();
+			List<LayerProperties> list = getList(layers);
+			properties.put(SaveMapWizardComponent.PROPERTY_LAYERS_MAP, list);
 		}
-	    }
 	}
 
-	return list;
+	private List<LayerProperties> getList(FLayers layers) {
+		List<LayerProperties> list = new ArrayList<LayerProperties>();
 
-    }
+		for (int i = layers.getLayersCount() - 1; i >= 0; i--) {
+			FLayer layer = layers.getLayer(i);
+			if (layer instanceof FLayers) {
+				list.addAll(getList((FLayers) layer));
+			} else {
+				if (layer instanceof FLyrVect) {
+					LayerProperties lp;
+					try {
+						lp = new LayerProperties((FLyrVect) layer);
 
+						lp.setVisible(layer.isVisible());
 
-    public WindowInfo getWindowInfo() {
-	if (viewInfo == null) {
-	    viewInfo = new WindowInfo(WindowInfo.MODALDIALOG | WindowInfo.RESIZABLE);
-	    viewInfo.setTitle(_("Save_legends"));
-	    viewInfo.setWidth(width);
-	    viewInfo.setHeight(height);
+						switch (layersOption) {
+						case ACTIVES:
+							lp.setSave(layer.isActive());
+							break;
+						case VISIBLES:
+							lp.setSave(layer.isVisible());
+							break;
+						case ALL:
+						default:
+							lp.setSave(true);
+						}
+
+						lp.setGroup(layer.getParentLayer().getName());
+						lp.setMaxScale(layer.getMaxScale());
+						lp.setMinScale(layer.getMinScale());
+						lp.setPosition(layers.getLayersCount() - i);
+
+						list.add(lp);
+					} catch (WizardException e) {
+						// layer is not postgis, nothing to do
+					}
+				}
+			}
+		}
+
+		return list;
+
 	}
-	return viewInfo;
-    }
 
+	public WindowInfo getWindowInfo() {
+		if (viewInfo == null) {
+			viewInfo = new WindowInfo(WindowInfo.MODALDIALOG | WindowInfo.RESIZABLE);
+			viewInfo.setTitle(_("Save_legends"));
+			viewInfo.setWidth(width);
+			viewInfo.setHeight(height);
+		}
+		return viewInfo;
+	}
 
-    public Object getWindowProfile() {
-	return WindowInfo.DIALOG_PROFILE;
-    }
+	public Object getWindowProfile() {
+		return WindowInfo.DIALOG_PROFILE;
+	}
 
 }
